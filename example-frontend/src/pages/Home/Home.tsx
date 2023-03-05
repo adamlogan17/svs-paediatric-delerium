@@ -1,4 +1,5 @@
 import logo from '../../assets/images/logo.svg';
+import ConsumeAPI from '../../components/ConsumeAPI/ConsumeAPI';
 import './Home.css';
 import { Link } from 'react-router-dom';
 
@@ -21,6 +22,10 @@ function Home() {
         >
           Learn React
         </a>
+
+        <p>
+          <ConsumeAPI />
+        </p>
       </div>
   );
 }

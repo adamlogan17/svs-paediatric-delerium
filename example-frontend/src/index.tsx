@@ -8,7 +8,6 @@ import Home from './pages/Home/Home'; // example component being added
 import OtherPage from './pages/OtherPage/OtherPage'; // to demonstrate routing
 import NoPage from './pages/NoPage/NoPage'; // to demonstrate routing
 
-
 const root = ReactDOM.createRoot(
   document.getElementById('root') as HTMLElement
 );

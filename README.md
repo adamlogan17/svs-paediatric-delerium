@@ -1,5 +1,7 @@
 - [svs-paediatric-delerium](#svs-paediatric-delerium)
   - [How to start the project](#how-to-start-the-project)
+    - [Frontend](#frontend)
+    - [Backend](#backend)
   - [Useful links](#useful-links)
     - [Setting up project](#setting-up-project)
     - [REST APIs](#rest-apis)
@@ -8,8 +10,16 @@
 
 # svs-paediatric-delerium 
 ## How to start the project
+### Frontend 
 * ```cd example-frontend```
 * ```npm run start```
+
+Before the first time you run the program you need to use the command ```npm install```
+### Backend
+* ```cd APIs\example-api```
+* ```npm run start:dev```
+
+Before the first time you run the program you need to use the command ```npm install```
 ## Useful links
 ### Setting up project
 * https://khalilstemmler.com/blogs/typescript/node-starter-project/

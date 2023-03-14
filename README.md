@@ -8,6 +8,7 @@
     - [Docker](#docker)
     - [D3.js](#d3js)
   - [How to use server](#how-to-use-server)
+  - [Useful vscode extension ids](#useful-vscode-extension-ids)
 
 # svs-paediatric-delerium 
 ## How to start the project
@@ -38,3 +39,15 @@ Before the first time you run the program you need to use the command ```npm ins
 * https://www.pluralsight.com/guides/using-d3.js-inside-a-react-app
 ## How to use server
 "See the message from IT admin. EEECS students can login to my server (143.117.69.4) machine in ECIT using their existing EEECS accounts. When they login the format at the login screen is studentnumber@eeecs.qub.ac.uk - they use the password they use when they login to the machines in the CSB or the Ashby.  We can't give access to the ECIT VPN to undergrad students. So students will need to access this machine from the campus."
+## Useful vscode extension ids
+formulahendry.auto-rename-tag
+ms-azuretools.vscode-docker
+dsznajder.es7-react-js-snippets
+dbaeumer.vscode-eslint
+eamodio.gitlens
+ecmel.vscode-html-css
+ms-vscode.vscode-typescript-next
+Orta.vscode-jest
+yzhang.markdown-all-in-one
+waderyan.nodejs-extension-pack
+christian-kohler.path-intellisense

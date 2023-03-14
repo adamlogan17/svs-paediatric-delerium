@@ -50,4 +50,5 @@ Before the first time you run the program you need to use the command ```npm ins
 * Orta.vscode-jest
 * yzhang.markdown-all-in-one
 * waderyan.nodejs-extension-pack
-* christian-kohler.path-intellisense*
+* christian-kohler.path-intellisense
+* rangav.vscode-thunder-client

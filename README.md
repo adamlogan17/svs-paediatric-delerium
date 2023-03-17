@@ -35,6 +35,7 @@ Before the first time you run the program you need to use the command ```npm ins
 * https://www.youtube.com/watch?v=gAkwW2tuIqE
 * https://wkrzywiec.medium.com/how-to-run-database-backend-and-frontend-in-a-single-click-with-docker-compose-4bcda66f6de
 * https://saasbase.dev/blog/dockerfile-for-react-and-typescript
+* https://rsbh.dev/blogs/rest-api-express-typescript-docker
 ### D3.js
 * https://www.pluralsight.com/guides/using-d3.js-inside-a-react-app
 ## How to use server

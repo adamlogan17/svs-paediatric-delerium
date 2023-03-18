@@ -23,6 +23,9 @@ function Home() {
           Learn React
         </a>
 
+
+        <h1>Hello</h1>
+
         <p>
           <ConsumeAPI />
         </p>

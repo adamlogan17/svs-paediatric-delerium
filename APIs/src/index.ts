@@ -11,7 +11,7 @@ app.use(morgan("tiny"));
 // create api
 app.get("/:val", (req: any,res: any)=>{
     res.send({
-        hello:"world!",
+        hello:"world",
         val: req.params.val
     });
 });

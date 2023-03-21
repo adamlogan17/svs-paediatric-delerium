@@ -24,7 +24,7 @@ function Home() {
         </a>
 
 
-        <h1>Hello</h1>
+        <h1>Silicon Valley Samurais</h1>
 
         <p>
           <ConsumeAPI />

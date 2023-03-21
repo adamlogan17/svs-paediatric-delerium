@@ -8,6 +8,7 @@
     - [Docker](#docker)
     - [D3.js](#d3js)
   - [How to use server](#how-to-use-server)
+    - [Connecting to postgres in nodejs](#connecting-to-postgres-in-nodejs)
   - [Useful vscode extension ids](#useful-vscode-extension-ids)
 
 # svs-paediatric-delerium 
@@ -40,6 +41,12 @@ Before the first time you run the program you need to use the command ```npm ins
 * https://www.pluralsight.com/guides/using-d3.js-inside-a-react-app
 ## How to use server
 "See the message from IT admin. EEECS students can login to my server (143.117.69.4) machine in ECIT using their existing EEECS accounts. When they login the format at the login screen is studentnumber@eeecs.qub.ac.uk - they use the password they use when they login to the machines in the CSB or the Ashby.  We can't give access to the ECIT VPN to undergrad students. So students will need to access this machine from the campus."
+### Connecting to postgres in nodejs
+* https://blog.logrocket.com/crud-rest-api-node-js-express-postgresql/#what-node-postgres
+* https://dev.to/chandrapantachhetri/docker-postgres-node-typescript-setup-47db
+* https://node-postgres.com/features/connecting
+* https://stackoverflow.com/questions/58254717/returning-the-result-of-a-node-postgres-query
+* https://stackoverflow.com/questions/61871242/how-to-call-result-out-side-the-pool-query-in-node-js
 ## Useful vscode extension ids
 * formulahendry.auto-rename-tag
 * ms-azuretools.vscode-docker

@@ -1,0 +1,21 @@
+import { Pool, Client } from "pg";
+
+const pool = new Pool({
+  host: "postgres",
+  user: "postgres",
+  database: "api",
+  password: "postgrespw",
+  port: 5432
+});
+
+const getUsers = (request: any, response: any) => {
+  pool.query('SELECT * FROM users ORDER BY id ASC', (error, results) => {
+    if (error) {
+      throw error
+    }
+    response.status(200).json(results.rows)
+  })
+}
+
+module.exports = {
+  getUsers}

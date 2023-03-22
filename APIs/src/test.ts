@@ -1,9 +1,9 @@
-import { Pool, Client } from "pg";
+import { Pool } from "pg";
 
 const pool = new Pool({
   host: "postgres",
   user: "postgres",
-  database: "api",
+  database: "test_database",
   password: "postgrespw",
   port: 5432
 });
@@ -17,5 +17,4 @@ const getUsers = (request: any, response: any) => {
   })
 }
 
-module.exports = {
-  getUsers}
+module.exports = {getUsers}

@@ -10,7 +10,15 @@ const port: number = 8000;
 // logs when the app 
 app.use(morgan("tiny"));
 
-
+/**
+ * Simple API that simply returns a value
+ */
+app.get("/test/:val", (req: any,res: any)=>{
+    res.send({
+        hello:"world",
+        val: req.params.val
+    });
+});
 
 app.get("/database", db.getUsers);
 

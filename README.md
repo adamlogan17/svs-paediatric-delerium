@@ -47,6 +47,7 @@ Before the first time you run the program you need to use the command ```npm ins
 * https://node-postgres.com/features/connecting
 * https://stackoverflow.com/questions/58254717/returning-the-result-of-a-node-postgres-query
 * https://stackoverflow.com/questions/61871242/how-to-call-result-out-side-the-pool-query-in-node-js
+* https://levelup.gitconnected.com/creating-and-filling-a-postgres-db-with-docker-compose-e1607f6f882f
 ## Useful vscode extension ids
 * formulahendry.auto-rename-tag
 * ms-azuretools.vscode-docker

@@ -1,7 +1,6 @@
 import express from 'express';
 import morgan from "morgan";
-const db = require('./test')
-
+import {getAll} from './test';
 
 // Express Initialize
 const app = express();
@@ -20,7 +19,10 @@ app.get("/test/:val", (req: any,res: any)=>{
     });
 });
 
-app.get("/database", db.getUsers);
+/**
+ * Gets all data from a database
+ */
+app.get("/getall/:table", getAll);
 
 app.listen(port,()=> {
     console.log(`listen port ${port}`);

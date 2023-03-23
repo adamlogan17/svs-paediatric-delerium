@@ -1,4 +1,4 @@
-import express from 'express';
+import express, { Request, Response } from 'express';
 import morgan from "morgan";
 import {getAll} from './test';
 
@@ -6,13 +6,14 @@ import {getAll} from './test';
 const app = express();
 const port: number = 8000;
 
-// logs when the app 
+// logs when an API is called from the app
 app.use(morgan("tiny"));
 
 /**
- * Simple API that simply returns a value
+ * Simple API that returns a value
+ * @author Adam Logan
  */
-app.get("/test/:val", (req: any,res: any)=>{
+app.get("/test/:val", (req: Request,res: Response)=>{
     res.send({
         hello:"world",
         val: req.params.val
@@ -21,6 +22,7 @@ app.get("/test/:val", (req: any,res: any)=>{
 
 /**
  * Gets all data from a database
+ * @author Adam Logan
  */
 app.get("/getall/:table", getAll);
 

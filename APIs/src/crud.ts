@@ -77,7 +77,7 @@ function createInsert(table:string, columns:string[], data:string[], upsertCol?:
 export function getAll(request: Request, response: Response) {
   const table:string = request.params.table;
 
-  const pool = createPool("test_database", "test_user", "password");
+  const pool = createPool(request.params.database, "test_user", "password");
 
   pool.query(createSelect(table), (error, results) => {
     if (error) {
@@ -96,10 +96,9 @@ export function getAll(request: Request, response: Response) {
  * @param response Returns an object with the property 'allData' which contains an array of the returned rows as an object
  */
 export function insertData(request: Request, response: Response) {
-  const { table, columns, data } = request.body
-  let bd = request.body;
-
-  const pool = createPool("test_database", "test_user", "password");
+  const { table, columns, data } = request.body;
+  
+  const pool = createPool(request.params.database, "test_user", "password");
 
   pool.query(createInsert(table, columns, data), (error, results) => {
     if (error) {

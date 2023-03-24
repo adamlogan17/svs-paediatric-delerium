@@ -28,9 +28,13 @@ app.get("/test/:val", (req: Request,res: Response)=>{
  * Gets all data from a database
  * @author Adam Logan
  */
-app.get("/database/getall/:table", getAll);
+app.get("/:database/getall/:table", getAll);
 
-app.post("/database/insertdata", insertData)
+/**
+ * Inserts data to a database
+ * @author Adam Logan
+ */
+app.post("/:database/insertdata", insertData)
 
 app.listen(port,()=> {
     console.log(`listen port ${port}`);

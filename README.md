@@ -15,6 +15,8 @@
     - [D3.js](#d3js)
     - [Connecting to postgres in nodejs](#connecting-to-postgres-in-nodejs)
     - [SQL commands](#sql-commands)
+    - [Removing containers, volumes and images](#removing-containers-volumes-and-images)
+    - [Bash Scripting](#bash-scripting)
   - [Useful vscode extension ids](#useful-vscode-extension-ids)
 
 # svs-paediatric-delerium 
@@ -87,6 +89,11 @@ If you would like to change the setup of the database alter the ```.sql``` files
 * https://stackoverflow.com/questions/61871242/how-to-call-result-out-side-the-pool-query-in-node-js
 ### SQL commands
 * https://www.postgresqltutorial.com/postgresql-tutorial/postgresql-upsert/
+### Removing containers, volumes and images
+* https://www.digitalocean.com/community/tutorials/how-to-remove-docker-images-containers-and-volumes
+### Bash Scripting
+* http://www.freekb.net/Article?id=1140
+* https://stackoverflow.com/questions/27176781/bash-file-returns-unexpected-token-do-r
 ## Useful vscode extension ids
 * formulahendry.auto-rename-tag
 * ms-azuretools.vscode-docker

@@ -1,0 +1,7 @@
+CREATE ROLE test_user WITH LOGIN PASSWORD 'password';
+ALTER ROLE test_user SUPERUSER;
+ALTER ROLE test_user CREATEDB;
+
+GRANT SELECT, INSERT, UPDATE
+ON test_table
+TO test_user;

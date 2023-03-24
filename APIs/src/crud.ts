@@ -1,4 +1,4 @@
-import express, { Request, Response } from "express";
+import { Request, Response } from "express";
 import { Pool } from "pg";
 
 /**
@@ -10,6 +10,7 @@ import { Pool } from "pg";
  * @returns A pool object that allows queries to be ran on a database
  */
 function createPool(database:string, user="postgres", password="postgrespw") : Pool {
+  console.log("password");
   return new Pool({
     host: "postgres",
     user: user,
@@ -51,7 +52,11 @@ function createInsert(table:string, columns:string[], data:string[], upsertCol?:
   let failedMssg:string = "FAILED";
   let query:string = "";
 
-  query = "INSERT INTO (" + data.concat() + ") VALUES (" + columns.concat()+ ")";
+  data = data.map((element) => {
+    return "'" + element + "'";
+  });
+
+  query = "INSERT INTO " + table + " (" + columns.concat() + ") VALUES (" + data.concat() + ")";
 
   query = columns.length !== data.length ? failedMssg : query;
 
@@ -72,14 +77,34 @@ function createInsert(table:string, columns:string[], data:string[], upsertCol?:
 export function getAll(request: Request, response: Response) {
   const table:string = request.params.table;
 
-  const pool = createPool("test_database");
+  const pool = createPool("test_database", "test_user", "password");
 
   pool.query(createSelect(table), (error, results) => {
     if (error) {
-      throw error
+      throw error;
     }
     response.send({
       allData: results.rows
-    })
-  })
+    });
+  });
+}
+
+/**
+ * Gets all the data from a specific table
+ * @author Adam Logan
+ * @param request Requires the body to be in the format {"table":"table_name", "columns":["col1","col2"], "data":["data1","data2"]}
+ * @param response Returns an object with the property 'allData' which contains an array of the returned rows as an object
+ */
+export function insertData(request: Request, response: Response) {
+  const { table, columns, data } = request.body
+  let bd = request.body;
+
+  const pool = createPool("test_database", "test_user", "password");
+
+  pool.query(createInsert(table, columns, data), (error, results) => {
+    if (error) {
+      throw error;
+    }
+    response.send("Successfully Inserted the Data 😊");
+  });
 }

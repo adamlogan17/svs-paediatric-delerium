@@ -1,8 +1,5 @@
 echo "Executing Start Up Script"
 
-echo "Creating Roles"
-psql -f "sql/create-roles.sql"
-
 # the array of the databases to create
 dbs=(test_database audit elearning)
 

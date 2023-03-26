@@ -5,6 +5,7 @@
     - [Running Without Docker](#running-without-docker)
       - [**Frontend**](#frontend)
       - [**Backend**](#backend)
+    - [**Typescript File**](#typescript-file)
   - [Initialising DB](#initialising-db)
   - [How to use server](#how-to-use-server)
   - [Useful links](#useful-links)
@@ -48,6 +49,10 @@ Before the first time you run the program you need to use the command ```npm ins
 ```
 cd APIs\example-api
 npm run start:dev
+```
+### **Typescript File**
+```
+npx ts-node src/file.ts
 ```
 
 Before the first time you run the program you need to use the command ```npm install```

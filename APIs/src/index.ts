@@ -1,7 +1,7 @@
 import express, { Request, Response } from 'express';
 import morgan from "morgan";
 import bp from 'body-parser';
-import {getAll, insertData} from './crud';
+import {getAll, insertData, updateData} from './crud';
 
 // Express Initialize
 const app = express();
@@ -35,6 +35,12 @@ app.get("/:database/getall/:table", getAll);
  * @author Adam Logan
  */
 app.post("/:database/insertdata", insertData)
+
+/**
+ * Updates data in the database
+ * @author Adam Logan
+ */
+app.put("/:database/updatedata", updateData)
 
 app.listen(port,()=> {
     console.log(`listen port ${port}`);

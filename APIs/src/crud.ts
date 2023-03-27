@@ -98,6 +98,22 @@ function createUpdate(table:string, columns:string[], data:string[], predicate:s
 }
 
 /**
+ * Creates a simple delete SQL statement
+ * @author Adam Logan
+ * @date 2023-03-27
+ * @param { string } table The table to delete the data from
+ * @param { string } predicate The condition to delete the data for
+ * @returns { string } The delete SQL statement
+ */
+function createDelete(table: string, predicate?:string) : string {
+  let query:string = "DELETE FROM " + table;
+
+  query = predicate !== undefined ? query + " WHERE " + predicate : query;
+
+  return query;
+}
+
+/**
  * Gets all the data from a specific table
  * @author Adam Logan
  * @date 2023-03-23
@@ -121,7 +137,7 @@ export function getAll(request: Request, response: Response): void {
 }
 
 /**
- * Gets all the data from a specific table
+ * Inserts data into the database
  * @author Adam Logan
  * @date 2023-03-24
  * @param { Request } request Requires the body to be in the format {"table":"table_name", "columns":["col1","col2"], "data":["data1","data2"]}
@@ -142,7 +158,7 @@ export function insertData(request: Request, response: Response): void {
 }
 
 /**
- * desc
+ * Updates a specific piece of data
  * @author Adam Logan
  * @date 2023-03-26
  * @param { Request } request Requires the body to be in the format {"table":"table_name", "columns":["col1","col2"], "data":["data1","data2"], "predicate":"condition"}
@@ -154,12 +170,34 @@ export function updateData(request: Request, response: Response): void {
   
   const POOL = createPool(request.params.database, "test_user", "password");
 
-  console.log(createUpdate(table, columns, data, predicate));
-
   POOL.query(createUpdate(table, columns, data, predicate), (error, results) => {
     if (error) {
       throw error;
     }
     response.send("Successfully Updated the Data 😊");
+  });
+}
+
+/**
+ * Deletes a specific piece of data
+ * @author Adam Logan
+ * @date 2023-03-27
+ * @param { Request } request Requires the parameter 'table' and 'predicate' which is the condition that will delete data if it is true
+ * @param { Response } response Returns a message if the data has been successfully deleted
+ * @returns { void }
+ */
+export function deleteData(request: Request, response: Response): void {
+  const TABLE:string = request.params.table;
+  const PREDICATE:string = request.params.predicate;
+  
+  const POOL = createPool(request.params.database, "postgres", "postgrespw");
+
+  console.log(createDelete(TABLE, PREDICATE));
+
+  POOL.query(createDelete(TABLE, PREDICATE), (error, results) => {
+    if (error) {
+      throw error;
+    }
+    response.send("Successfully Deleted the Data 😊");
   });
 }

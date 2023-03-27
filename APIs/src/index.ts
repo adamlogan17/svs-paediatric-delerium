@@ -1,7 +1,7 @@
 import express, { Request, Response } from 'express';
 import morgan from "morgan";
 import bp from 'body-parser';
-import {getAll, insertData, updateData} from './crud';
+import {deleteData, getAll, insertData, updateData} from './crud';
 
 // Express Initialize
 const app = express();
@@ -34,13 +34,20 @@ app.get("/:database/getall/:table", getAll);
  * Inserts data to a database
  * @author Adam Logan
  */
-app.post("/:database/insertdata", insertData)
+app.post("/:database/insertdata", insertData);
 
 /**
  * Updates data in the database
  * @author Adam Logan
  */
-app.put("/:database/updatedata", updateData)
+app.put("/:database/updatedata", updateData);
+
+/**
+ * Deletes the data in the database
+ * @author Adam Logan
+ */
+app.delete("/:database/deletedata/:table/:predicate", deleteData);
+
 
 app.listen(port,()=> {
     console.log(`listen port ${port}`);

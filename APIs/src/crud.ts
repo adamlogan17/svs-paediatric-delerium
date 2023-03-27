@@ -6,8 +6,8 @@ import { Pool } from "pg";
  * @author Adam Logan
  * @date 2023-03-26
  * @param { string } database The name of the database to connect to
- * @param { string } user The username of the user to be used
- * @param { string } password The password associated with the username
+ * @param { string } [user="postgres"] The username of the user to be used
+ * @param { string } [password="postgrespw"] The password associated with the username
  * @returns { Pool } A pool object that allows queries to be ran on a database
  */
 function createPool(database:string, user:string="postgres", password:string="postgrespw") : Pool {
@@ -26,8 +26,8 @@ function createPool(database:string, user:string="postgres", password:string="po
  * @author Adam Logan
  * @date 2023-03-23
  * @param { string } table The table the data is to be selected from
- * @param { string } condition A condition to filter the data upon
- * @param { string[] } data The columns to be selected
+ * @param { string } [condition] A condition to filter the data upon
+ * @param { string[] } [data] The columns to be selected
  * @returns { string } A query that will return the required results
  */
 function createSelect(table:string, condition?:string, data?:string[]) : string {
@@ -49,7 +49,7 @@ function createSelect(table:string, condition?:string, data?:string[]) : string 
  * @param { string } table The table where the data is required to be inserted
  * @param { string[] } columns The column names that are being inserted
  * @param { string[] } data The data to be inserted, must match the length of the 'columns' parameter
- * @param { string } upsertCol If a row exists with the same data, the existing row will be updated with the new data
+ * @param { string } [upsertCol] If a row exists with the same data, the existing row will be updated with the new data
  * @returns { string } A query that inserts data into a table
  * TODO Need to implement the UPSERT functionality
  */
@@ -102,7 +102,7 @@ function createUpdate(table:string, columns:string[], data:string[], predicate:s
  * @author Adam Logan
  * @date 2023-03-27
  * @param { string } table The table to delete the data from
- * @param { string } predicate The condition to delete the data for
+* @param { string } [predicate] The condition to delete the data for
  * @returns { string } The delete SQL statement
  */
 function createDelete(table: string, predicate?:string) : string {

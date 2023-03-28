@@ -14,10 +14,10 @@ services:
       - "8000:8000"
   frontend:
     build: 
-      context: ./example-frontend
+      context: ./Audit
       dockerfile: Dockerfile
     volumes:
-      - ./example-frontend/src:/app/src
+      - ./Audit/src:/app/src
     ports:
       - "3000:3000"
   postgres:

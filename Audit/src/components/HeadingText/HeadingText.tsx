@@ -1,9 +1,9 @@
 
 function HeadingText(props:{text:string}) {
     return (
-        <>
-            <h2>{props.text}</h2>
-        </>
+        <h2>
+            <u>{props.text}</u>
+        </h2>
     )
 };
 

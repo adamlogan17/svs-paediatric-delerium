@@ -1,9 +1,8 @@
-
 function BodyText(props:{text:string}) {
     return (
-        <>
-            <p>{props.text}</p>
-        </>
+        <p>
+            <b>{props.text}</b>
+        </p>
     )
 };
 

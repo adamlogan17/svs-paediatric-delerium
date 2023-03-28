@@ -18,6 +18,7 @@
     - [SQL commands](#sql-commands)
     - [Removing containers, volumes and images](#removing-containers-volumes-and-images)
     - [Bash Scripting](#bash-scripting)
+    - [React Components](#react-components)
   - [Useful vscode extension ids](#useful-vscode-extension-ids)
 
 # svs-paediatric-delerium
@@ -139,6 +140,12 @@ If you would like to change the setup of the database alter the ```.sql``` files
 - <http://www.freekb.net/Article?id=1140>
 - <https://stackoverflow.com/questions/27176781/bash-file-returns-unexpected-token-do-r>
 
+### React Components
+
+- <https://react-bootstrap.github.io/components/navbar/>
+- <https://blog.logrocket.com/using-bootstrap-with-react-tutorial-with-examples/>
+- <https://stackoverflow.com/questions/32229910/react-bootstrap-contains-no-css>
+
 ## Useful vscode extension ids
 
 - formulahendry.auto-rename-tag
@@ -157,3 +164,4 @@ If you would like to change the setup of the database alter the ```.sql``` files
 - vitaliymaz.vscode-svg-previewer
 - DavidAnson.vscode-markdownlint
 - winkchen.parser-jsdoc
+- esbenp.prettier-vscode

@@ -2,12 +2,12 @@ import Container from 'react-bootstrap/Container';
 import Nav from 'react-bootstrap/Nav';
 import Navbar from 'react-bootstrap/Navbar';
 // import NavDropdown from 'react-bootstrap/NavDropdown';
-import PDLongLogo from '../../assets/images/Paediatric Delirium Long Logo.png';
+import PDLongLogo from '../../assets/images/transparent-PD-long-logo.png';
 
 function BasicNavBar() {
   return (
     <Navbar bg="light" expand="lg">
-       <Container>
+      <Container>
         <Navbar.Brand href="#home">
             <img src={PDLongLogo}  
             alt="logo"
@@ -18,11 +18,11 @@ function BasicNavBar() {
         <Navbar.Toggle aria-controls="basic-navbar-nav" />
         <Navbar.Collapse id="basic-navbar-nav">
           <Nav className="me-auto">
-            <Nav.Link href="#home">Home</Nav.Link>
             <Nav.Link href="#home">Background</Nav.Link>
             <Nav.Link href="#home">Team</Nav.Link>
             <Nav.Link href="#home">How to use the Audit System</Nav.Link>
             <Nav.Link href="#home">Contact us</Nav.Link>
+            <Nav.Link href="#home">Home</Nav.Link>
             {/* <NavDropdown title="Dropdown" id="basic-nav-dropdown">
               <NavDropdown.Item href="#action/3.1">Action</NavDropdown.Item>
               <NavDropdown.Item href="#action/3.2">

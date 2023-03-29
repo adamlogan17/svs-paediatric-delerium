@@ -19,6 +19,7 @@
     - [Removing containers, volumes and images](#removing-containers-volumes-and-images)
     - [Bash Scripting](#bash-scripting)
     - [React Components](#react-components)
+    - [Bootstrap](#bootstrap)
   - [Useful vscode extension ids](#useful-vscode-extension-ids)
 
 # svs-paediatric-delerium
@@ -145,6 +146,10 @@ If you would like to change the setup of the database alter the ```.sql``` files
 - <https://react-bootstrap.github.io/components/navbar/>
 - <https://blog.logrocket.com/using-bootstrap-with-react-tutorial-with-examples/>
 - <https://stackoverflow.com/questions/32229910/react-bootstrap-contains-no-css>
+
+### Bootstrap
+
+- <https://mdbootstrap.com/docs/standard/extended/colors-code/>
 
 ## Useful vscode extension ids
 

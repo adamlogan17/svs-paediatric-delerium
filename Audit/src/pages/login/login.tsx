@@ -16,7 +16,7 @@ function Login() {
 
                 <form action="" method="get">
                     <div className="data-input">
-                        <TypeDropDown />
+                        <TypeDropDown text="Site Number" primaryColour='#025858' secondaryColour='#013e3e' options={["hello", "world"]}/>
                         <br />
 
                         <label htmlFor="password">Password:</label>

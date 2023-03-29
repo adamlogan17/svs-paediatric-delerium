@@ -150,6 +150,7 @@ If you would like to change the setup of the database alter the ```.sql``` files
 ### Bootstrap
 
 - <https://mdbootstrap.com/docs/standard/extended/colors-code/>
+- <https://react-bootstrap.github.io/components/dropdowns/>
 
 ## Useful vscode extension ids
 

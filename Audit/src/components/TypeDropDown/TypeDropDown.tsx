@@ -1,9 +1,10 @@
-import React, { ForwardedRef } from 'react';
+import React from 'react';
 import { useState } from 'react';
 import Dropdown from 'react-bootstrap/Dropdown';
 import Form from 'react-bootstrap/Form';
+import useHover from '../../hooks/useAPI/useHover';
 
-const filter:ForwardedRef<Dropdown> = React.forwardRef((props:{ children:any, style:any, className:any }) => {
+const Filter = React.forwardRef((props:{ children:any, style:any, className:any }, ref) => {
     const [value, setValue] = useState('');
     
     return (
@@ -26,20 +27,31 @@ const filter:ForwardedRef<Dropdown> = React.forwardRef((props:{ children:any, st
     );
 },);
 
-function TypeDropDown() {
-  return (
-    <Dropdown>
-      <Dropdown.Toggle>
-        Pick Site Number
-      </Dropdown.Toggle>
+function TypeDropDown(props:{text:string, options:string[], onButtonClick?:any, primaryColour?:string, secondaryColour?:string, textColor?:string}) {
+    const checkHover = useHover();
 
-      <Dropdown.Menu as={filter}>
-        <Dropdown.Item href="#/action-1">Action</Dropdown.Item>
-        <Dropdown.Item href="#/action-2">Another action</Dropdown.Item>
-        <Dropdown.Item href="#/action-3">Something else</Dropdown.Item>
-      </Dropdown.Menu>
-    </Dropdown>
-  );
+    const primColour:string = props.primaryColour === undefined ? "#025858" : props.primaryColour;
+    const secColour:string = props.secondaryColour === undefined ? "#007e7e" : props.secondaryColour;
+    
+    const bgColours:any = {
+        backgroundColor: checkHover.hoverVar ? secColour : primColour,
+        borderColor: primColour,
+        color: props.textColor
+    };
+
+    return (
+        <Dropdown>
+            <Dropdown.Toggle style={bgColours} onMouseEnter={checkHover.mouseEnter} onMouseLeave={checkHover.mosueLeave}>
+                {props.text + ' '}
+            </Dropdown.Toggle>
+
+            <Dropdown.Menu as={Filter}>
+                {props.options.map((option) => (
+                    <Dropdown.Item href="#/action-1">{option}</Dropdown.Item>
+                ))}
+            </Dropdown.Menu>
+        </Dropdown>
+    );
 }
 
 export default TypeDropDown;

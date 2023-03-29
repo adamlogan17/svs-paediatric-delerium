@@ -1,7 +1,7 @@
 import Button from 'react-bootstrap/Button';
 import { useState } from 'react';
 
-function PButton(props:{text:string, onButtonClick?:any, primaryColour?:string, secondaryColour?:string}) {
+function PButton(props:{text:string, onButtonClick?:any, primaryColour?:string, secondaryColour?:string, textColor?:string}) {
   const [isHover, setIsHover] = useState(false);
 
   function handleMouseEnter() {
@@ -17,7 +17,8 @@ function PButton(props:{text:string, onButtonClick?:any, primaryColour?:string, 
   
   const newStyle:any = {
     backgroundColor: isHover ? secColour : primColour,
-    borderColor: primColour
+    borderColor: primColour,
+    color: props.textColor
   };
 
   return (

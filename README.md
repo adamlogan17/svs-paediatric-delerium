@@ -131,6 +131,9 @@ If you would like to change the setup of the database alter the ```.sql``` files
 ### SQL commands
 
 - <https://www.postgresqltutorial.com/postgresql-tutorial/postgresql-upsert/>
+- <https://www.postgresqltutorial.com/postgresql-tutorial/postgresql-foreign-key/>
+- <https://www.postgresqltutorial.com/postgresql-triggers/#:~:text=A%20PostgreSQL%20trigger%20is%20a,%2C%20update%2C%20or%20delete%20occurs.>
+- 
 
 ### Removing containers, volumes and images
 

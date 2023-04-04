@@ -27,3 +27,15 @@ INSERT INTO picu (ward_name, hospital_name, auditor, password)
         ('Nassau','Bahamas','Philip Davis', 'pass1');
 
 -- Initial 'compliance_data'
+INSERT INTO compliance_data (entry_date, method, bed_number, correct_details, 
+    comfort_recorded, comfort_above, all_params_scored, totalled_correctly, 
+    in_score_range, observer_name, picu_id)
+    VALUES
+        (now(), 'SOSPD', 1, TRUE, TRUE, TRUE, TRUE, TRUE, TRUE, TRUE, 2),
+        (now(), 'SOSPD', 1, FALSE, TRUE, TRUE, TRUE, TRUE, TRUE, TRUE, 2);
+
+INSERT INTO compliance_data (entry_date, method, bed_number, correct_details, 
+    comfort_recorded, comfort_above, all_params_scored, totalled_correctly, 
+    in_score_range, observer_name, picu_id)
+    VALUES
+        (now(), 'SOSPD', 1, FALSE, TRUE, TRUE, TRUE, TRUE, TRUE, TRUE, 2);

@@ -12,7 +12,7 @@ CREATE TABLE IF NOT EXISTS picu (
 
 CREATE TABLE IF NOT EXISTS compliance_data (
   comp_id SERIAL PRIMARY KEY,
-  entry_dat DATE NOT NULL,
+  entry_date DATE NOT NULL,
   method VARCHAR(5) 
     CHECK(method IN ('SOSPD', 'CAPD')),
   bed_number INTEGER NOT NULL,

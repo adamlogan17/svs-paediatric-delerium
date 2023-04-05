@@ -30,7 +30,7 @@ function createPool(database:string, user:string="postgres", password:string="po
  * @param { string[] } [data] The columns to be selected
  * @returns { string } A query that will return the required results
  */
-function createSelect(table:string, condition?:string, data?:string[]) : string {
+export function createSelect(table:string, condition?:string, data?:string[]) : string {
   let query:string = "SELECT ";
 
   query += data == undefined ? "*" : query += data.concat();

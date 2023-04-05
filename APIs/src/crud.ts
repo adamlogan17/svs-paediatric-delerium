@@ -105,7 +105,7 @@ export function createUpdate(table:string, columns:string[], data:string[], pred
 * @param { string } [predicate] The condition to delete the data for
  * @returns { string } The delete SQL statement
  */
-function createDelete(table: string, predicate?:string) : string {
+export function createDelete(table: string, predicate?:string) : string {
   let query:string = "DELETE FROM " + table;
 
   query = predicate !== undefined ? query + " WHERE " + predicate : query;

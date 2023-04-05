@@ -1,5 +1,5 @@
 import {describe, expect, test} from '@jest/globals';
-import { createSelect, createInsert, createUpdate } from '../src/crud';
+import { createSelect, createInsert, createUpdate, createDelete} from '../src/crud';
 
 describe('createSelect', () => {
   it('returns a SELECT query for a given table', () => {
@@ -85,5 +85,26 @@ describe('createUpdate function', () => {
     const result = createUpdate(table, columns, data, predicate);
 
     expect(result).toEqual('FAILED');
+  });
+});
+
+describe('createDelete', () => {
+  it('should generate a delete query without a predicate', () => {
+    const table = 'users';
+    const expectedQuery = 'DELETE FROM users';
+
+    const actualQuery = createDelete(table);
+
+    expect(actualQuery).toEqual(expectedQuery);
+  });
+
+  it('should generate a delete query with a predicate', () => {
+    const table = 'users';
+    const predicate = 'id = 123';
+    const expectedQuery = 'DELETE FROM users WHERE id = 123';
+
+    const actualQuery = createDelete(table, predicate);
+
+    expect(actualQuery).toEqual(expectedQuery);
   });
 });

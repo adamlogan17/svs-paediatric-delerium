@@ -33,7 +33,7 @@ function createPool(database:string, user:string="postgres", password:string="po
 export function createSelect(table:string, condition?:string, data?:string[]) : string {
   let query:string = "SELECT ";
 
-  query += data == undefined ? "*" : query += data.concat();
+  query += data == undefined ? "*" : query += data.join();
 
   query += " FROM " + table;
 
@@ -53,7 +53,7 @@ export function createSelect(table:string, condition?:string, data?:string[]) : 
  * @returns { string } A query that inserts data into a table
  * TODO Need to implement the UPSERT functionality
  */
-function createInsert(table:string, columns:string[], data:string[], upsertCol?:string) : string {
+export function createInsert(table:string, columns:string[], data:string[], upsertCol?:string) : string {
   const FAILEDMSSG:string = "FAILED";
   let query:string = "";
 

@@ -33,5 +33,8 @@ INSERT INTO compliance_data (entry_date, method, bed_number, correct_details,
     VALUES
         (now(), 'SOSPD', 1, TRUE, TRUE, TRUE, TRUE, TRUE, TRUE, TRUE, 2),
         (now(), 'SOSPD', 1, FALSE, TRUE, TRUE, TRUE, TRUE, TRUE, TRUE, 2),
-        (now(), 'SOSPD', 1, FALSE, TRUE, TRUE, TRUE, TRUE, TRUE, TRUE, 2),
-        (now(), 'SOSPD', 1, FALSE, TRUE, TRUE, TRUE, TRUE, TRUE, TRUE, 1);
+        (now(), 'CAPD', 1, FALSE, TRUE, TRUE, TRUE, TRUE, TRUE, TRUE, 2),
+        (now(), 'SOSPD', 1, FALSE, TRUE, TRUE, TRUE, TRUE, TRUE, TRUE, 1),
+        (now(), 'SOSPD', 1, FALSE, TRUE, FALSE, TRUE, TRUE, TRUE, FALSE, 22),
+        (now(), 'SOSPD', 1, FALSE, TRUE, TRUE, FALSE, TRUE, FALSE, TRUE, 1),
+        (now(), 'SOSPD', 1, FALSE, FALSE, TRUE, FALSE, TRUE, FALSE, TRUE, 1);

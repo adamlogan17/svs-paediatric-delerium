@@ -5,6 +5,6 @@ describe('sum module', () => {
   test('adds 1 + 2 to equal 3', () => {
     
     expect(createSelect("tname")).toBe("SELECT * FROM tname;");
-    // this is a test
+    // this is a test dsadasd
   });
 });

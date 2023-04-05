@@ -83,7 +83,7 @@ export function createInsert(table:string, columns:string[], data:string[], upse
  * @param { string } predicate The condition to decide which rows to update
  * @returns { string } The update SQL statement
  */
-function createUpdate(table:string, columns:string[], data:string[], predicate:string) : string {
+export function createUpdate(table:string, columns:string[], data:string[], predicate:string) : string {
   const FAILEDMSSG:string = "FAILED";
   let query:string = ""
 

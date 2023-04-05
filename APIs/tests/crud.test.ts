@@ -1,5 +1,5 @@
 import {describe, expect, test} from '@jest/globals';
-import { createSelect, createInsert } from '../src/crud';
+import { createSelect, createInsert, createUpdate } from '../src/crud';
 
 describe('createSelect', () => {
   it('returns a SELECT query for a given table', () => {
@@ -60,5 +60,30 @@ describe('createInsert', () => {
     const query = createInsert(table, columns, data, upsertCol);
 
     expect(query).toBe("FAILED");
+  });
+});
+
+describe('createUpdate function', () => {
+  test('generates valid SQL query when given valid input', () => {
+    const table = 'users';
+    const columns = ['name', 'email'];
+    const data = ['John Doe', 'johndoe@example.com'];
+    const predicate = 'id = 1';
+    const expectedQuery = "UPDATE users SET name = 'John Doe',email = 'johndoe@example.com' WHERE id = 1;";
+
+    const result = createUpdate(table, columns, data, predicate);
+
+    expect(result).toEqual(expectedQuery);
+  });
+
+  test('returns "FAILED" message when columns and data have different lengths', () => {
+    const table = 'users';
+    const columns = ['name', 'email'];
+    const data = ['John Doe'];
+    const predicate = 'id = 1';
+
+    const result = createUpdate(table, columns, data, predicate);
+
+    expect(result).toEqual('FAILED');
   });
 });

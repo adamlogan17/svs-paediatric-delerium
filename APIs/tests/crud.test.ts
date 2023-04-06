@@ -1,8 +1,8 @@
 import {describe, expect, test} from '@jest/globals';
 import { createSelect, createInsert, createUpdate, createDelete} from '../src/crud';
 
-describe('createSelect', () => {
-  it('returns a SELECT query for a given table', () => {
+describe('testCreateSelect (Tests the select query on the database, database with default columns and database with default columns and no condition', () => {
+  it('returns a valid SELECT query for a given table', () => {
     const table = 'users';
     const condition = 'age > 18';
     const data = ['id', 'name'];
@@ -30,7 +30,7 @@ describe('createSelect', () => {
   });
 });
 
-describe('createInsert', () => {
+describe('testCreateInsert (tests insert query on database, an invalid insert query on database and if an upsert is on an invalid column', () => {
   it('returns a basic INSERT query for a given table and data', () => {
     const table = 'users';
     const columns = ['name', 'age'];
@@ -63,8 +63,8 @@ describe('createInsert', () => {
   });
 });
 
-describe('createUpdate function', () => {
-  test('generates valid SQL query when given valid input', () => {
+describe('testCreateUpdate (valid update statement and invalid update statement', () => {
+  it('generates valid SQL query when given valid input', () => {
     const table = 'users';
     const columns = ['name', 'email'];
     const data = ['John Doe', 'johndoe@example.com'];
@@ -75,8 +75,7 @@ describe('createUpdate function', () => {
 
     expect(result).toEqual(expectedQuery);
   });
-
-  test('returns "FAILED" message when columns and data have different lengths', () => {
+  it('returns "FAILED" message when columns and data have different lengths', () => {
     const table = 'users';
     const columns = ['name', 'email'];
     const data = ['John Doe'];
@@ -88,7 +87,7 @@ describe('createUpdate function', () => {
   });
 });
 
-describe('createDelete', () => {
+describe('testCreateDelete (valid delete query and one with a predicate)', () => {
   it('should generate a delete query without a predicate', () => {
     const table = 'users';
     const expectedQuery = 'DELETE FROM users';

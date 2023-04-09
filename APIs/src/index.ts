@@ -2,6 +2,7 @@ import express, { Request, Response } from 'express';
 import morgan from "morgan";
 import bp from 'body-parser';
 import {deleteData, getAll, insertData, updateData} from './crud';
+import { loginTest } from './login';
 
 // Express Initialize
 const app = express();
@@ -48,6 +49,7 @@ app.put("/:database/updatedata", updateData);
  */
 app.delete("/:database/deletedata/:table/:predicate", deleteData);
 
+app.get("/login", loginTest);
 
 app.listen(port,()=> {
     console.log(`listen port ${port}`);

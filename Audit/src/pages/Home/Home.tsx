@@ -3,11 +3,12 @@ import HeadingText from '../../components/HeadingText/HeadingText'
 import BodyText from '../../components/BodyText/BodyText'
 import PButton from '../../components/PButton/PButton'
 import ContactInfo from '../../components/ContactInfo/ContactInfo'
-import './Home.css';
+
+import '../../shared/layout.css';
 
 function Home() {
   return (
-        <div className='wrapper'>
+        <div id='home' className='wrapper'>
           
           <BasicNavBar />
           <div className = 'content'>

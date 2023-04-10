@@ -20,6 +20,7 @@
     - [Bash Scripting](#bash-scripting)
     - [React Components](#react-components)
     - [Bootstrap](#bootstrap)
+    - [Login](#login)
   - [Useful vscode extension ids](#useful-vscode-extension-ids)
 
 # svs-paediatric-delerium
@@ -155,6 +156,11 @@ If you would like to change the setup of the database alter the ```.sql``` files
 - <https://mdbootstrap.com/docs/standard/extended/colors-code/>
 - <https://react-bootstrap.github.io/components/dropdowns/>
 
+### Login
+
+- <https://www.freecodecamp.org/news/how-to-build-a-fullstack-authentication-system-with-react-express-mongodb-heroku-and-netlify/#how-to-create-the-login-endpoint>
+- <https://dev.to/juliecherner/authentication-with-jwt-tokens-in-typescript-with-express-3gb1>
+
 ## Useful vscode extension ids
 
 - formulahendry.auto-rename-tag
@@ -174,5 +180,3 @@ If you would like to change the setup of the database alter the ```.sql``` files
 - DavidAnson.vscode-markdownlint
 - winkchen.parser-jsdoc
 - esbenp.prettier-vscode
-
-<https://www.freecodecamp.org/news/how-to-build-a-fullstack-authentication-system-with-react-express-mongodb-heroku-and-netlify/#how-to-create-the-login-endpoint>

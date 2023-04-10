@@ -7,8 +7,6 @@ export function loginTest(request: Request, response: Response): void {
 
     let condition:string = "picu_id=" + request.params.username + " AND password='" + request.params.password + "'";
 
-    console.log(createSelect("picu", condition, ["picu_role"]));
-
     POOL.query(createSelect("picu", condition, ["picu_role"]), (error:any, results:any) => {
         if (error) {
           throw error;

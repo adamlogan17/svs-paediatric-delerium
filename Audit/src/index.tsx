@@ -13,8 +13,8 @@ import Login from './pages/login/login';
 const root = ReactDOM.createRoot(
   document.getElementById('root') as HTMLElement
 );
+
 root.render(
-  
     <Router>
       <Routes>
           <Route index path="/" element={<Home />}/>

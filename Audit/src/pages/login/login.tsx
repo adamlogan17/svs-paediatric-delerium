@@ -1,12 +1,15 @@
 import BasicNavBar from '../../components/NavBar/NavBar';
 import PButton from '../../components/PButton/PButton';
 import TypeDropDown from '../../components/TypeDropDown/TypeDropDown';
+import Cookies from "universal-cookie";
+import axios from 'axios';
 
 import '../../shared/layout.css';
 import './login.css'
 
 function Login() {
-  return (
+    const cookies = new Cookies();
+    return (
         <div id='login' className='wrapper'>
             <BasicNavBar />
             
@@ -23,7 +26,27 @@ function Login() {
                         <input id="password" className="entry" type="text" name="password"/>
                         <br />
                     </div>
-                    <PButton text="Start" primaryColour='#025858' secondaryColour='#013e3e'/>
+                    <PButton text="Start" primaryColour='#025858' secondaryColour='#013e3e' onButtonClick={() => {
+                        const configuration = {
+                            method: "get",
+                            url: "http://localhost:8000/login/21/pass1"
+                        };
+                        
+                        // make the API call
+                        axios(configuration)
+                            .then((result) => {
+                                // set the cookie
+                                cookies.set("TOKEN", result.data.token, {
+                                    path: "/",
+                                });
+                                cookies.set("ROLE", result.data.role, {
+                                    path: "/",
+                                });
+                                // redirect user to the auth page
+                                window.location.href = "/";
+                            })
+                            .catch((error) => error = new Error());
+                        }} />
                 </form>
             </div>
         </div>

@@ -5,7 +5,11 @@ import {createPool, createSelect} from './crud';
 export function loginTest(request: Request, response: Response): void {
     const POOL = createPool("audit", "admin_role", "password");
 
-    POOL.query(createSelect("picu", "picu_id=1 AND password='pass1'", ["picu_role"]), (error:any, results:any) => {
+    let condition:string = "picu_id=" + request.params.username + " AND password='" + request.params.password + "'";
+
+    console.log(createSelect("picu", condition, ["picu_role"]));
+
+    POOL.query(createSelect("picu", condition, ["picu_role"]), (error:any, results:any) => {
         if (error) {
           throw error;
         }
@@ -13,7 +17,8 @@ export function loginTest(request: Request, response: Response): void {
         try {
           const userToken = jwt.sign(
             {
-              userId: 1
+              userId: request.params.username,
+              role: results.rows[0].picu_role
             },
             "REPLACE-WITH-PRIVATE-KEY",
             {expiresIn: "1d"}
@@ -31,8 +36,6 @@ export function loginTest(request: Request, response: Response): void {
 
 export function authorise(request: any, response: Response, next:any) {
   try {
-
-  
     // get the token from the authorization header
     const token = request.headers.authorization.split(" ")[1];
 
@@ -40,10 +43,11 @@ export function authorise(request: any, response: Response, next:any) {
     const decodedToken = jwt.verify(token, "REPLACE-WITH-PRIVATE-KEY");
 
     // retrieve the user details of the logged in user
-    const user = decodedToken;
+    const user:any = decodedToken;
 
     // pass the user down to the endpoints here
-    request.user = user;
+    request.params.user = user.userId;
+    request.params.role = user.role;
 
     // pass down functionality to the endpoint
     next();

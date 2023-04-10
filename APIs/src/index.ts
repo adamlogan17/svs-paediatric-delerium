@@ -64,10 +64,10 @@ app.put("/:database/updatedata", updateData);
  */
 app.delete("/:database/deletedata/:table/:predicate", deleteData);
 
-app.get("/login", loginTest);
+app.get("/login/:username/:password", loginTest);
 
-app.get("/auth-endpoint", authorise, (request, response) => {
-    response.json({ message: "You are authorized to access me" });
+app.get("/auth-endpoint", authorise, (request:any, response) => {
+    response.json({ message: "You are authorized to access me" , user: request.params.user, role: request.params.role});
 });
 
 app.listen(port,()=> {

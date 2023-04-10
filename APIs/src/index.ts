@@ -1,8 +1,8 @@
 import express, { Request, Response } from 'express';
 import morgan from "morgan";
 import bp from 'body-parser';
-import {deleteData, getAll, insertData, updateData} from './crud';
-import { authorise, loginTest } from './login';
+import { deleteData, getAll, insertData, updateData } from './crud';
+import { authorise, loginTest, retrieveUserDetails } from './login';
 
 // import cors from 'cors';
 
@@ -66,9 +66,11 @@ app.delete("/:database/deletedata/:table/:predicate", deleteData);
 
 app.get("/login/:username/:password", loginTest);
 
-app.get("/auth-endpoint", authorise, (request:any, response) => {
+app.get("/test-auth", authorise, (request:any, response) => {
     response.json({ message: "You are authorized to access me" , user: request.params.user, role: request.params.role});
 });
+
+app.get("/auth/:token", retrieveUserDetails);
 
 app.listen(port,()=> {
     console.log(`listen port ${port}`);

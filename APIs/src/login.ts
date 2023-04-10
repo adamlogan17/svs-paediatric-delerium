@@ -41,17 +41,38 @@ export function authorise(request: any, response: Response, next:any) {
     const decodedToken = jwt.verify(token, "REPLACE-WITH-PRIVATE-KEY");
 
     // retrieve the user details of the logged in user
-    const user:any = decodedToken;
+    const user:JwtPayload|string = decodedToken;
 
     // pass the user down to the endpoints here
-    request.params.user = user.userId;
-    request.params.role = user.role;
+    if(typeof user == 'string') {
+      request.params.user = user;
+    } else {
+      request.params.username =  user.userId;
+      request.params.role =  user.role;
+    }
 
     // pass down functionality to the endpoint
     next();
   } catch (err) {
-    response.status(401).json({
+    response.json({
       error: new Error("Invalid request!"),
+    });
+  }
+}
+
+export function retrieveUserDetails(request: any, response: Response, next:any) {
+  const token = request.params.token;
+
+  const decodedToken = jwt.verify(token, "REPLACE-WITH-PRIVATE-KEY");
+
+  const user:JwtPayload|string = decodedToken;
+
+  if(typeof user == 'string') {
+    response.send(user);
+  } else {
+    response.send({
+      username: user.userId,
+      role: user.role
     });
   }
 }

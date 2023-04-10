@@ -1,23 +1,30 @@
 import { Request, Response } from "express";
-import jwt from "jsonwebtoken";
+import jwt, { Secret, JwtPayload } from 'jsonwebtoken';
 import {createPool, createSelect} from './crud';
 
 export function loginTest(request: Request, response: Response): void {
     const POOL = createPool("audit", "admin_role", "password");
 
-    POOL.query(createSelect("picu", "picu_id=1 AND password='pass1'", ["picu_role"]), (error, results) => {
-        let role:string = "FAILED";
-        if (!error) {
-            role = results.rows[0].picu_role;
+    POOL.query(createSelect("picu", "picu_id=1 AND password='pass1'", ["picu_role"]), (error:any, results:any) => {
+        if (error) {
+          throw error;
         }
 
-        const token = jwt.sign(
+        try {
+          const userToken = jwt.sign(
             {
               userId: 1
             },
-            "RANDOM-TOKEN",
-            { expiresIn: "24h" }
+            "REPLACE-WITH-PRIVATE-KEY",
+            {expiresIn: "1d"}
           );
-        response.send({role});
+          response.send({
+            token: userToken,
+            role: results.rows[0].picu_role
+          });
+        } catch (err) {
+          response.send("Invalid User");
+        }
+        
     });
 }

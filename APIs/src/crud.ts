@@ -11,7 +11,6 @@ import { Pool } from "pg";
  * @returns { Pool } A pool object that allows queries to be ran on a database
  */
 export function createPool(database:string, user:string="postgres", password:string="postgrespw") : Pool {
-  console.log("password");
   return new Pool({
     host: "postgres",
     user: user,

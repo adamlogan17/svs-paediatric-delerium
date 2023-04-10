@@ -1,15 +1,12 @@
 import BasicNavBar from '../../components/NavBar/NavBar';
 import PButton from '../../components/PButton/PButton';
 import TypeDropDown from '../../components/TypeDropDown/TypeDropDown';
-import Cookies from "universal-cookie";
 import axios from 'axios';
 
 import '../../shared/layout.css';
 import './login.css';
 
 function authenticateUser():void {
-    const cookies:Cookies = new Cookies();
-
     const configuration = {
         method: "get",
         url: "http://localhost:8000/login/21/pass1"
@@ -18,14 +15,11 @@ function authenticateUser():void {
     // make the API call
     axios(configuration)
         .then((result) => {
-            // set the cookie
-            cookies.set("TOKEN", result.data.token, {
-                path: "/",
-            });
-            cookies.set("ROLE", result.data.role, {
-                path: "/",
-            });
-            // redirect user to the auth page
+            // sets the cookies
+            sessionStorage.setItem("TOKEN", result.data.token);
+            sessionStorage.setItem("ROLE", result.data.role);
+
+            // redirect user to another page
             window.location.href = "/";
         })
         .catch((error) => error = new Error());

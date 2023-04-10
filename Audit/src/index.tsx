@@ -2,7 +2,6 @@ import ReactDOM from 'react-dom/client';
 import 'bootstrap/dist/css/bootstrap.min.css';
 import './index.css';
 import reportWebVitals from './reportWebVitals';
-import Cookies from "universal-cookie";
 
 
 import { BrowserRouter as Router, Route, Routes} from "react-router-dom";
@@ -16,13 +15,12 @@ const root = ReactDOM.createRoot(
   document.getElementById('root') as HTMLElement
 );
 
-const cookies = new Cookies();
+const token:string|null = sessionStorage.getItem("TOKEN");
+const role:string|null = sessionStorage.getItem("ROLE");
 
-const token:string = cookies.get("TOKEN");
-const role:string = cookies.get("ROLE");
 
 let adminAccess:boolean = false;
-let picuAccess:boolean = token !== undefined;
+let picuAccess:boolean = token !== (undefined || null) && role === 'picu';
 let fieldAccess:boolean = false;
 
 

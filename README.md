@@ -174,3 +174,5 @@ If you would like to change the setup of the database alter the ```.sql``` files
 - DavidAnson.vscode-markdownlint
 - winkchen.parser-jsdoc
 - esbenp.prettier-vscode
+
+<https://www.freecodecamp.org/news/how-to-build-a-fullstack-authentication-system-with-react-express-mongodb-heroku-and-netlify/#how-to-create-the-login-endpoint>

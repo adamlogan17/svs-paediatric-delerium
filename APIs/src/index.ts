@@ -4,6 +4,8 @@ import bp from 'body-parser';
 import {deleteData, getAll, insertData, updateData} from './crud';
 import { loginTest } from './login';
 
+// import cors from 'cors';
+
 // Express Initialize
 const app = express();
 const port: number = 8000;
@@ -12,7 +14,8 @@ const port: number = 8000;
 app.use(morgan("tiny"));
 // allows messages to be read from the body of a request
 app.use(bp.json())
-app.use(bp.urlencoded({ extended: true }))
+app.use(bp.urlencoded({ extended: true }));
+// app.use(cors()); // remove this when on the sever (only here for local development)
 
 /**
  * Simple API that returns a value

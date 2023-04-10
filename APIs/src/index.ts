@@ -64,12 +64,24 @@ app.put("/:database/updatedata", updateData);
  */
 app.delete("/:database/deletedata/:table/:predicate", deleteData);
 
+/**
+ * Will log a user into the system
+ * @author Adam Logan
+ */
 app.get("/login/:username/:password", loginTest);
 
+/**
+ * Tests the 'authorise' function
+ * @author Adam Logan
+ */
 app.get("/test-auth", authorise, (request:any, response) => {
     response.json({ message: "You are authorized to access me" , user: request.params.user, role: request.params.role});
 });
 
+/**
+ * Retrieves the user's userId and role from the token provided
+ * @author Adam Logan
+ */
 app.get("/auth/:token", retrieveUserDetails);
 
 app.listen(port,()=> {

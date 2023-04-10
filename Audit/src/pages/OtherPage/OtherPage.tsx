@@ -1,7 +1,12 @@
 import axios from "axios";
 import PButton from "../../components/PButton/PButton";
 
-function testAuth() {
+/**
+ * Logs a message if authentication is achieved and undefined if authentication is not given
+ * @author Adam Logan
+ * @date 2023-04-10
+ */
+function testAuth():void {
     const configuration = {
         method: "get",
         url: "http://localhost:8000/test-auth",
@@ -17,6 +22,7 @@ function testAuth() {
         .catch((error) => error = new Error());
 }
 
+// this page is used to test RBAC in regards of if the page can be visited and the APIs
 const OtherPage = () => {
     return (
         <>

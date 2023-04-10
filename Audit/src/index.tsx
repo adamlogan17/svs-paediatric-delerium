@@ -18,7 +18,7 @@ const root = ReactDOM.createRoot(
 const token:string|null = sessionStorage.getItem("TOKEN");
 const role:string|null = sessionStorage.getItem("ROLE");
 
-
+// Below are the access conditions for each role, and which pages they can access
 let adminAccess:boolean = false;
 let picuAccess:boolean = token !== (undefined || null) && role === 'picu';
 let fieldAccess:boolean = false;

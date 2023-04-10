@@ -28,3 +28,28 @@ export function loginTest(request: Request, response: Response): void {
         
     });
 }
+
+export function authorise(request: any, response: Response, next:any) {
+  try {
+
+  
+    // get the token from the authorization header
+    const token = request.headers.authorization.split(" ")[1];
+
+    // check if the token matches the supposed origin
+    const decodedToken = jwt.verify(token, "REPLACE-WITH-PRIVATE-KEY");
+
+    // retrieve the user details of the logged in user
+    const user = decodedToken;
+
+    // pass the user down to the endpoints here
+    request.user = user;
+
+    // pass down functionality to the endpoint
+    next();
+  } catch (err) {
+    response.status(401).json({
+      error: new Error("Invalid request!"),
+    });
+  }
+}

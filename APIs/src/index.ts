@@ -2,7 +2,7 @@ import express, { Request, Response } from 'express';
 import morgan from "morgan";
 import bp from 'body-parser';
 import {deleteData, getAll, insertData, updateData} from './crud';
-import { loginTest } from './login';
+import { authorise, loginTest } from './login';
 
 // import cors from 'cors';
 
@@ -15,7 +15,19 @@ app.use(morgan("tiny"));
 // allows messages to be read from the body of a request
 app.use(bp.json())
 app.use(bp.urlencoded({ extended: true }));
-// app.use(cors()); // remove this when on the sever (only here for local development)
+
+app.use((req:Request, res:Response, next) => {
+    res.setHeader("Access-Control-Allow-Origin", "*");
+    res.setHeader(
+        "Access-Control-Allow-Headers",
+        "Origin, X-Requested-With, Content, Accept, Content-Type, Authorization"
+    );
+    res.setHeader(
+        "Access-Control-Allow-Methods",
+        "GET, POST, PUT, DELETE, PATCH, OPTIONS"
+    );
+    next();
+});
 
 /**
  * Simple API that returns a value
@@ -53,6 +65,10 @@ app.put("/:database/updatedata", updateData);
 app.delete("/:database/deletedata/:table/:predicate", deleteData);
 
 app.get("/login", loginTest);
+
+app.get("/auth-endpoint", authorise, (request, response) => {
+    response.json({ message: "You are authorized to access me" });
+});
 
 app.listen(port,()=> {
     console.log(`listen port ${port}`);

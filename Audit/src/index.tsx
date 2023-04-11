@@ -8,7 +8,8 @@ import { BrowserRouter as Router, Route, Routes} from "react-router-dom";
 import Home from './pages/Home/Home'; // example component being added
 import OtherPage from './pages/OtherPage/OtherPage'; // to demonstrate routing
 import NoPage from './pages/NoPage/NoPage'; // to demonstrate routing
-import Login from './pages/login/login';
+import Login from './pages/Login/login';
+import Form from './pages/Form/form';
 
 const root = ReactDOM.createRoot(
   document.getElementById('root') as HTMLElement
@@ -19,6 +20,7 @@ root.render(
       <Routes>
           <Route index path="/" element={<Home />}/>
           <Route path="/login" element={<Login />}/>
+          <Route path="/form" element={<Form />}/>
           <Route path="/otherPage" element={<OtherPage />}/>
           <Route path="*" element={<NoPage />}/>
       </Routes>

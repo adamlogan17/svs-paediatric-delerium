@@ -22,7 +22,8 @@ function BasicNavBar() {
             <Nav.Link href="#home">Team</Nav.Link>
             <Nav.Link href="#home">How to use the Audit System</Nav.Link>
             <Nav.Link href="#home">Contact us</Nav.Link>
-            <Nav.Link href="#home">Home</Nav.Link>
+            <Nav.Link href="/">Home</Nav.Link>
+            <Nav.Link href="/login">Login</Nav.Link>
             {/* <NavDropdown title="Dropdown" id="basic-nav-dropdown">
               <NavDropdown.Item href="#action/3.1">Action</NavDropdown.Item>
               <NavDropdown.Item href="#action/3.2">

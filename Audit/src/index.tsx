@@ -9,6 +9,7 @@ import Home from './pages/Home/Home'; // example component being added
 import OtherPage from './pages/OtherPage/OtherPage'; // to demonstrate routing
 import NoPage from './pages/NoPage/NoPage'; // to demonstrate routing
 import Login from './pages/login/login';
+import AuditGraphs from './pages/AuditGraphs/AuditGraphs';
 
 const root = ReactDOM.createRoot(
   document.getElementById('root') as HTMLElement
@@ -20,6 +21,7 @@ root.render(
           <Route index path="/" element={<Home />}/>
           <Route path="/login" element={<Login />}/>
           <Route path="/otherPage" element={<OtherPage />}/>
+          <Route path="/auditGraphs" element={<AuditGraphs />}/>
           <Route path="*" element={<NoPage />}/>
       </Routes>
     </Router>

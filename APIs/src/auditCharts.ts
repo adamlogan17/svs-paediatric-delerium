@@ -22,7 +22,7 @@ export function singlePicuCompliance(request: Request, response: Response): void
         let data = results.rows;
 
         let dates = data.map((singleEntry:{entry_date:string, score:string}) => singleEntry.entry_date);
-        let compScores = data.map((singleEntry:{entry_date:string, score:string}) => singleEntry.score);
+        let compScores = data.map((singleEntry:{entry_date:string, score:string}) => Math.round(parseFloat(singleEntry.score) * 1e2)/1e2);
 
         response.send({
             entryDates: dates,
@@ -51,7 +51,7 @@ export function allPicuCompliance(request: Request, response: Response): void {
 
         let data = results.rows;
 
-        let anonymised = shuffleArray(data.map((singleEntry:{overall_compliance:string}) => singleEntry.overall_compliance));
+        let anonymised = shuffleArray(data.map((singleEntry:{overall_compliance:string}) => Math.round(parseFloat(singleEntry.overall_compliance) * 1e2)/1e2));
 
         response.send({
             entryDates: anonymised.map((score, i) => i+1),

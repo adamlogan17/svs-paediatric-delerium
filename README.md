@@ -21,6 +21,7 @@
     - [React Components](#react-components)
     - [Bootstrap](#bootstrap)
     - [Login](#login)
+    - [Shuffle Array](#shuffle-array)
   - [Useful vscode extension ids](#useful-vscode-extension-ids)
 
 # svs-paediatric-delerium
@@ -160,6 +161,10 @@ If you would like to change the setup of the database alter the ```.sql``` files
 
 - <https://www.freecodecamp.org/news/how-to-build-a-fullstack-authentication-system-with-react-express-mongodb-heroku-and-netlify/#how-to-create-the-login-endpoint>
 - <https://dev.to/juliecherner/authentication-with-jwt-tokens-in-typescript-with-express-3gb1>
+
+### Shuffle Array
+
+- <https://dev.to/codebubb/how-to-shuffle-an-array-in-javascript-2ikj>
 
 ## Useful vscode extension ids
 

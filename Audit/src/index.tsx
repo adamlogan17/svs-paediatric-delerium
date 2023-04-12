@@ -1,10 +1,11 @@
-import React from 'react';
 import ReactDOM from 'react-dom/client';
 import 'bootstrap/dist/css/bootstrap.min.css';
 import './index.css';
 import reportWebVitals from './reportWebVitals';
 
+
 import { BrowserRouter as Router, Route, Routes} from "react-router-dom";
+
 import Home from './pages/Home/Home'; // example component being added
 import OtherPage from './pages/OtherPage/OtherPage'; // to demonstrate routing
 import NoPage from './pages/NoPage/NoPage'; // to demonstrate routing
@@ -15,6 +16,16 @@ import AuditGraphs from './pages/AuditGraphs/AuditGraphs';
 const root = ReactDOM.createRoot(
   document.getElementById('root') as HTMLElement
 );
+
+const token:string|null = sessionStorage.getItem("TOKEN");
+const role:string|null = sessionStorage.getItem("ROLE");
+
+// Below are the access conditions for each role, and which pages they can access
+let adminAccess:boolean = false;
+let picuAccess:boolean = token !== (undefined || null) && role === 'picu';
+let fieldAccess:boolean = false;
+
+
 root.render(
   
     <Router>
@@ -22,7 +33,7 @@ root.render(
           <Route index path="/" element={<Home />}/>
           <Route path="/login" element={<Login />}/>
           <Route path="/form" element={<Form />}/>
-          <Route path="/otherPage" element={<OtherPage />}/>
+          {picuAccess ? <Route path="/otherPage" element={<OtherPage />}/> : <></>}
           <Route path="/auditGraphs" element={<AuditGraphs />}/>
           <Route path="*" element={<NoPage />}/>
       </Routes>

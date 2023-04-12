@@ -10,8 +10,7 @@ import { Pool } from "pg";
  * @param { string } [password="postgrespw"] The password associated with the username
  * @returns { Pool } A pool object that allows queries to be ran on a database
  */
-function createPool(database:string, user:string="postgres", password:string="postgrespw") : Pool {
-  console.log("password");
+export function createPool(database:string, user:string="postgres", password:string="postgrespw") : Pool {
   return new Pool({
     host: "postgres",
     user: user,
@@ -30,10 +29,10 @@ function createPool(database:string, user:string="postgres", password:string="po
  * @param { string[] } [data] The columns to be selected
  * @returns { string } A query that will return the required results
  */
-function createSelect(table:string, condition?:string, data?:string[]) : string {
+export function createSelect(table:string, condition?:string, data?:string[]) : string {
   let query:string = "SELECT ";
 
-  query += data == undefined ? "*" : query += data.concat();
+  query += data == undefined ? "*" : data.concat();
 
   query += " FROM " + table;
 

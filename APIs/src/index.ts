@@ -1,7 +1,10 @@
 import express, { Request, Response } from 'express';
 import morgan from "morgan";
 import bp from 'body-parser';
-import {deleteData, getAll, insertData, updateData} from './crud';
+import { deleteData, getAll, insertData, updateData } from './crud';
+import { authorise, loginTest, retrieveUserDetails } from './login';
+
+// import cors from 'cors';
 
 // Express Initialize
 const app = express();
@@ -11,7 +14,20 @@ const port: number = 8000;
 app.use(morgan("tiny"));
 // allows messages to be read from the body of a request
 app.use(bp.json())
-app.use(bp.urlencoded({ extended: true }))
+app.use(bp.urlencoded({ extended: true }));
+
+app.use((req:Request, res:Response, next) => {
+    res.setHeader("Access-Control-Allow-Origin", "*");
+    res.setHeader(
+        "Access-Control-Allow-Headers",
+        "Origin, X-Requested-With, Content, Accept, Content-Type, Authorization"
+    );
+    res.setHeader(
+        "Access-Control-Allow-Methods",
+        "GET, POST, PUT, DELETE, PATCH, OPTIONS"
+    );
+    next();
+});
 
 /**
  * Simple API that returns a value
@@ -48,6 +64,25 @@ app.put("/:database/updatedata", updateData);
  */
 app.delete("/:database/deletedata/:table/:predicate", deleteData);
 
+/**
+ * Will log a user into the system
+ * @author Adam Logan
+ */
+app.get("/login/:username/:password", loginTest);
+
+/**
+ * Tests the 'authorise' function
+ * @author Adam Logan
+ */
+app.get("/test-auth", authorise, (request:any, response) => {
+    response.json({ message: "You are authorized to access me" , user: request.params.user, role: request.params.role});
+});
+
+/**
+ * Retrieves the user's userId and role from the token provided
+ * @author Adam Logan
+ */
+app.get("/auth/:token", retrieveUserDetails);
 
 app.listen(port,()=> {
     console.log(`listen port ${port}`);

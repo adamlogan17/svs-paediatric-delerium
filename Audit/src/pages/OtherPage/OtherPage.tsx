@@ -26,7 +26,7 @@ function testAuth():void {
 const OtherPage = () => {
     return (
         <>
-            <h1>Page</h1>
+            <h1>Other Page</h1>
             
             <PButton text="Test Auth" primaryColour='#025858' secondaryColour='#013e3e' onButtonClick={()=>testAuth()} />
         </>

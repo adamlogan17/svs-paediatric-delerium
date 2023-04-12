@@ -6,7 +6,7 @@ function useHover() {
     return {
         hoverVar: isHover,
         mouseEnter: () => setIsHover(true),
-        mosueLeave: () => setIsHover(false)
+        mouseLeave: () => setIsHover(false)
     };
 }
 

@@ -41,7 +41,7 @@ function TypeDropDown(props:{text:string, options:string[], onButtonClick?:any, 
 
     return (
         <Dropdown>
-            <Dropdown.Toggle style={bgColours} onMouseEnter={checkHover.mouseEnter} onMouseLeave={checkHover.mosueLeave}>
+            <Dropdown.Toggle style={bgColours} onMouseEnter={checkHover.mouseEnter} onMouseLeave={checkHover.mouseLeave}>
                 {props.text + ' '}
             </Dropdown.Toggle>
 

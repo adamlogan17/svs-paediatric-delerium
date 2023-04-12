@@ -20,6 +20,7 @@ export function createPool(database:string, user:string="postgres", password:str
   });
 }
 
+
 /**
  * Creates a simply SQL select query, only creates a query with valid syntax but does not check if the content of the query is correct
  * @author Adam Logan
@@ -29,7 +30,6 @@ export function createPool(database:string, user:string="postgres", password:str
  * @param { string[] } [data] The columns to be selected
  * @returns { string } A query that will return the required results
  */
-export function createSelect(table:string, condition?:string, data?:string[]) : string {
 export function createSelect(table:string, condition?:string, data?:string[]) : string {
   let query:string = "SELECT ";
 

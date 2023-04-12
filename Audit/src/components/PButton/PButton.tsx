@@ -15,7 +15,7 @@ function PButton(props:{text:string, onButtonClick?:any, primaryColour?:string, 
 
   return (
     <>
-      <Button style={newStyle} onMouseEnter={checkHover.mouseEnter} onMouseLeave={checkHover.mosueLeave} size="lg" onClick = {props.onButtonClick}>{props.text}</Button>{' '}
+      <Button style={newStyle} onMouseEnter={checkHover.mouseEnter} onMouseLeave={checkHover.mouseLeave} size="lg" onClick = {props.onButtonClick}>{props.text}</Button>{' '}
     </>
   );
 }

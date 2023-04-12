@@ -3,6 +3,7 @@ import morgan from "morgan";
 import bp from 'body-parser';
 import { deleteData, getAll, insertData, updateData } from './crud';
 import { authorise, loginTest, retrieveUserDetails } from './login';
+import { singlePicuCompliance } from './auditCharts';
 
 // import cors from 'cors';
 
@@ -83,6 +84,8 @@ app.get("/test-auth", authorise, (request:any, response) => {
  * @author Adam Logan
  */
 app.get("/auth/:token", retrieveUserDetails);
+
+app.get("/chartData/singleSite/:siteId", singlePicuCompliance);
 
 app.listen(port,()=> {
     console.log(`listen port ${port}`);

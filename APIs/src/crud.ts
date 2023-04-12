@@ -30,6 +30,7 @@ export function createPool(database:string, user:string="postgres", password:str
  * @returns { string } A query that will return the required results
  */
 export function createSelect(table:string, condition?:string, data?:string[]) : string {
+export function createSelect(table:string, condition?:string, data?:string[]) : string {
   let query:string = "SELECT ";
 
   query += data == undefined ? "*" : data.concat();
@@ -52,7 +53,7 @@ export function createSelect(table:string, condition?:string, data?:string[]) : 
  * @returns { string } A query that inserts data into a table
  * TODO Need to implement the UPSERT functionality
  */
-function createInsert(table:string, columns:string[], data:string[], upsertCol?:string) : string {
+export function createInsert(table:string, columns:string[], data:string[], upsertCol?:string) : string {
   const FAILEDMSSG:string = "FAILED";
   let query:string = "";
 
@@ -82,7 +83,7 @@ function createInsert(table:string, columns:string[], data:string[], upsertCol?:
  * @param { string } predicate The condition to decide which rows to update
  * @returns { string } The update SQL statement
  */
-function createUpdate(table:string, columns:string[], data:string[], predicate:string) : string {
+export function createUpdate(table:string, columns:string[], data:string[], predicate:string) : string {
   const FAILEDMSSG:string = "FAILED";
   let query:string = ""
 
@@ -104,7 +105,7 @@ function createUpdate(table:string, columns:string[], data:string[], predicate:s
 * @param { string } [predicate] The condition to delete the data for
  * @returns { string } The delete SQL statement
  */
-function createDelete(table: string, predicate?:string) : string {
+export function createDelete(table: string, predicate?:string) : string {
   let query:string = "DELETE FROM " + table;
 
   query = predicate !== undefined ? query + " WHERE " + predicate : query;

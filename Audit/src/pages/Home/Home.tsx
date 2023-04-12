@@ -5,6 +5,8 @@ import PButton from '../../components/PButton/PButton'
 import ContactInfo from '../../components/ContactInfo/ContactInfo'
 
 import '../../shared/layout.css';
+import { link } from 'fs';
+import { useHref } from 'react-router-dom';
 
 function Home() {
   return (
@@ -21,10 +23,10 @@ function Home() {
 
             <div className = 'row' id = 'ButtonContainer'>
               <div className = 'half-column' id = 'SOSPD-ButtonColumn'>
-                <PButton text = 'SOSPD Audit Section' onButtonClick = {() => console.log('SOSPD Audit Button Clicked')}/>
+                <PButton text = 'SOSPD Audit Section' onButtonClick = {() => {window.location.href = "/form"}}/>
               </div>
               <div className = 'half-column' id = 'CAPD-ButtonColumn'>
-                <PButton text = 'CAPD Audit Section' onButtonClick = {() => {console.log('CAPD Audit Button Clicked')}}/>
+                <PButton text = 'CAPD Audit Section' onButtonClick = {() => {window.location.href = "/form"}}/>
               </div>
             </div>
 

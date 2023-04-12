@@ -29,15 +29,14 @@ function Login() {
     return (
         <div id='login' className='wrapper'>
             <BasicNavBar />
-            
-            <div className = 'content'>
+            <div className='content'>
                 <h1>Please Login</h1>
                 <br />
 
-                <form action="" method="get">
-                    <div className="data-input">
-                        <TypeDropDown text="Site Number" primaryColour='#025858' secondaryColour='#013e3e' options={["hello", "world"]}/>
-                        <br />
+                <div className='data-input'>
+                    <label htmlFor='username'>Username:</label>
+                    <input id='username' className='entry' type='text' name='username' ref={usernameRef} />
+                    <br />
 
                         <label htmlFor="password">Password:</label>
                         <input id="password" className="entry" type="text" name="password"/>

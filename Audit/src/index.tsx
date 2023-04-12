@@ -10,6 +10,8 @@ import Home from './pages/Home/Home'; // example component being added
 import OtherPage from './pages/OtherPage/OtherPage'; // to demonstrate routing
 import NoPage from './pages/NoPage/NoPage'; // to demonstrate routing
 import Login from './pages/login/login';
+import Form from './pages/Form/form';
+import AuditGraphs from './pages/AuditGraphs/AuditGraphs';
 
 const root = ReactDOM.createRoot(
   document.getElementById('root') as HTMLElement
@@ -25,14 +27,18 @@ let fieldAccess:boolean = false;
 
 
 root.render(
-  <Router>
-    <Routes>
-        <Route index path="/" element={<Home />}/>
-        <Route path="/login" element={<Login />}/>
-        {picuAccess ? <Route path="/otherPage" element={<OtherPage />}/> : <></>}
-        <Route path="*" element={<NoPage />}/>
-    </Routes>
-  </Router>
+  
+    <Router>
+      <Routes>
+          <Route index path="/" element={<Home />}/>
+          <Route path="/login" element={<Login />}/>
+          <Route path="/form" element={<Form />}/>
+          <Route path="/otherPage" element={<OtherPage />}/>
+          <Route path="/auditGraphs" element={<AuditGraphs />}/>
+          <Route path="*" element={<NoPage />}/>
+      </Routes>
+    </Router>
+  
 );
 
 // If you want to start measuring performance in your app, pass a function

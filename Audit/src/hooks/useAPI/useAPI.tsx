@@ -8,6 +8,7 @@ function useGetAPI(defaultValue: any, url: string) {
         const fetchPost = async () => {
             try {
                 let response = await axios.get(url);
+                console.log(response);
                 setPosts(response.data);
             } catch (err:any) {
                 console.log(err);

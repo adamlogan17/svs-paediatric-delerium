@@ -11,7 +11,7 @@ function LineGraph(props:{ chartData:any }) {
           plugins: {
             title: {
               display: true,
-              text: "Users Gained between 2016-2020"
+              text: "Compliance Scores"
             },
             legend: {
               display: false

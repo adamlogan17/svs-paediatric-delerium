@@ -3,6 +3,7 @@ import morgan from "morgan";
 import bp from 'body-parser';
 import { deleteData, getAll, insertData, updateData } from './crud';
 import { adminAuthorise, authenticate, authorise, fieldAuthorise, retrieveUserDetails } from './login';
+import { insertCompData } from './complianceScores';
 
 // import cors from 'cors';
 
@@ -93,6 +94,8 @@ app.post("/test-auth/:database/insertdata", authorise, insertData);
 app.put("/test-auth/:database/updatedata", authorise, updateData);
 
 app.delete("/test-auth/:database/deletedata/:table/:predicate", authorise, deleteData);
+
+app.post("/compData", authorise, insertCompData);
 
 
 /**

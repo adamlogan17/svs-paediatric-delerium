@@ -24,12 +24,11 @@ export function authenticate(request: Request, response: Response): void {
         if (error) {
           response.send("Invalid User");
         }
-
-        bcrypt
+        else {
+          bcrypt
           .compare(password, results.rows[0].password)
           .then(res => {
             if(res) {
-
               const userToken = jwt.sign(
                 {
                   userId: username,
@@ -48,7 +47,9 @@ export function authenticate(request: Request, response: Response): void {
               response.send("Invalid User");
             }
           })
-          .catch(err => console.error(err.message))
+          .catch(err => response.send(err))
+        }
+        
     });
 }
 

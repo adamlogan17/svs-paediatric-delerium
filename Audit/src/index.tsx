@@ -32,7 +32,7 @@ root.render(
       <Routes>
           <Route index path="/" element={<Home />}/>
           <Route path="/login" element={<Login />}/>
-          <Route path="/form" element={<Form />}/>
+          {picuAccess ? <Route path="/form" element={<Form />}/> : <></>}
           {picuAccess ? <Route path="/otherPage" element={<OtherPage />}/> : <></>}
           <Route path="/auditGraphs" element={<AuditGraphs />}/>
           <Route path="*" element={<NoPage />}/>

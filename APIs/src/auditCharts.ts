@@ -54,7 +54,7 @@ export function allPicuCompliance(request: Request, response: Response): void {
         let anonymised = shuffleArray(data.map((singleEntry:{overall_compliance:string}) => Math.round(parseFloat(singleEntry.overall_compliance) * 1e2)/1e2));
 
         response.send({
-            entryDates: anonymised.map((score, i) => i+1),
+            siteNum: anonymised.map((score, i) => i+1),
             complianceScore: anonymised
         });
         

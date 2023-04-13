@@ -1,11 +1,20 @@
 import BasicNavBar from '../../components/NavBar/NavBar';
 import TypeDropDown from '../../components/TypeDropDown/TypeDropDown';
 import PButton from '../../components/PButton/PButton';
+import LineChart from '../../components/LineGraph/LineGraph';
+import Chart from "chart.js/auto";
+import { CategoryScale } from "chart.js";
+import { useState } from "react";
 
 import '../../shared/layout.css';
 import BodyText from '../../components/BodyText/BodyText';
 
+
+Chart.register(CategoryScale);
 function AuditGraphs() {
+  const [chartData, setChartData] = useState({
+      
+  });
   return (
         <div id='form' className='wrapper'>
           
@@ -31,6 +40,9 @@ function AuditGraphs() {
             </div>
             <div className = 'row' id = 'ButtonContainer'>
                 <BodyText text = 'THIS IS JUST A PLACEHOLDER TEXT BOX FOR WHAT WILL BE THE GRAPH CANVAS'/>
+                <div className="App">
+                <LineChart chartData={chartData} />
+                </div>
             </div>
                 <PButton text="Submit" onButtonClick = {() => {console.log("Hello World")}} primaryColour='#025858' secondaryColour='#013e3e'/>
             </form>

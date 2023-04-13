@@ -9,12 +9,13 @@ import useGetAPI from '../../hooks/useAPI/useAPI';
 
 import '../../shared/layout.css';
 import axios from 'axios';
+import { useState } from 'react';
 
 
 
 Chart.register(CategoryScale);
 
-function getLineChartData(xValues: number[], yValues:Date[]) : any {
+function getLineChartData(xValues: Date[], yValues:number[]) : any {
   return {
     type: "line",
     data: {
@@ -28,13 +29,27 @@ function getLineChartData(xValues: number[], yValues:Date[]) : any {
     }
   };
 }
-
+// function dbGetAPI() {
+//   const configuration = {
+//     method: "get",
+//     url: "http://localhost:8000/chartData/singleSite/1"
+//   };  
+//   axios(configuration)
+//       .then((result) => {
+//         return result
+//       })
+//       .catch((error) => error = new Error());
+// }
 function AuditGraphs() { 
   // const { complianceScore , entryDates } = useGetAPI([], "http://localhost:8000/chartData/singleSite/1");
 
   // console.log(useGetAPI([], "http://localhost:8000/chartData/singleSite/1"));
   // console.log(useGetAPI([], "http://localhost:8000/chartData/singleSite/1").toString());
 
+  const [chartData, setChartData] = useState({
+    "entryDates": ['2023-04-13T00:00:00.000Z'], "complianceScore":[0]
+  });
+  
   const configuration = {
     method: "get",
     url: "http://localhost:8000/chartData/singleSite/1"
@@ -42,17 +57,12 @@ function AuditGraphs() {
 
   // make the API call
   axios(configuration)
-      .then((result) => {
-          // sets the cookies
-          console.log(result.data);
-
-          // redirect user to another page
-          // window.location.href = "/";
-      })
+      .then((result => setChartData(result.data)))
       .catch((error) => error = new Error());
 
   // let test = getLineChartData(entryDates.map((date:string) => new Date(date)), complianceScore);
   // console.log(test.toString())
+  //console.log(chartData)
 
   return (
         <div id='form' className='wrapper'>
@@ -80,7 +90,7 @@ function AuditGraphs() {
               <div className = 'row' id = 'ButtonContainer'>
                   {/* <BodyText text = 'THIS IS JUST A PLACEHOLDER TEXT BOX FOR WHAT WILL BE THE GRAPH CANVAS'/> */}
                   <div className="canvas">
-                  {/* <LineChart chartData={getLineChartData(entryDates.map((date:string) => new Date(date)), complianceScore)} /> */}
+                  <LineChart chartData={getLineChartData(chartData.entryDates.map((date:string) => new Date(date)), chartData.complianceScore)} />
                   </div>
               </div>
                   <PButton text="Submit" onButtonClick = {() => {console.log("Hello World")}} primaryColour='#025858' secondaryColour='#013e3e'/>

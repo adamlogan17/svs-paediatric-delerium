@@ -1,5 +1,5 @@
 -- Creates the PICU role
-CREATE ROLE picu_user_role WITH LOGIN PASSWORD 'password';
+CREATE ROLE picu_role WITH LOGIN PASSWORD 'password';
 
 GRANT SELECT, INSERT ON compliance_data TO picu_user_role;
 

@@ -11,7 +11,7 @@ import bcrypt from 'bcrypt';
  * @param { Response } response If valid, the token and the role of the user, and a error message if not
  * @returns { void }
  */
-export function checkPass(request: Request, response: Response): void {
+export function authenticate(request: Request, response: Response): void {
     const POOL = createPool("audit", "admin_role", "password");
 
     const { username, password } = request.body;
@@ -80,6 +80,26 @@ export function authorise(request: any, response: Response, next:NextFunction):v
     // pass down functionality to the endpoint
     next();
   } catch (err) {
+    response.json({
+      error: new Error("Invalid request!"),
+    });
+  }
+}
+
+export function adminAuthorise(request: any, response: Response, next:NextFunction): void {
+  if(request.params.role == "admin") {
+    next();
+  } else {
+    response.json({
+      error: new Error("Invalid request!"),
+    });
+  }
+}
+
+export function fieldAuthorise(request: any, response: Response, next:NextFunction): void {
+  if(request.params.role == "field_engineer") {
+    next();
+  } else {
     response.json({
       error: new Error("Invalid request!"),
     });

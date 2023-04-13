@@ -1,8 +1,8 @@
-import express, { Request, Response } from 'express';
+import express, { Request, Response, response } from 'express';
 import morgan from "morgan";
 import bp from 'body-parser';
 import { deleteData, getAll, insertData, updateData } from './crud';
-import { authorise, checkPass, retrieveUserDetails } from './login';
+import { adminAuthorise, authenticate, authorise, fieldAuthorise, retrieveUserDetails } from './login';
 
 // import cors from 'cors';
 
@@ -68,7 +68,7 @@ app.delete("/:database/deletedata/:table/:predicate", deleteData);
  * Will log a user into the system
  * @author Adam Logan
  */
-app.post("/login", checkPass);
+app.post("/login", authenticate);
 
 /**
  * Tests the 'authorise' function
@@ -77,6 +77,23 @@ app.post("/login", checkPass);
 app.get("/test-auth", authorise, (request:any, response) => {
     response.json({ message: "You are authorized to access me" , user: request.params.user, role: request.params.role});
 });
+
+app.get("/test-auth/admin", authorise, adminAuthorise, (request:any, response) => {
+    response.json({ message: "You are authorized to access me" , user: request.params.user, role: request.params.role});
+});
+
+app.get("/test-auth/field-engineer", authorise, fieldAuthorise, (request:any, response) => {
+    response.json({ message: "You are authorized to access me" , user: request.params.user, role: request.params.role});
+});
+
+app.get("/test-auth/:database/getall/:table", authorise, getAll);
+
+app.post("/test-auth/:database/insertdata", authorise, insertData);
+
+app.put("/test-auth/:database/updatedata", authorise, updateData);
+
+app.delete("/test-auth/:database/deletedata/:table/:predicate", authorise, deleteData);
+
 
 /**
  * Retrieves the user's userId and role from the token provided

@@ -26,6 +26,11 @@ INSERT INTO picu (ward_name, hospital_name, auditor, password)
         ('Monrovia','Liberia','George Weah', '$2a$10$QKROIDI35N4hIOQ1qwVwU.25ciIBjum/8mgQNEfzK.fMbMgJhUUUi'),
         ('Nassau','Bahamas','Philip Davis', '$2a$10$QKROIDI35N4hIOQ1qwVwU.25ciIBjum/8mgQNEfzK.fMbMgJhUUUi');
 
+INSERT INTO picu (ward_name, hospital_name, auditor, password, picu_role)
+    VALUES
+        ('Adamstown','Pitcairn Islands','Iona Thomas', '$2a$10$QKROIDI35N4hIOQ1qwVwU.25ciIBjum/8mgQNEfzK.fMbMgJhUUUi', 'admin'),
+        ('Adamstown','Pitcairn Islands','Iona Thomas', '$2a$10$QKROIDI35N4hIOQ1qwVwU.25ciIBjum/8mgQNEfzK.fMbMgJhUUUi', 'field_engineer');
+
 -- Initial 'compliance_data'
 INSERT INTO compliance_data (entry_date, method, bed_number, correct_details, 
     comfort_recorded, comfort_above, all_params_scored, totalled_correctly, 

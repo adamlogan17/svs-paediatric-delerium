@@ -2,7 +2,7 @@ import express, { Request, Response } from 'express';
 import morgan from "morgan";
 import bp from 'body-parser';
 import { deleteData, getAll, insertData, updateData } from './crud';
-import { authorise, loginTest, retrieveUserDetails } from './login';
+import { authorise, checkPass, retrieveUserDetails } from './login';
 
 // import cors from 'cors';
 
@@ -68,7 +68,7 @@ app.delete("/:database/deletedata/:table/:predicate", deleteData);
  * Will log a user into the system
  * @author Adam Logan
  */
-app.post("/login", loginTest);
+app.post("/login", checkPass);
 
 /**
  * Tests the 'authorise' function

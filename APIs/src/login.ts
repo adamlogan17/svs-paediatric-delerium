@@ -11,7 +11,7 @@ import bcrypt from 'bcrypt';
  * @param { Response } response If valid, the token and the role of the user, and a error message if not
  * @returns { void }
  */
-export function loginTest(request: Request, response: Response): void {
+export function checkPass(request: Request, response: Response): void {
     const POOL = createPool("audit", "admin_role", "password");
 
     const { username, password } = request.body;
@@ -20,34 +20,35 @@ export function loginTest(request: Request, response: Response): void {
 
     let condition:string = "picu_id=" + username;
 
-    POOL.query(createSelect("picu", condition, ["picu_role", "password"]), (error:any, results:any) => {
+    POOL.query(createSelect("picu", condition, ["picu_role", "password"]), async (error:any, results:any) => {
         if (error) {
-          throw error;
+          response.send("Invalid User");
         }
 
         bcrypt
-          .compare(password, results.rows[0].picu_role)
+          .compare(password, results.rows[0].password)
           .then(res => {
-            console.log(res) // return true
+            if(res) {
+
+              const userToken = jwt.sign(
+                {
+                  userId: username,
+                  role: results.rows[0].picu_role
+                },
+                "REPLACE-WITH-PRIVATE-KEY",
+                {expiresIn: "1d"}
+              );
+              response.send({
+                token: userToken,
+                role: results.rows[0].picu_role,
+                username: username
+              });
+
+            } else {
+              response.send("Invalid User");
+            }
           })
           .catch(err => console.error(err.message))
-
-        try {
-          const userToken = jwt.sign(
-            {
-              userId: username,
-              role: results.rows[0].picu_role
-            },
-            "REPLACE-WITH-PRIVATE-KEY",
-            {expiresIn: "1d"}
-          );
-          response.send({
-            token: userToken,
-            role: results.rows[0].picu_role
-          });
-        } catch (err) {
-          response.send("Invalid User");
-        }
     });
 }
 

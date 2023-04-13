@@ -9,8 +9,12 @@ import { useRef } from 'react';
 function authenticateUser(username:string|undefined, password:string|undefined):void {
     
     const configuration = {
-        method: "get",
-        url: "http://localhost:8000/login/" + username + "/"+ password
+        method: "post",
+        url: "http://localhost:8000/login", 
+        data: {
+                username: username,
+                password: password
+            }
     };
     
     // make the API call
@@ -19,12 +23,12 @@ function authenticateUser(username:string|undefined, password:string|undefined):
             // sets the cookies
             sessionStorage.setItem("TOKEN", result.data.token);
             sessionStorage.setItem("ROLE", result.data.role);
+            sessionStorage.setItem("SITE", result.data.username);
 
             // redirect user to another page
             window.location.href = "/";
         })
         .catch((error) => error = new Error());
-      
 }
 
 

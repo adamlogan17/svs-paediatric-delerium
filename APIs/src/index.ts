@@ -68,7 +68,7 @@ app.delete("/:database/deletedata/:table/:predicate", deleteData);
  * Will log a user into the system
  * @author Adam Logan
  */
-app.get("/login/:username/:password", loginTest);
+app.post("/login", loginTest);
 
 /**
  * Tests the 'authorise' function

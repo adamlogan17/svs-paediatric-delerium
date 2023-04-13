@@ -13,17 +13,19 @@ import {createPool, createSelect} from './crud';
 export function loginTest(request: Request, response: Response): void {
     const POOL = createPool("audit", "admin_role", "password");
 
-    let condition:string = "picu_id=" + request.params.username + " AND password='" + request.params.password + "'";
+    const { username, password } = request.body;
+
+    let condition:string = "picu_id=" + username + " AND password='" + password + "'";
 
     POOL.query(createSelect("picu", condition, ["picu_role"]), (error:any, results:any) => {
         if (error) {
           throw error;
         }
 
-        try {
+        // try {
           const userToken = jwt.sign(
             {
-              userId: request.params.username,
+              userId: username,
               role: results.rows[0].picu_role
             },
             "REPLACE-WITH-PRIVATE-KEY",
@@ -33,9 +35,9 @@ export function loginTest(request: Request, response: Response): void {
             token: userToken,
             role: results.rows[0].picu_role
           });
-        } catch (err) {
-          response.send("Invalid User");
-        }
+        // } catch (err) {
+        //   response.send("Invalid User");
+        // }
         
     });
 }

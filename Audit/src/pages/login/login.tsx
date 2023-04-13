@@ -1,6 +1,5 @@
 import BasicNavBar from '../../components/NavBar/NavBar';
 import PButton from '../../components/PButton/PButton';
-import TypeDropDown from '../../components/TypeDropDown/TypeDropDown';
 import axios from 'axios';
 
 import '../../shared/layout.css';

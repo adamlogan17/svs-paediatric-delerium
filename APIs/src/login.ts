@@ -1,6 +1,7 @@
 import { NextFunction, Request, Response } from "express";
 import jwt, { Secret, JwtPayload } from 'jsonwebtoken';
 import {createPool, createSelect} from './crud';
+import bcrypt from 'bcrypt';
 
 /**
  * Initial login function that creates a JWT token based on the userId and their role
@@ -15,14 +16,23 @@ export function loginTest(request: Request, response: Response): void {
 
     const { username, password } = request.body;
 
-    let condition:string = "picu_id=" + username + " AND password='" + password + "'";
+    console.log(request.body);
 
-    POOL.query(createSelect("picu", condition, ["picu_role"]), (error:any, results:any) => {
+    let condition:string = "picu_id=" + username;
+
+    POOL.query(createSelect("picu", condition, ["picu_role", "password"]), (error:any, results:any) => {
         if (error) {
           throw error;
         }
 
-        // try {
+        bcrypt
+          .compare(password, results.rows[0].picu_role)
+          .then(res => {
+            console.log(res) // return true
+          })
+          .catch(err => console.error(err.message))
+
+        try {
           const userToken = jwt.sign(
             {
               userId: username,
@@ -35,10 +45,9 @@ export function loginTest(request: Request, response: Response): void {
             token: userToken,
             role: results.rows[0].picu_role
           });
-        // } catch (err) {
-        //   response.send("Invalid User");
-        // }
-        
+        } catch (err) {
+          response.send("Invalid User");
+        }
     });
 }
 

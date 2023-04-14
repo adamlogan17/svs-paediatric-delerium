@@ -11,17 +11,17 @@ function insertData(data:any[]):void {
   const configuration = {
     method: "post",
     url: "http://localhost:8000/compData", 
+    headers: { 'Authorization': "bearer " + sessionStorage.getItem('TOKEN') },
     data: {
         table:"compliance_data",
-        data: ["robbie", "hello"]
+        data: data
       }
   };
 
   // make the API call
   axios(configuration)
       .then((result) => {
-          // redirect user to another page
-          window.location.href = "/";
+          alert("Data inserted!");
       })
       .catch((error) => error = new Error());
 }

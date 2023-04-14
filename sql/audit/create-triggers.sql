@@ -10,7 +10,7 @@ BEGIN
 
     RETURN NEW;
 END;
-$calculate_score$ LANGUAGE plpgsql;
+$calculate_score$ LANGUAGE plpgsql SECURITY DEFINER;
 
 -- Sets a update trigger on the fields used to calculate the 'score' field within the 'compliance_comp' table
 CREATE TRIGGER update_calc_score
@@ -35,7 +35,7 @@ BEGIN
     UPDATE picu SET overall_compliance=(SELECT AVG(score) FROM compliance_data WHERE picu_id=NEW.picu_id) WHERE picu_id=NEW.picu_id;
     RETURN NEW;
 END;
-$calculate_overall_score$ LANGUAGE plpgsql;
+$calculate_overall_score$ LANGUAGE plpgsql SECURITY DEFINER;
 
 -- Calculates the 'overall_compliance' field, within the 'picu' table, when data is inserted into the 'compliance_data' table
 CREATE TRIGGER insert_overall_score

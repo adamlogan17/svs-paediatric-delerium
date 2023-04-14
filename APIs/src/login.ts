@@ -65,6 +65,7 @@ export function authenticate(request: Request, response: Response): void {
 export function authorise(request: any, response: Response, next:NextFunction):void {
   try {
     // get the token from the authorization header
+    console.log("authorise");
     const token:string = request.headers.authorization.split(" ")[1];
 
     // retrieve the user details of the logged in user

@@ -7,21 +7,12 @@
       - [**Backend**](#backend)
     - [Typescript File](#typescript-file)
   - [Initialising DB](#initialising-db)
+  - [Access Database Server](#access-database-server)
+    - [CLI](#cli)
+    - [pgAdmin4](#pgadmin4)
+      - [**Access**](#access)
+      - [**View Tables**](#view-tables)
   - [How to use server](#how-to-use-server)
-  - [Useful links](#useful-links)
-    - [Setting up project](#setting-up-project)
-    - [Database Set Up](#database-set-up)
-    - [REST APIs](#rest-apis)
-    - [Docker](#docker)
-    - [D3.js](#d3js)
-    - [Connecting to postgres in nodejs](#connecting-to-postgres-in-nodejs)
-    - [SQL commands](#sql-commands)
-    - [Removing containers, volumes and images](#removing-containers-volumes-and-images)
-    - [Bash Scripting](#bash-scripting)
-    - [React Components](#react-components)
-    - [Bootstrap](#bootstrap)
-    - [Login](#login)
-  - [Useful vscode extension ids](#useful-vscode-extension-ids)
 
 # svs-paediatric-delerium
 
@@ -87,96 +78,41 @@ vi database-set-up.sh
 
 If you would like to change the setup of the database alter the ```.sql``` files within the relevant database folder within the ```sql``` folder.
 
+## Access Database Server
+
+### CLI
+
+To access the database once the container is running use the command ```docker exec -it containerID psql -U postgres``` where ```containerID``` is replaced with the ID of the database container.
+
+### pgAdmin4
+
+The instructions [here](https://towardsdatascience.com/how-to-run-postgresql-and-pgadmin-using-docker-3a6a8ae918b5) were followed to set up pgAdmin4.
+
+#### **Access**
+
+The instructions below must be repeated every time the project is launched.
+
+1. Go to <http://localhost:5050/>, the page may take a while to load
+2. Enter in the following details
+
+    - username = admin@admin.com
+    - password = root
+
+3. Select 'Add New Server'
+4. Enter any name you would like for the server to be called
+5. Select the 'Configuration' tab and enter the below details, the default values for the other fields mentioned below should be left
+
+    - Host name/address = svs_postgres
+    - Username = postgres
+    - Password = postgrespw
+
+#### **View Tables**
+
+- Within the side panel go to serverName -> Databases -> databaseName -> Schemas -> public -> Tables
+  - Replace 'severName' with the name given to the server in step 4 within the [Access](#access) section
+  - Replace 'databaseName' with the specific name of the database in which the tables are contained in
+- To view the data within the table right click the table name and select 'View/Edit Data'
+
 ## How to use server
 
 "See the message from IT admin. EEECS students can login to my server (143.117.69.4) machine in ECIT using their existing EEECS accounts. When they login the format at the login screen is studentnumber@eeecs.qub.ac.uk - they use the password they use when they login to the machines in the CSB or the Ashby.  We can't give access to the ECIT VPN to undergrad students. So students will need to access this machine from the campus."
-
-## Useful links
-
-### Setting up project
-
-- <https://khalilstemmler.com/blogs/typescript/node-starter-project/>
-- <https://khalilstemmler.com/blogs/typescript/eslint-for-typescript/>
-- <https://www.toptal.com/nodejs/secure-rest-api-in-nodejs>
-
-### Database Set Up
-
-- <https://stackoverflow.com/questions/27176781/bash-file-returns-unexpected-token-do-r>
-- <https://levelup.gitconnected.com/creating-and-filling-a-postgres-db-with-docker-compose-e1607f6f882f>
-
-### REST APIs
-
-- <https://medium.com/swlh/interacting-with-restful-apis-using-typescript-react-hooks-and-axios-part-1-af52920ae3e4>
-- <https://www.freecodecamp.org/news/how-to-consume-rest-apis-in-react/>
-
-### Docker
-
-- <https://medium.com/bb-tutorials-and-thoughts/dockerizing-react-app-with-nodejs-backend-typescript-version-55a40389b0ac>
-- <https://www.youtube.com/watch?v=gAkwW2tuIqE>
-- <https://wkrzywiec.medium.com/how-to-run-database-backend-and-frontend-in-a-single-click-with-docker-compose-4bcda66f6de>
-- <https://saasbase.dev/blog/dockerfile-for-react-and-typescript>
-- <https://rsbh.dev/blogs/rest-api-express-typescript-docker>
-  
-### D3.js
-
-- <https://www.pluralsight.com/guides/using-d3.js-inside-a-react-app>
-
-### Connecting to postgres in nodejs
-
-- <https://blog.logrocket.com/crud-rest-api-node-js-express-postgresql/#what-node-postgres>
-- <https://dev.to/chandrapantachhetri/docker-postgres-node-typescript-setup-47db>
-- <https://node-postgres.com/features/connecting>
-- <https://stackoverflow.com/questions/58254717/returning-the-result-of-a-node-postgres-query>
-- <https://stackoverflow.com/questions/61871242/how-to-call-result-out-side-the-pool-query-in-node-js>
-
-### SQL commands
-
-- <https://www.postgresqltutorial.com/postgresql-tutorial/postgresql-upsert/>
-- <https://www.postgresqltutorial.com/postgresql-tutorial/postgresql-foreign-key/>
-- <https://www.postgresqltutorial.com/postgresql-triggers/#:~:text=A%20PostgreSQL%20trigger%20is%20a,%2C%20update%2C%20or%20delete%20occurs.>
-- <https://stackoverflow.com/questions/55488508/how-to-create-trigger-after-update-of-a-table-on-multiple-column-in-postgresql>
-
-### Removing containers, volumes and images
-
-- <https://www.digitalocean.com/community/tutorials/how-to-remove-docker-images-containers-and-volumes>
-
-### Bash Scripting
-
-- <http://www.freekb.net/Article?id=1140>
-- <https://stackoverflow.com/questions/27176781/bash-file-returns-unexpected-token-do-r>
-
-### React Components
-
-- <https://react-bootstrap.github.io/components/navbar/>
-- <https://blog.logrocket.com/using-bootstrap-with-react-tutorial-with-examples/>
-- <https://stackoverflow.com/questions/32229910/react-bootstrap-contains-no-css>
-
-### Bootstrap
-
-- <https://mdbootstrap.com/docs/standard/extended/colors-code/>
-- <https://react-bootstrap.github.io/components/dropdowns/>
-
-### Login
-
-- <https://www.freecodecamp.org/news/how-to-build-a-fullstack-authentication-system-with-react-express-mongodb-heroku-and-netlify/#how-to-create-the-login-endpoint>
-- <https://dev.to/juliecherner/authentication-with-jwt-tokens-in-typescript-with-express-3gb1>
-
-## Useful vscode extension ids
-
-- formulahendry.auto-rename-tag
-- ms-azuretools.vscode-docker
-- dsznajder.es7-react-js-snippets
-- dbaeumer.vscode-eslint
-- eamodio.gitlens
-- ecmel.vscode-html-css
-- ms-vscode.vscode-typescript-next
-- Orta.vscode-jest
-- yzhang.markdown-all-in-one
-- waderyan.nodejs-extension-pack
-- christian-kohler.path-intellisense
-- rangav.vscode-thunder-client
-- aaron-bond.better-comments
-- vitaliymaz.vscode-svg-previewer
-- DavidAnson.vscode-markdownlint
-- winkchen.parser-jsdoc
-- esbenp.prettier-vscode

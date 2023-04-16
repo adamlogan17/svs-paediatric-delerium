@@ -1,6 +1,6 @@
 CREATE TABLE IF NOT EXISTS picu (
   picu_id SERIAL PRIMARY KEY,
-  password VARCHAR NOT NULL,
+  password CHAR(60) NOT NULL,
   ward_name VARCHAR NOT NULL,
   hospital_name VARCHAR NOT NULL,
   auditor VARCHAR NOT NULL,

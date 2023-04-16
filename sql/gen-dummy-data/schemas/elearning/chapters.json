@@ -1,0 +1,23 @@
+{
+    "tableName": "chapters",
+    "rows": [
+        {
+            "name": "chapter_name",
+            "dataType" : "string"
+        },
+        {
+            "name":"pass_score",
+            "dataType" : "decimal",
+            "decimalPlace": 2
+        },
+        {
+            "name":"num_pages",
+            "dataType" : "integer"
+        },
+        {
+            "name":"course_id",
+            "dataType" : "integer",
+            "forceVal": 1
+        }
+    ]
+}

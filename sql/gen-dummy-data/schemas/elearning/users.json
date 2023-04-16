@@ -1,0 +1,37 @@
+
+{
+    "tableName": "users",
+    "rows" : [
+        {
+            "name": "email",
+            "dataType": "string",
+            "unique": true
+        },
+        {
+            "name": "password",
+            "dataType": "string",
+            "forceVal": "$2a$10$QKROIDI35N4hIOQ1qwVwU.25ciIBjum/8mgQNEfzK.fMbMgJhUUUi"
+        },
+        {
+            "name": "forename",
+            "dataType": "string"
+        },
+        {
+            "name": "surname",
+            "dataType": "string"
+        },
+        {
+            "name": "profession",
+            "dataType": "string"
+        },
+        {
+            "name": "country",
+            "dataType": "string"
+        },
+        {
+            "name": "user_role",
+            "dataType": "string",
+            "possibleVals": ["learner", "admin", "field_engineer"]
+        }
+    ]
+}

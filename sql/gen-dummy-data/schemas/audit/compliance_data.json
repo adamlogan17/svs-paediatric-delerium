@@ -1,0 +1,51 @@
+{
+    "tableName":"compliance_data",
+    "rows":[
+        {
+            "name": "entry_date",
+            "dataType": "datetime"
+        },
+        {
+            "name": "method",
+            "dataType": "string",
+            "possibleVals": ["SOSPD", "CAPD"]
+        },
+        {
+            "name": "bed_number",
+            "dataType": "integer"
+        }, 
+        {
+            "name": "picu_id",
+            "dataType": "integer",
+            "valRange": [1,23]
+        },
+        {
+            "name": "correct_details",
+            "dataType": "boolean"
+        },
+        {
+            "name": "comfort_recorded",
+            "dataType": "boolean"
+        },
+        {
+            "name": "comfort_above",
+            "dataType": "boolean"
+        },
+        {
+            "name": "all_params_scored",
+            "dataType": "boolean"
+        },
+        {
+            "name": "totalled_correctly",
+            "dataType": "boolean"
+        },
+        {
+            "name": "in_score_range",
+            "dataType": "boolean"
+        },
+        {
+            "name": "observer_name",
+            "dataType": "boolean"
+        }
+    ]
+}

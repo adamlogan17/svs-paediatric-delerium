@@ -18,9 +18,15 @@ CREATE TABLE IF NOT EXISTS courses (
 
 CREATE TABLE IF NOT EXISTS chapters (
   chapter_id SERIAL PRIMARY KEY,
-  chapter_name VARCHAR NOT NULL UNIQUE,
+  chapter_name VARCHAR NOT NULL,
   pass_score DECIMAL NOT NULL,
-  num_pages INTEGER NOT NULL
+  num_pages INTEGER NOT NULL,
+  course_id INTEGER NOT NULL,
+  CONSTRAINT fk_courses
+    FOREIGN KEY (course_id) 
+	  REFERENCES courses (course_id)
+	  ON DELETE CASCADE,
+  UNIQUE (chapter_name, course_id)
 );
 
 CREATE TABLE IF NOT EXISTS enrollment (
@@ -36,7 +42,8 @@ CREATE TABLE IF NOT EXISTS enrollment (
   CONSTRAINT fk_courses
     FOREIGN KEY (course_id) 
 	  REFERENCES courses (course_id)
-	  ON DELETE CASCADE
+	  ON DELETE CASCADE,
+  UNIQUE (user_id, course_id)
 );
 
 CREATE TABLE IF NOT EXISTS progression (
@@ -53,5 +60,6 @@ CREATE TABLE IF NOT EXISTS progression (
   CONSTRAINT fk_chapters
     FOREIGN KEY (chapter_id) 
       REFERENCES chapters (chapter_id)
-      ON DELETE CASCADE
+      ON DELETE CASCADE,
+  UNIQUE (user_id, chapter_id)
 );

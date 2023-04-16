@@ -1,0 +1,20 @@
+{
+    "tableName":"enrollment",
+    "rows": [
+        {
+            "name":"enrollment_date",
+            "dataType" : "datetime"
+        },
+        {
+            "name":"user_id",
+            "dataType" : "integer",
+            "unique" : true,
+            "valRange": [1,20]
+        },
+        {
+            "name":"course_id",
+            "dataType" : "integer",
+            "forceVal": 1
+        }
+    ]
+}

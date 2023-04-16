@@ -1,0 +1,32 @@
+{
+    "tableName":"progression",
+    "rows": [
+        {
+            "name":"user_id",
+            "dataType" : "integer",
+            "unique" : true,
+            "valRange": [1,20]
+        }, 
+        {
+            "name":"chapter_id",
+            "dataType" : "integer",
+            "unique" : true,
+            "valRange": [1,6]
+        }, 
+        {
+            "name":"current_page",
+            "dataType":"integer"
+        },
+        {
+            "name":"completed_date",
+            "dataType":"datetime"
+        },
+        {
+            "name":"score",
+            "dataType" : "decimal",
+            "unique" : true,
+            "valRange": [1,100],
+            "decimalPlace":2
+        }
+    ]
+}

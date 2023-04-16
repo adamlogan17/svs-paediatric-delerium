@@ -24,8 +24,11 @@ function authenticateUser(username:string|undefined, password:string|undefined):
             sessionStorage.setItem("ROLE", result.data.role);
             sessionStorage.setItem("SITE", result.data.username);
 
-            // redirect user to another page
-            window.location.href = "/";
+            if(result.data.token === undefined) {
+                alert("Invalid username or password");
+            } else {
+                alert("Logged in as " + result.data.username + " with the role of " + result.data.role);
+            }
         })
         .catch((error) => error = new Error());
 }

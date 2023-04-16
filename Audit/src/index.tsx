@@ -23,7 +23,7 @@ const token:string|null = sessionStorage.getItem("TOKEN");
 const role:string|null = sessionStorage.getItem("ROLE");
 
 // Below are the access conditions for each role, and which pages they can access
-let adminAccess:boolean = false;
+let adminAccess:boolean = token !== (undefined || null) && role === 'admin';
 let picuAccess:boolean = token !== (undefined || null) && role === 'picu';
 let fieldAccess:boolean = false;
 
@@ -38,8 +38,7 @@ root.render(
           {picuAccess ? <Route path="/otherPage" element={<OtherPage />}/> : <></>}
           <Route path="/auditGraphs" element={<AuditGraphs />}/>
           <Route path="*" element={<NoPage />}/>
-          <Route path="/admin" element={<Admin />}/>
-          <Route path="/adminpassword" element={<AdminPassword />}/>
+          {adminAccess ? <Route path="/admin" element={<Admin />}/>: <></>}
       </Routes>
     </Router>
   

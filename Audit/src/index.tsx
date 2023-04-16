@@ -12,6 +12,7 @@ import NoPage from './pages/NoPage/NoPage'; // to demonstrate routing
 import Login from './pages/login/login';
 import Form from './pages/Form/form';
 import Admin from './pages/Admin/Admin';
+import AdminPassword from './pages/Admin/AdminPassword';
 import AuditGraphs from './pages/AuditGraphs/AuditGraphs';
 
 const root = ReactDOM.createRoot(
@@ -38,6 +39,7 @@ root.render(
           <Route path="/auditGraphs" element={<AuditGraphs />}/>
           <Route path="*" element={<NoPage />}/>
           <Route path="/admin" element={<Admin />}/>
+          <Route path="/adminpassword" element={<AdminPassword />}/>
       </Routes>
     </Router>
   

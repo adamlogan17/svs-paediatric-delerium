@@ -10,7 +10,7 @@ for db in "${dbs[@]}"; do
     do
         # checks if a file exists, and if it does executes it
         if [ -f "$file" ]
-        then
+      	then
             echo "Executing $file"
             psql -d ${db} -f "$file"
         fi

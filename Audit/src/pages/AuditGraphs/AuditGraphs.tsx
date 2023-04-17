@@ -60,6 +60,8 @@ function AuditGraphs() {
       .then((result => setChartData(result.data)))
       .catch((error) => error = new Error());
 
+    console.log(chartData);
+
   // let test = getLineChartData(entryDates.map((date:string) => new Date(date)), complianceScore);
   // console.log(test.toString())
   //console.log(chartData)

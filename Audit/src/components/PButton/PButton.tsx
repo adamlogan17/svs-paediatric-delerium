@@ -1,7 +1,7 @@
 import Button from 'react-bootstrap/Button';
 import useHover from '../../hooks/useAPI/useHover';
 
-function PButton(props:{text:string, onButtonClick?:any, primaryColour?:string, secondaryColour?:string, textColor?:string}) {
+function PButton(props:{text:string, onButtonClick?:any, primaryColour?:string, secondaryColour?:string, textColor?:string, width?:string}) {
   const checkHover = useHover();
 
   const primColour:string = props.primaryColour === undefined ? "#009999" : props.primaryColour;
@@ -10,7 +10,8 @@ function PButton(props:{text:string, onButtonClick?:any, primaryColour?:string, 
   const newStyle:any = {
     backgroundColor: checkHover.hoverVar ? secColour : primColour,
     borderColor: primColour,
-    color: props.textColor
+    color: props.textColor,
+    width: props.width
   };
 
   return (

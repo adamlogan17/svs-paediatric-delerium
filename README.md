@@ -7,6 +7,11 @@
       - [**Backend**](#backend)
     - [Typescript File](#typescript-file)
   - [Initialising DB](#initialising-db)
+  - [Access Database Server](#access-database-server)
+    - [CLI](#cli)
+    - [pgAdmin4](#pgadmin4)
+      - [**Access**](#access)
+      - [**View Tables**](#view-tables)
   - [How to use server](#how-to-use-server)
   - [Useful links](#useful-links)
     - [Setting up project](#setting-up-project)
@@ -87,6 +92,41 @@ vi database-set-up.sh
 ```
 
 If you would like to change the setup of the database alter the ```.sql``` files within the relevant database folder within the ```sql``` folder.
+
+## Access Database Server
+
+### CLI
+
+To access the database once the container is running use the command ```docker exec -it containerID psql -U postgres``` where ```containerID``` is replaced with the ID of the database container.
+
+### pgAdmin4
+
+The instructions [here](https://towardsdatascience.com/how-to-run-postgresql-and-pgadmin-using-docker-3a6a8ae918b5) were followed to set up pgAdmin4.
+
+#### **Access**
+
+The instructions below must be repeated every time the project is launched.
+
+1. Go to <http://localhost:5050/>, the page may take a while to load
+2. Enter in the following details
+
+    - username = admin@admin.com
+    - password = root
+
+3. Select 'Add New Server'
+4. Enter any name you would like for the server to be called
+5. Select the 'Configuration' tab and enter the below details, the default values for the other fields mentioned below should be left
+
+    - Host name/address = svs_postgres
+    - Username = postgres
+    - Password = postgrespw
+
+#### **View Tables**
+
+- Within the side panel go to serverName -> Databases -> databaseName -> Schemas -> public -> Tables
+  - Replace 'severName' with the name given to the server in step 4 within the [Access](#access) section
+  - Replace 'databaseName' with the specific name of the database in which the tables are contained in
+- To view the data within the table right click the table name and select 'View/Edit Data'
 
 ## How to use server
 

@@ -11,6 +11,8 @@ import OtherPage from './pages/OtherPage/OtherPage'; // to demonstrate routing
 import NoPage from './pages/NoPage/NoPage'; // to demonstrate routing
 import Login from './pages/login/login';
 import Form from './pages/Form/form';
+import Admin from './pages/Admin/Admin';
+import AdminPassword from './pages/Admin/AdminPassword';
 import AuditGraphs from './pages/AuditGraphs/AuditGraphs';
 
 const root = ReactDOM.createRoot(
@@ -21,7 +23,7 @@ const token:string|null = sessionStorage.getItem("TOKEN");
 const role:string|null = sessionStorage.getItem("ROLE");
 
 // Below are the access conditions for each role, and which pages they can access
-let adminAccess:boolean = false;
+let adminAccess:boolean = token !== (undefined || null) && role === 'admin';
 let picuAccess:boolean = token !== (undefined || null) && role === 'picu';
 let fieldAccess:boolean = false;
 
@@ -32,10 +34,11 @@ root.render(
       <Routes>
           <Route index path="/" element={<Home />}/>
           <Route path="/login" element={<Login />}/>
-          <Route path="/form" element={<Form />}/>
+          {picuAccess ? <Route path="/form" element={<Form />}/> : <></>}
           {picuAccess ? <Route path="/otherPage" element={<OtherPage />}/> : <></>}
           <Route path="/auditGraphs" element={<AuditGraphs />}/>
           <Route path="*" element={<NoPage />}/>
+          {adminAccess ? <Route path="/admin" element={<Admin />}/>: <></>}
       </Routes>
     </Router>
   

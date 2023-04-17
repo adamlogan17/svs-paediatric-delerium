@@ -2,29 +2,34 @@
 
 INSERT INTO picu (ward_name, hospital_name, auditor, password) 
     VALUES 
-        ('Adamstown','Pitcairn Islands','Iona Thomas', 'pass1'),
-        ('Camp Thunder Cove','British Indian Ocean Territory','Paul Candler', 'pass1'),
-        ('Maseru','Lesotho','Sam Matekane', 'pass1'),
-        ('Rabat','Morocco','Aziz Akhannouch', 'pass1'),
-        ('Riga','Latvia','Egils Levits', 'pass1'),
-        ('Ulaanbaatar','Mongolia','Luvsannamsrain Oyun-Erdene', 'pass1'),
-        ('Vaduz','Liechtenstein','Daniel Risch', 'pass1'),
-        ('Caracas','Venezuela','Nicolas Maduro', 'pass1'),
-        ('Riyadh','Saudi Arabia','Mohammed bin Salman', 'pass1'),
-        ('Riyadh','El Salvador','Nayib Bukele', 'pass1'),
-        ('Skopje','North Macedonia','Stevo Pendarovski', 'pass1'),
-        ('South Tarawa','Kiribati','Taneti Maamau', 'pass1'),
-        ('Port of Spain','Trinidad and Tobago','Keith Rowley', 'pass1'),
-        ('Philipsburg','Sint Maarten','Silveria Jacobs', 'pass1'),
-        ('Port Louis','Mauritius','Pravind Jugnauth', 'pass1'),
-        ('NDjamena','Chad','Saleh Kebzabo', 'pass1'),
-        ('Muscat','Oman','Haitham bin Tariq', 'pass1'),
-        ('Pago Pago','American Samoa','Lemanu Peleti Mauga', 'pass1'),
-        ('Papeete','French Polynesia','Edouard Fritch', 'pass1'),
-        ('Nuuk','Greenland','Julie Prast Wilche', 'pass1'),
-        ('Ottawa','Canada','Justin Trudeau', 'pass1'),
-        ('Monrovia','Liberia','George Weah', 'pass1'),
-        ('Nassau','Bahamas','Philip Davis', 'pass1');
+        ('Adamstown','Pitcairn Islands','Iona Thomas', '$2a$10$QKROIDI35N4hIOQ1qwVwU.25ciIBjum/8mgQNEfzK.fMbMgJhUUUi'),
+        ('Camp Thunder Cove','British Indian Ocean Territory','Paul Candler', '$2a$10$QKROIDI35N4hIOQ1qwVwU.25ciIBjum/8mgQNEfzK.fMbMgJhUUUi'),
+        ('Maseru','Lesotho','Sam Matekane', '$2a$10$QKROIDI35N4hIOQ1qwVwU.25ciIBjum/8mgQNEfzK.fMbMgJhUUUi'),
+        ('Rabat','Morocco','Aziz Akhannouch', '$2a$10$QKROIDI35N4hIOQ1qwVwU.25ciIBjum/8mgQNEfzK.fMbMgJhUUUi'),
+        ('Riga','Latvia','Egils Levits', '$2a$10$QKROIDI35N4hIOQ1qwVwU.25ciIBjum/8mgQNEfzK.fMbMgJhUUUi'),
+        ('Ulaanbaatar','Mongolia','Luvsannamsrain Oyun-Erdene', '$2a$10$QKROIDI35N4hIOQ1qwVwU.25ciIBjum/8mgQNEfzK.fMbMgJhUUUi'),
+        ('Vaduz','Liechtenstein','Daniel Risch', '$2a$10$QKROIDI35N4hIOQ1qwVwU.25ciIBjum/8mgQNEfzK.fMbMgJhUUUi'),
+        ('Caracas','Venezuela','Nicolas Maduro', '$2a$10$QKROIDI35N4hIOQ1qwVwU.25ciIBjum/8mgQNEfzK.fMbMgJhUUUi'),
+        ('Riyadh','Saudi Arabia','Mohammed bin Salman', '$2a$10$QKROIDI35N4hIOQ1qwVwU.25ciIBjum/8mgQNEfzK.fMbMgJhUUUi'),
+        ('Riyadh','El Salvador','Nayib Bukele', '$2a$10$QKROIDI35N4hIOQ1qwVwU.25ciIBjum/8mgQNEfzK.fMbMgJhUUUi'),
+        ('Skopje','North Macedonia','Stevo Pendarovski', '$2a$10$QKROIDI35N4hIOQ1qwVwU.25ciIBjum/8mgQNEfzK.fMbMgJhUUUi'),
+        ('South Tarawa','Kiribati','Taneti Maamau', '$2a$10$QKROIDI35N4hIOQ1qwVwU.25ciIBjum/8mgQNEfzK.fMbMgJhUUUi'),
+        ('Port of Spain','Trinidad and Tobago','Keith Rowley', '$2a$10$QKROIDI35N4hIOQ1qwVwU.25ciIBjum/8mgQNEfzK.fMbMgJhUUUi'),
+        ('Philipsburg','Sint Maarten','Silveria Jacobs', '$2a$10$QKROIDI35N4hIOQ1qwVwU.25ciIBjum/8mgQNEfzK.fMbMgJhUUUi'),
+        ('Port Louis','Mauritius','Pravind Jugnauth', '$2a$10$QKROIDI35N4hIOQ1qwVwU.25ciIBjum/8mgQNEfzK.fMbMgJhUUUi'),
+        ('NDjamena','Chad','Saleh Kebzabo', '$2a$10$QKROIDI35N4hIOQ1qwVwU.25ciIBjum/8mgQNEfzK.fMbMgJhUUUi'),
+        ('Muscat','Oman','Haitham bin Tariq', '$2a$10$QKROIDI35N4hIOQ1qwVwU.25ciIBjum/8mgQNEfzK.fMbMgJhUUUi'),
+        ('Pago Pago','American Samoa','Lemanu Peleti Mauga', '$2a$10$QKROIDI35N4hIOQ1qwVwU.25ciIBjum/8mgQNEfzK.fMbMgJhUUUi'),
+        ('Papeete','French Polynesia','Edouard Fritch', '$2a$10$QKROIDI35N4hIOQ1qwVwU.25ciIBjum/8mgQNEfzK.fMbMgJhUUUi'),
+        ('Nuuk','Greenland','Julie Prast Wilche', '$2a$10$QKROIDI35N4hIOQ1qwVwU.25ciIBjum/8mgQNEfzK.fMbMgJhUUUi'),
+        ('Ottawa','Canada','Justin Trudeau', '$2a$10$QKROIDI35N4hIOQ1qwVwU.25ciIBjum/8mgQNEfzK.fMbMgJhUUUi'),
+        ('Monrovia','Liberia','George Weah', '$2a$10$QKROIDI35N4hIOQ1qwVwU.25ciIBjum/8mgQNEfzK.fMbMgJhUUUi'),
+        ('Nassau','Bahamas','Philip Davis', '$2a$10$QKROIDI35N4hIOQ1qwVwU.25ciIBjum/8mgQNEfzK.fMbMgJhUUUi');
+
+INSERT INTO picu (ward_name, hospital_name, auditor, password, picu_role)
+    VALUES
+        ('Adamstown','Pitcairn Islands','Iona Thomas', '$2a$10$QKROIDI35N4hIOQ1qwVwU.25ciIBjum/8mgQNEfzK.fMbMgJhUUUi', 'admin'),
+        ('Adamstown','Pitcairn Islands','Iona Thomas', '$2a$10$QKROIDI35N4hIOQ1qwVwU.25ciIBjum/8mgQNEfzK.fMbMgJhUUUi', 'field_engineer');
 
 -- Initial 'compliance_data'
 INSERT INTO compliance_data (entry_date, method, bed_number, correct_details, 

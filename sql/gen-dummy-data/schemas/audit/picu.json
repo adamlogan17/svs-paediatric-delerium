@@ -1,0 +1,26 @@
+{
+    "tableName":"picu",
+    "rows": [
+        {
+            "name": "password",
+            "dataType": "string",
+            "forceVal": "$2a$10$QKROIDI35N4hIOQ1qwVwU.25ciIBjum/8mgQNEfzK.fMbMgJhUUUi"
+        },
+        {
+            "name":"ward_name",
+            "dataType":"string"
+        },
+        {
+            "name":"hospital_name",
+            "dataType":"string"
+        },
+        {
+            "name":"auditor",
+            "dataType":"string"
+        }, 
+        {
+            "name":"picu_role",
+            "dataType":"string"
+        }
+    ]
+}

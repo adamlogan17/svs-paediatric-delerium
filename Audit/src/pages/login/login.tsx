@@ -1,6 +1,5 @@
 import BasicNavBar from '../../components/NavBar/NavBar';
 import PButton from '../../components/PButton/PButton';
-import TypeDropDown from '../../components/TypeDropDown/TypeDropDown';
 import axios from 'axios';
 
 import '../../shared/layout.css';
@@ -8,10 +7,13 @@ import './login.css';
 import { useRef } from 'react';
 
 function authenticateUser(username:string|undefined, password:string|undefined):void {
-    
     const configuration = {
-        method: "get",
-        url: "http://localhost:8000/login/" + username + "/"+ password
+        method: "post",
+        url: "http://localhost:8000/login", 
+        data: {
+                username: username,
+                password: password
+            }
     };
     
     // make the API call
@@ -20,12 +22,15 @@ function authenticateUser(username:string|undefined, password:string|undefined):
             // sets the cookies
             sessionStorage.setItem("TOKEN", result.data.token);
             sessionStorage.setItem("ROLE", result.data.role);
+            sessionStorage.setItem("SITE", result.data.username);
 
-            // redirect user to another page
-            window.location.href = "/";
+            if(result.data.token === undefined) {
+                alert("Invalid username or password");
+            } else {
+                alert("Logged in as " + result.data.username + " with the role of " + result.data.role);
+            }
         })
         .catch((error) => error = new Error());
-      
 }
 
 

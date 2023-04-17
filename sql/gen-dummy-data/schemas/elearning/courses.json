@@ -1,0 +1,10 @@
+{
+    "tableName": "courses",
+    "rows": [
+        {
+            "name": "course_name",
+            "dataType" : "string",
+            "unique": true
+        }
+    ]
+}

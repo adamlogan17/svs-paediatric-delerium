@@ -124,15 +124,23 @@ export function createDelete(table: string, predicate?:string) : string {
 export function getAll(request: Request, response: Response): void {
   const table:string = request.params.table;
 
-  const POOL = createPool(request.params.database, "test_user", "password");
+  let userForDb:string = request.params.role === undefined ? "postgres" : request.params.role + "_role";
 
-  POOL.query(createSelect(table), (error, results) => {
-    if (error) {
-      throw error;
+  let passForDb:string = request.params.role === undefined ? "postgrespw": "password";
+
+  const POOL = createPool(request.params.database, userForDb, passForDb);
+
+  POOL.query(createSelect(table), (error:any, results:any) => {
+    if(error == undefined) {
+      response.send({
+        allData: results.rows
+      });
     }
-    response.send({
-      allData: results.rows
-    });
+    else if (error.code == 42501) {
+      response.send("Invalid user");
+    } else {
+      response.send(error);
+    }
   });
 }
 
@@ -146,14 +154,25 @@ export function getAll(request: Request, response: Response): void {
  */
 export function insertData(request: Request, response: Response): void {
   const { table, columns, data } = request.body;
-  
-  const POOL = createPool(request.params.database, "test_user", "password");
 
-  POOL.query(createInsert(table, columns, data), (error, results) => {
+  let userForDb:string = request.params.role === undefined ? "postgres" : request.params.role + "_role";
+
+  let passForDb:string = request.params.role === undefined ? "postgrespw": "password";
+
+  const POOL = createPool(request.params.database, userForDb, passForDb);
+  
+  POOL.query(createInsert(table, columns, data), (error:any, results:any) => {
+    if(error == undefined) {
+      response.send("Successfully Inserted the Data 😊");
+    }
+    else if (error.code == 42501) {
+      response.send("Invalid user");
+    } else {
+      response.send(error);
+    }
     if (error) {
       throw error;
     }
-    response.send("Successfully Inserted the Data 😊");
   });
 }
 
@@ -168,13 +187,22 @@ export function insertData(request: Request, response: Response): void {
 export function updateData(request: Request, response: Response): void {
   const { table, columns, data, predicate } = request.body;
   
-  const POOL = createPool(request.params.database, "test_user", "password");
+  let userForDb:string = request.params.role === undefined ? "postgres" : request.params.role + "_role";
 
-  POOL.query(createUpdate(table, columns, data, predicate), (error, results) => {
-    if (error) {
-      throw error;
+  let passForDb:string = request.params.role === undefined ? "postgrespw": "password";
+
+  const POOL = createPool(request.params.database, userForDb, passForDb);
+
+  POOL.query(createUpdate(table, columns, data, predicate), (error:any, results:any) => {
+    if(error == undefined) {
+      response.send("Successfully Updated the Data 😊");
     }
-    response.send("Successfully Updated the Data 😊");
+    else if (error.code == 42501) {
+      response.send("Invalid user");
+    } else {
+      response.send(error);
+    }
+    
   });
 }
 
@@ -190,14 +218,20 @@ export function deleteData(request: Request, response: Response): void {
   const TABLE:string = request.params.table;
   const PREDICATE:string = request.params.predicate;
   
-  const POOL = createPool(request.params.database, "postgres", "postgrespw");
+  let userForDb:string = request.params.role === undefined ? "postgres" : request.params.role + "_role";
 
-  console.log(createDelete(TABLE, PREDICATE));
+  let passForDb:string = request.params.role === undefined ? "postgrespw": "password";
 
-  POOL.query(createDelete(TABLE, PREDICATE), (error, results) => {
-    if (error) {
-      throw error;
+  const POOL = createPool(request.params.database, userForDb, passForDb);
+
+  POOL.query(createDelete(TABLE, PREDICATE), (error:any, results:any) => {
+    if(error == undefined) {
+      response.send("Successfully Deleted the Data 😊");
     }
-    response.send("Successfully Deleted the Data 😊");
+    else if (error.code == 42501) {
+      response.send("Invalid user");
+    } else {
+      response.send(error);
+    }
   });
 }

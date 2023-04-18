@@ -13,6 +13,7 @@
     - [React Components](#react-components)
     - [Bootstrap](#bootstrap)
     - [Login](#login)
+    - [Chart.js](#chartjs)
   - [Useful vscode extension ids](#useful-vscode-extension-ids)
 
 # useful-resources
@@ -96,6 +97,11 @@
 
 - <https://www.freecodecamp.org/news/how-to-build-a-fullstack-authentication-system-with-react-express-mongodb-heroku-and-netlify/#how-to-create-the-login-endpoint>
 - <https://dev.to/juliecherner/authentication-with-jwt-tokens-in-typescript-with-express-3gb1>
+
+### Chart.js
+
+- <https://react-chartjs-2.js.org/examples/line-chart>
+- <https://stackoverflow.com/questions/68076078/react-hook-is-not-calling-api-after-first-load-sometimes-not-at-all>
 
 ## Useful vscode extension ids
 

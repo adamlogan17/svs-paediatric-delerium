@@ -1,119 +1,84 @@
 import BasicNavBar from '../../components/NavBar/NavBar';
 import TypeDropDown from '../../components/TypeDropDown/TypeDropDown';
 import PButton from '../../components/PButton/PButton';
-import LineChart from '../../components/LineGraph/LineGraph';
 import Chart from "chart.js/auto";
 import { CategoryScale } from "chart.js";
-import BodyText from '../../components/BodyText/BodyText';
 import useGetAPI from '../../hooks/useAPI/useAPI';
 
 import '../../shared/layout.css';
+import LineGraph from '../../components/LineGraph/LineGraph';
 import axios from 'axios';
-import { useState } from 'react';
-
-
+import { useEffect, useState } from 'react';
 
 Chart.register(CategoryScale);
 
-function getLineChartData(xValues: Date[], yValues:number[]) : any {
+function getLineChartData(xValues: string[], yValues:number[]) : any {
   return {
-    type: "line",
-    data: {
-      labels: xValues,
-      datasets: [{
-        fill: false,
-        pointRadius: 1,
-        borderColor: "rgba(255,0,0,0.5)",
-        data: yValues
-      }]
-    }
-  };
+    labels: xValues,
+    datasets: [{
+      pointRadius: 1,
+      borderColor: "rgba(255,255,255,1)",
+      data: yValues
+    }]
+  }
 }
-// function dbGetAPI() {
-//   const configuration = {
-//     method: "get",
-//     url: "http://localhost:8000/chartData/singleSite/1"
-//   };  
-//   axios(configuration)
-//       .then((result) => {
-//         return result
-//       })
-//       .catch((error) => error = new Error());
-// }
-function AuditGraphs() { 
-  // const { complianceScore , entryDates } = useGetAPI([], "http://localhost:8000/chartData/singleSite/1");
 
-  // console.log(useGetAPI([], "http://localhost:8000/chartData/singleSite/1"));
-  // console.log(useGetAPI([], "http://localhost:8000/chartData/singleSite/1").toString());
-
+function AuditGraphs() {
   const [chartData, setChartData] = useState({
-    "entryDates": ['2023-04-13T00:00:00.000Z'], "complianceScore":[0]
+    entryDates: ['1970-01-01T00:00:00.000Z'], complianceScore:[0]
   });
-  
-  const configuration = {
-    method: "get",
-    url: "http://localhost:8000/chartData/singleSite/1"
-};
 
-  // make the API call
-  axios(configuration)
-      .then((result => setChartData(result.data)))
-      .catch((error) => error = new Error());
+  useEffect(() => {
+      const fetchAPI = async () => {
+          const configuration = {
+                  method: "get",
+                  url: "http://localhost:8000/chartData/singleSite/1"
+              };
+          try {
+              let response = await axios(configuration);
+              console.log(response);
+              setChartData(response.data);
+          } catch (err:any) {
+              console.log(err);
+          }
+      };
+      fetchAPI();
+  }, []);
 
-    console.log(chartData);
-
-  // let test = getLineChartData(entryDates.map((date:string) => new Date(date)), complianceScore);
-  // console.log(test.toString())
-  //console.log(chartData)
+  console.log(chartData);
 
   return (
-        <div id='form' className='wrapper'>
-          
-          <BasicNavBar />
+    <div id='form' className='wrapper'>
 
-          <div className = 'content'>
-          <h1>Delirium Compliance - Audit Form</h1>
-            <br />
+      <BasicNavBar />
 
-            <form action="" method="get">
-              <div className="data-input">
-                  <div className = 'row' id = 'UpperTextContainer'>
-                          <div className='col'>
-                              <h5>Select your PICU number from this list: </h5>
-                              <TypeDropDown text="Site Number" primaryColour='#025858' secondaryColour='#013e3e' options={Array.from({length: 29}, (_, i) => ("s" + (i + 1)).toString())}/>
-                          </div>
-                          <div className='col'>
-                              <h5>Select the type of chart you would like: </h5>
-                              <TypeDropDown text="Chart Type" primaryColour='#025858' secondaryColour='#013e3e' options={["Line Graph", "Pie Chart", "Bar Chart"]}/>
-                          </div>
-                  </div>
-      
-              </div>
-              <div className = 'row' id = 'ButtonContainer'>
-                  {/* <BodyText text = 'THIS IS JUST A PLACEHOLDER TEXT BOX FOR WHAT WILL BE THE GRAPH CANVAS'/> */}
-                  <div className="canvas">
-                  <LineChart chartData={getLineChartData(chartData.entryDates.map((date:string) => new Date(date)), chartData.complianceScore)} />
-                  </div>
-              </div>
-                  <PButton text="Submit" onButtonClick = {() => {console.log("Hello World")}} primaryColour='#025858' secondaryColour='#013e3e'/>
-              </form>
-              
-              
-              {/* <div className = 'row' id = 'UpperTextContainer'>
-                <div className='col'>
-                  
-                  </div>
-              </div>
+      <div className = 'content'>
+        <h1>Delirium Compliance - Audit Form</h1>
+        <br />
 
-              <div className = 'row' id = 'ButtonContainer'>
-                
+        <form action="" method="get">
+          <div className="data-input">
+            <div className = 'row' id = 'UpperTextContainer'>
+              <div className='col'>
+                <h5>Select the type of chart you would like: </h5>
               </div>
-
-              <div className = 'row' id = 'ContactInfoContainer'>
-                
-              </div> */}
+              <div className='col'>
+                <TypeDropDown text="Chart Type" primaryColour='#025858' secondaryColour='#013e3e' options={["Line Graph", "Pie Chart", "Bar Chart"]}/>
+              </div>
+            </div>
           </div>
-        </div>
+
+          <div className = 'row' id = 'ButtonContainer'>
+            <div className="canvas">
+              <LineGraph chartData={
+                getLineChartData(chartData.entryDates.map((date:string) => new Date(date).toLocaleDateString("en-GB")), chartData.complianceScore)} /> 
+            </div>
+          </div>
+
+          <PButton text="Submit" onButtonClick = {() => {console.log("Hello World")}} primaryColour='#025858' secondaryColour='#013e3e'/>
+        </form>
+      </div>
+    </div>
   );
 }
 

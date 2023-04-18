@@ -87,7 +87,6 @@ app.get("/auth/:token", retrieveUserDetails);
 
 app.get("/chartData/singleSite/:siteId", singlePicuCompliance);
 
-
 app.get("/chartData/allSites", allPicuCompliance);
 
 app.listen(port,()=> {

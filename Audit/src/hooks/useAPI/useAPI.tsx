@@ -6,8 +6,12 @@ function useGetAPI(defaultValue: any, url: string) {
 
     useEffect(() => {
         const fetchPost = async () => {
+            const configuration = {
+                    method: "get",
+                    url: url
+                };
             try {
-                let response = await axios.get(url);
+                let response = await axios(configuration);
                 console.log(response);
                 setPosts(response.data);
             } catch (err:any) {

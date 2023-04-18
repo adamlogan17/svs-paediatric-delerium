@@ -14,6 +14,7 @@ import Form from './pages/Form/form';
 import Admin from './pages/Admin/Admin';
 import AdminPassword from './pages/Admin/AdminPassword';
 import AuditGraphs from './pages/AuditGraphs/AuditGraphs';
+import ConsumeAPI from './components/line';
 
 const root = ReactDOM.createRoot(
   document.getElementById('root') as HTMLElement
@@ -37,6 +38,7 @@ root.render(
           {picuAccess ? <Route path="/form" element={<Form />}/> : <></>}
           {picuAccess ? <Route path="/otherPage" element={<OtherPage />}/> : <></>}
           <Route path="/auditGraphs" element={<AuditGraphs />}/>
+          <Route path="/test" element={<ConsumeAPI />}/>
           <Route path="*" element={<NoPage />}/>
           {adminAccess ? <Route path="/admin" element={<Admin />}/>: <></>}
       </Routes>

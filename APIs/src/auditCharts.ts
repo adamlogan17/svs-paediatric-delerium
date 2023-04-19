@@ -23,6 +23,8 @@ export function singlePicuCompliance(request: Request, response: Response): void
 
         let dates = data.map((singleEntry:{entry_date:string, score:string}) => singleEntry.entry_date);
         let compScores = data.map((singleEntry:{entry_date:string, score:string}) => Math.round(parseFloat(singleEntry.score) * 1e2)/1e2);
+        dates.map((date:string) => new Date(date));
+        dates.sort((a:Date,b:Date)=>a.getTime()-b.getTime());
 
         response.send({
             entryDates: dates,

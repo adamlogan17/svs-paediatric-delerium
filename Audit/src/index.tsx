@@ -38,6 +38,7 @@ root.render(
           {picuAccess ? <Route path="/form" element={<Form />}/> : <></>}
           {picuAccess ? <Route path="/otherPage" element={<OtherPage />}/> : <></>}
           <Route path="/auditGraphs" element={<AuditGraphs />}/>
+          <Route path="/test" element={<ConsumeAPI />}/>
           <Route path="*" element={<NoPage />}/>
           {adminAccess ? <Route path="/admin" element={<Admin />}/>: <></>}
           {fieldAccess ? <Route path="/fieldagent" element={<FieldAgent />}/>: <></>}

@@ -4,8 +4,8 @@
 CREATE FUNCTION calculate_score() 
 RETURNS trigger AS $calculate_score$
 BEGIN
-    UPDATE compliance_data SET score=(SELECT (((correct_details::INTEGER + comfort_recorded::INTEGER
-        + all_params_scored::INTEGER + totalled_correctly::INTEGER + observer_name::INTEGER)/5.0)* comfort_recorded::INTEGER) 
+    UPDATE compliance_data SET score=(SELECT ((((correct_details::INTEGER + comfort_recorded::INTEGER
+        + all_params_scored::INTEGER + totalled_correctly::INTEGER + observer_name::INTEGER)/5.0)* comfort_recorded::INTEGER)*100) 
         FROM compliance_data WHERE comp_id = NEW.comp_id) WHERE comp_id = NEW.comp_id;
 
     RETURN NEW;

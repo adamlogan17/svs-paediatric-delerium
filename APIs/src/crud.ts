@@ -67,7 +67,7 @@ export function createInsert(table:string, columns:string[], data:string[], upse
 
   // UPSERT operation, not yet implemented
   if (upsertCol !== undefined) {
-    query = !columns.includes(upsertCol) ? FAILEDMSSG : query;
+    // query = !columns.includes(upsertCol) ? FAILEDMSSG : query;
   }
 
   return query

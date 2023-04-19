@@ -70,8 +70,7 @@ function AuditGraphs() {
 
           <div className = 'row' id = 'ButtonContainer'>
             <div className="canvas">
-              <LineGraph chartData={
-                getLineChartData(chartData.entryDates.map((date:string) => new Date(date).toLocaleDateString("en-GB")), chartData.complianceScore)} /> 
+              <LineGraph chartData={getLineChartData(chartData.entryDates.map((date:string) => new Date(date).toLocaleDateString("en-GB")), chartData.complianceScore)} /> 
             </div>
           </div>
 

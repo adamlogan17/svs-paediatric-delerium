@@ -1,0 +1,14 @@
+div {
+    width: 100%;
+    text-align: center;
+}
+
+.number{
+    background: #fff;
+    font: 900 30vmin 'Consolas';
+    letter-spacing: 5vmin;
+}
+
+.text span {
+    font-size: 10vmin;
+}

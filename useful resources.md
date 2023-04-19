@@ -15,6 +15,7 @@
     - [Login](#login)
     - [Chart.js](#chartjs)
     - [Shuffle Array](#shuffle-array)
+    - [Potential 404 pages](#potential-404-pages)
   - [Useful vscode extension ids](#useful-vscode-extension-ids)
 
 # useful-resources
@@ -107,6 +108,10 @@
 ### Shuffle Array
 
 - <https://dev.to/codebubb/how-to-shuffle-an-array-in-javascript-2ikj>
+
+### Potential 404 pages
+
+- <https://codepen.io/uzcho_/pen/eYZLMdg>
 
 ## Useful vscode extension ids
 

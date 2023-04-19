@@ -14,7 +14,7 @@ import Form from './pages/Form/form';
 import Admin from './pages/Admin/Admin';
 import AdminPassword from './pages/Admin/AdminPassword';
 import AuditGraphs from './pages/AuditGraphs/AuditGraphs';
-import ConsumeAPI from './components/line';
+import FieldAgent from './pages/Admin/FieldAgent'
 
 const root = ReactDOM.createRoot(
   document.getElementById('root') as HTMLElement
@@ -26,7 +26,7 @@ const role:string|null = sessionStorage.getItem("ROLE");
 // Below are the access conditions for each role, and which pages they can access
 let adminAccess:boolean = token !== (undefined || null) && role === 'admin';
 let picuAccess:boolean = token !== (undefined || null) && role === 'picu';
-let fieldAccess:boolean = false;
+let fieldAccess:boolean = token !== (undefined || null) && role === 'field_engineer';
 
 
 root.render(
@@ -41,6 +41,7 @@ root.render(
           <Route path="/test" element={<ConsumeAPI />}/>
           <Route path="*" element={<NoPage />}/>
           {adminAccess ? <Route path="/admin" element={<Admin />}/>: <></>}
+          {fieldAccess ? <Route path="/fieldagent" element={<FieldAgent />}/>: <></>}
       </Routes>
     </Router>
   

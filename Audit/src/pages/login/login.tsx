@@ -28,6 +28,15 @@ function authenticateUser(username:string|undefined, password:string|undefined):
                 alert("Invalid username or password");
             } else {
                 alert("Logged in as " + result.data.username + " with the role of " + result.data.role);
+                if(result.data.username === "24") {
+                    window.location.href = "/admin"
+                }//else if (result.data.username = 25) {
+
+                //}
+                else {
+                    window.location.href = "/"
+                }
+
             }
         })
         .catch((error) => error = new Error());

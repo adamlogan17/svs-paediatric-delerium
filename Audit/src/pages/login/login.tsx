@@ -1,7 +1,6 @@
 import BasicNavBar from '../../components/NavBar/NavBar';
 import PButton from '../../components/PButton/PButton';
 import axios from 'axios';
-import { Link } from 'react-router-dom';
 
 import '../../shared/layout.css';
 import './login.css';

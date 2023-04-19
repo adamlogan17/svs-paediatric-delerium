@@ -4,8 +4,7 @@ import bp from 'body-parser';
 import { deleteData, getAll, insertData, updateData } from './crud';
 import { authenticate, authorise, retrieveUserDetails } from './login';
 import { allPicuCompliance, singlePicuCompliance } from './auditCharts';
-
-// import cors from 'cors';
+import { insertCompData } from './complianceScores';
 
 // Express Initialize
 const app = express();
@@ -69,7 +68,7 @@ app.delete("/:database/deletedata/:table/:predicate", deleteData);
  * Will log a user into the system
  * @author Adam Logan
  */
-app.get("/login/:username/:password", authenticate);
+app.post("/login", authenticate);
 
 /**
  * Tests the 'authorise' function
@@ -88,6 +87,8 @@ app.get("/auth/:token", retrieveUserDetails);
 app.get("/chartData/singleSite/:siteId", singlePicuCompliance);
 
 app.get("/chartData/allSites", allPicuCompliance);
+
+app.post("/compData", authorise, insertCompData);
 
 app.listen(port,()=> {
     console.log(`listen port ${port}`);

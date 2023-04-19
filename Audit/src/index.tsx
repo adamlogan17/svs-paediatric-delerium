@@ -12,7 +12,6 @@ import NoPage from './pages/NoPage/NoPage'; // to demonstrate routing
 import Login from './pages/login/login';
 import Form from './pages/Form/form';
 import Admin from './pages/Admin/Admin';
-import AdminPassword from './pages/Admin/AdminPassword';
 import AuditGraphs from './pages/AuditGraphs/AuditGraphs';
 import FieldAgent from './pages/Admin/FieldAgent'
 
@@ -37,11 +36,10 @@ root.render(
           <Route path="/login" element={<Login />}/>
           {picuAccess ? <Route path="/form" element={<Form />}/> : <></>}
           {picuAccess ? <Route path="/otherPage" element={<OtherPage />}/> : <></>}
-          <Route path="/auditGraphs" element={<AuditGraphs />}/>
-          <Route path="/test" element={<ConsumeAPI />}/>
+          {picuAccess ? <Route path="/auditGraphs" element={<AuditGraphs />}/> : <></>}
           <Route path="*" element={<NoPage />}/>
           {adminAccess ? <Route path="/admin" element={<Admin />}/>: <></>}
-          {fieldAccess ? <Route path="/fieldagent" element={<FieldAgent />}/>: <></>}
+          {fieldAccess ? <Route path="/fieldengineer" element={<FieldAgent />}/>: <></>}
       </Routes>
     </Router>
   

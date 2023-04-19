@@ -14,6 +14,7 @@
     - [Bootstrap](#bootstrap)
     - [Login](#login)
     - [Chart.js](#chartjs)
+    - [Shuffle Array](#shuffle-array)
   - [Useful vscode extension ids](#useful-vscode-extension-ids)
 
 # useful-resources
@@ -102,6 +103,10 @@
 
 - <https://react-chartjs-2.js.org/examples/line-chart>
 - <https://stackoverflow.com/questions/68076078/react-hook-is-not-calling-api-after-first-load-sometimes-not-at-all>
+
+### Shuffle Array
+
+- <https://dev.to/codebubb/how-to-shuffle-an-array-in-javascript-2ikj>
 
 ## Useful vscode extension ids
 

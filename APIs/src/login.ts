@@ -92,9 +92,7 @@ export function adminAuthorise(request: any, response: Response, next:NextFuncti
   if(request.params.role == "admin") {
     next();
   } else {
-    response.json({
-      error: new Error("Invalid request!"),
-    });
+    response.json("Invalid request!");
   }
 }
 
@@ -102,9 +100,7 @@ export function fieldAuthorise(request: any, response: Response, next:NextFuncti
   if(request.params.role == "field_engineer") {
     next();
   } else {
-    response.json({
-      error: new Error("Invalid request!"),
-    });
+    response.json("Invalid request!");
   }
 }
 

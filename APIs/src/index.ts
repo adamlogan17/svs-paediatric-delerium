@@ -2,7 +2,7 @@ import express, { Request, Response } from 'express';
 import morgan from "morgan";
 import bp from 'body-parser';
 import { deleteData, getAll, insertData, updateData } from './crud';
-import { authenticate, authorise, retrieveUserDetails } from './login';
+import { adminAuthorise, authenticate, authorise, fieldAuthorise, retrieveUserDetails } from './login';
 import { allPicuCompliance, singlePicuCompliance } from './auditCharts';
 import { insertCompData } from './complianceScores';
 
@@ -77,6 +77,23 @@ app.post("/login", authenticate);
 app.get("/test-auth", authorise, (request:any, response) => {
     response.json({ message: "You are authorized to access me" , user: request.params.user, role: request.params.role});
 });
+
+app.get("/test-auth/admin", authorise, adminAuthorise, (request:any, response) => {
+    response.json("You are authorized to access me!");
+});
+
+app.get("/test-auth/field-engineer", authorise, fieldAuthorise, (request:any, response) => {
+    response.json("You are authorized to access me!");
+});
+
+app.get("/test-auth/:database/getall/:table", authorise, getAll);
+
+app.post("/test-auth/:database/insertdata", authorise, insertData);
+
+app.put("/test-auth/:database/updatedata", authorise, updateData);
+
+app.delete("/test-auth/:database/deletedata/:table/:predicate", authorise, deleteData);
+
 
 /**
  * Retrieves the user's userId and role from the token provided

@@ -28,9 +28,9 @@ function Admin() {
       <div className='content'>
         <h1>Admin Page</h1>
         <div className='button-container'>
-          <PButton text='Reset a PICU account password' primaryColour='#025858' secondaryColour='#013e3e' width='50%' onButtonClick={() => adminAuth()}/>
-          <PButton text='View / Edit Compliance Data' primaryColour='#025858' secondaryColour='#013e3e' width='50%' onButtonClick={() => adminAuth()}/>
-          <PButton text='Admin Audit Log' primaryColour='#025858' secondaryColour='#013e3e'  width='50%' onButtonClick={() => adminAuth()} />
+          <PButton text='Reset a PICU account password' primaryColour='#025858' secondaryColour='#013e3e' width='100%' onButtonClick={() => adminAuth()}/>
+          <PButton text='View / Edit Compliance Data' primaryColour='#025858' secondaryColour='#013e3e' width='100%' onButtonClick={() => adminAuth()}/>
+          <PButton text='Admin Audit Log' primaryColour='#025858' secondaryColour='#013e3e'  width='100%' onButtonClick={() => adminAuth()} />
         </div>
         <Link to='/'>
           <PButton text='Home' primaryColour='#025858' secondaryColour='#013e3e' width='100%' onButtonClick={() => window.location.href = "/"}/>

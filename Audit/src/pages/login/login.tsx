@@ -69,7 +69,7 @@ function Login() {
                 <input id='password' className='entry' type='password' name='password' ref={passwordRef} />
                 <br />
             </div>
-            <PButton text='Start' primaryColour='#025858' secondaryColour='#013e3e' onButtonClick={handleButtonClick} />
+            <PButton text='Login' primaryColour='#025858' secondaryColour='#013e3e' onButtonClick={handleButtonClick} />
         </div>
     </div>
 

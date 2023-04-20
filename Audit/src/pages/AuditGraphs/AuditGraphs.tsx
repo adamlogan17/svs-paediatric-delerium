@@ -74,7 +74,7 @@ function AuditGraphs() {
             </div>
           </div>
 
-          <PButton text="Submit" onButtonClick = {() => {console.log("Hello World")}} primaryColour='#025858' secondaryColour='#013e3e'/>
+          {/* <PButton text="Submit" onButtonClick = {() => {console.log("Hello World")}} primaryColour='#025858' secondaryColour='#013e3e'/> */}
         </form>
       </div>
     </div>

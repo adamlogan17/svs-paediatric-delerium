@@ -1,7 +1,6 @@
 import BasicNavBar from '../../components/NavBar/NavBar';
 import PButton from '../../components/PButton/PButton';
 import RadioButton from '../../components/RadioButton/RadioButton';
-import { Link } from 'react-router-dom';
 
 import '../../shared/layout.css';
 import './form.css'
@@ -139,9 +138,7 @@ function Form() {
             />
             <br></br>
           </div>
-          <Link to='/'>
           <PButton text='Submit' onButtonClick={handleSubmit} primaryColour='#025858' secondaryColour='#013e3e' />
-          </Link>
         </form>
       </div>
     </div>

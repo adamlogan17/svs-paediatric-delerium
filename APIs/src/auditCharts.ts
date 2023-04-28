@@ -41,6 +41,7 @@ export function singlePicuCompliance(request: Request, response: Response): void
  * @param { Request } request
  * @param { Response } response An anonymised array of the overall compliance score along with suggested label
  * @returns { void }
+ * TODO Retain the correct ID for the site which requested the data
  */
 export function allPicuCompliance(request: Request, response: Response): void {
     const POOL = createPool("audit", "admin_role", "password");

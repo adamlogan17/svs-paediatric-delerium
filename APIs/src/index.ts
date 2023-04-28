@@ -132,7 +132,7 @@ app.get("/auth/:token", retrieveUserDetails);
  * TODO If the user has a picu role make sure that their ID matches that of the one they are requesting
  * @author Adam Logan
  */
-app.get("/chartData/singleSite/:siteId", singlePicuCompliance);
+app.get("/chartData/singleSite/:siteId", authorise, singlePicuCompliance);
 
 /**
  * Retrieves the anonymised compliance data of all the sites

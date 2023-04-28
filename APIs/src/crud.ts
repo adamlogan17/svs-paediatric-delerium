@@ -20,14 +20,14 @@ export function createPool(database:string, user:string="postgres", password:str
   });
 }
 
-
 /**
  * Creates a simply SQL select query, only creates a query with valid syntax but does not check if the content of the query is correct
  * @author Adam Logan
  * @date 2023-03-23
  * @param { string } table The table the data is to be selected from
  * @param { string } [condition] A condition to filter the data upon
- * @param { string[] } [data] The columns to be selected
+ * @param { string[] } [data] The columns to be selected, including the function which you would like to perform
+ * @param { string } [groupBy] The name of the column which you would like to group by
  * @returns { string } A query that will return the required results
  */
 export function createSelect(table:string, condition?:string, data?:string[], groupBy?:string) : string {

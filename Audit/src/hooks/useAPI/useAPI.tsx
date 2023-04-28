@@ -1,6 +1,13 @@
 import axios from 'axios';
 import { useState, useEffect } from 'react';
 
+/**
+ * A custom hook which calls a GET API and returns the result to the user
+ * @author Adam Logan
+ * @date 2023-04-28
+ * @param { any } defaultValue The default value for the hook
+ * @param { string } url The URL of the API to be calles
+ */
 function useGetAPI(defaultValue: any, url: string) {
     const [posts, setPosts] = useState(defaultValue);
 

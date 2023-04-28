@@ -1,19 +1,17 @@
 import ReactDOM from 'react-dom/client';
 import 'bootstrap/dist/css/bootstrap.min.css';
-import './index.css';
 import reportWebVitals from './reportWebVitals';
-
 
 import { BrowserRouter as Router, Route, Routes} from "react-router-dom";
 
 import Home from './pages/Home/Home'; // example component being added
 import OtherPage from './pages/OtherPage/OtherPage'; // to demonstrate routing
 import NoPage from './pages/NoPage/NoPage'; // to demonstrate routing
-import Login from './pages/login/login';
+import Login from './pages/Login/Login';
 import Form from './pages/Form/form';
 import Admin from './pages/Admin/Admin';
 import AuditGraphs from './pages/AuditGraphs/AuditGraphs';
-import FieldAgent from './pages/Admin/FieldAgent'
+import FieldEngineer from './pages/FieldEngineer/FieldEngineer';
 
 const root = ReactDOM.createRoot(
   document.getElementById('root') as HTMLElement
@@ -29,7 +27,6 @@ let fieldAccess:boolean = token !== (undefined || null) && role === 'field_engin
 
 
 root.render(
-  
     <Router>
       <Routes>
           <Route index path="/" element={<Home />}/>
@@ -39,10 +36,9 @@ root.render(
           {picuAccess ? <Route path="/auditGraphs" element={<AuditGraphs />}/> : <></>}
           <Route path="*" element={<NoPage />}/>
           {adminAccess ? <Route path="/admin" element={<Admin />}/>: <></>}
-          {fieldAccess ? <Route path="/fieldengineer" element={<FieldAgent />}/>: <></>}
+          {fieldAccess ? <Route path="/fieldengineer" element={<FieldEngineer />}/>: <></>}
       </Routes>
     </Router>
-  
 );
 
 // If you want to start measuring performance in your app, pass a function

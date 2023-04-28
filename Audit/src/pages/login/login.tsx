@@ -6,6 +6,14 @@ import '../../shared/layout.css';
 import './login.css';
 import { useRef } from 'react';
 
+/**
+ * Calls the 'login' API and, if successful, sets the role, username and JWT token in session storage
+ * @author Adam Logan
+ * @date 2023-04-28
+ * @param { string|undefined } username The username provided
+ * @param { string|undefined } password The password provided
+ * @returns { void }
+ */
 function authenticateUser(username:string|undefined, password:string|undefined):void {
     const configuration = {
         method: "post",
@@ -28,6 +36,7 @@ function authenticateUser(username:string|undefined, password:string|undefined):
                 alert("Invalid username or password");
             } else {
                 alert("Logged in as " + result.data.username + " with the role of " + result.data.role);
+                // redirects the user depending on role
                 if(result.data.role === "admin") {
                     window.location.href = "/admin";
                 } else if (result.data.role === "field_engineer") {
@@ -43,6 +52,11 @@ function authenticateUser(username:string|undefined, password:string|undefined):
 }
 
 
+/**
+ * This is the login page which, depending on the user's role redirects them to a different page
+ * @author Adam Logan
+ * @date 2023-04-28
+ */
 function Login() {
     const usernameRef = useRef<HTMLInputElement>(null);
     const passwordRef = useRef<HTMLInputElement>(null);

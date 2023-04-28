@@ -20,24 +20,26 @@ export function createPool(database:string, user:string="postgres", password:str
   });
 }
 
-
 /**
  * Creates a simply SQL select query, only creates a query with valid syntax but does not check if the content of the query is correct
  * @author Adam Logan
  * @date 2023-03-23
  * @param { string } table The table the data is to be selected from
  * @param { string } [condition] A condition to filter the data upon
- * @param { string[] } [data] The columns to be selected
+ * @param { string[] } [data] The columns to be selected, including the function which you would like to perform
+ * @param { string } [groupBy] The name of the column which you would like to group by
  * @returns { string } A query that will return the required results
  */
-export function createSelect(table:string, condition?:string, data?:string[]) : string {
+export function createSelect(table:string, condition?:string, data?:string[], groupBy?:string) : string {
   let query:string = "SELECT ";
 
   query += data == undefined ? "*" : data.concat();
 
   query += " FROM " + table;
 
-  query += condition != undefined ? " WHERE " + condition: "";
+  query += condition !== undefined ? " WHERE " + condition: "";
+
+  query += groupBy !== undefined ? " GROUP BY " + groupBy : "";
 
   return query;
 }
@@ -102,7 +104,7 @@ export function createUpdate(table:string, columns:string[], data:string[], pred
  * @author Adam Logan
  * @date 2023-03-27
  * @param { string } table The table to delete the data from
-* @param { string } [predicate] The condition to delete the data for
+ * @param { string } [predicate] The condition to delete the data for
  * @returns { string } The delete SQL statement
  */
 export function createDelete(table: string, predicate?:string) : string {

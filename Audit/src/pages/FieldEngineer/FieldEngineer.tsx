@@ -3,10 +3,16 @@ import BasicNavBar from '../../components/NavBar/NavBar';
 import PButton from '../../components/PButton/PButton';
 
 import '../../shared/layout.css';
-import './Admin.css';
-import { adminAuth } from './Admin';
+import '../../shared/landing.css';
+import { adminAuth } from '../Admin/Admin';
 import axios from 'axios';
 
+
+/**
+ * Checks if the current user as the role of 'field_engineer' and if so sends an alert to the user
+ * @author Adam Logan
+ * @date 2023-04-28
+ */
 export function fieldAuth() {
   const configuration = {
       method: "get",
@@ -22,9 +28,9 @@ export function fieldAuth() {
       .catch((error) => error = new Error());
 }
 
-function FieldAgent() {
+function FieldEngineer() {
   return (
-    <div id='fieldAgent' className='wrapper'>
+    <div id='fieldEngineer' className='wrapper'>
       <BasicNavBar />
       <div className='content'>
         <h1>Field Agent Page</h1>
@@ -41,4 +47,4 @@ function FieldAgent() {
   );
 }
 
-export default FieldAgent;
+export default FieldEngineer;

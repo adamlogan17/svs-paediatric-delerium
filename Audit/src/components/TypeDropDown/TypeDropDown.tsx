@@ -27,6 +27,20 @@ const Filter = React.forwardRef((props:{ children:any, style:any, className:any 
     );
 },);
 
+/**
+ * A dropdown compinent 
+ * @author Adam Logan
+ * @date 2023-04-28
+ * @param { {text:string, options:string[], onButtonClick?:any, primaryColour?:string, secondaryColour?:string, textColor?:string} } props
+ * @prop { string } text The text to be displayed on the dropdown button
+ * @prop { string[] } options The selectable options of the dropdown
+ * @prop { any } [onButtonClick] The function which is called when the button is clicked
+ * @prop { sting } [primaryColour] The background hex code of the button (default is "#025858")
+ * @prop { sting } [primaryColour] The background hex code of the button when a mouse hovers over the button (default is "#007e7e")
+ * @prop { string } [textColor] The hex code of the text
+ * @prop { string } [width] The width of the button
+ * TODO Add a way for a action to occur when an option is selected
+ */
 function TypeDropDown(props:{text:string, options:string[], onButtonClick?:any, primaryColour?:string, secondaryColour?:string, textColor?:string}) {
     const checkHover = useHover();
 

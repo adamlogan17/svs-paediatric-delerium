@@ -3,9 +3,14 @@ import BasicNavBar from '../../components/NavBar/NavBar';
 import PButton from '../../components/PButton/PButton';
 
 import '../../shared/layout.css';
-import './Admin.css';
+import '../../shared/landing.css';
 import axios from 'axios';
 
+/**
+ * Checks if the current user as the role of 'admin' and if so sends an alert to the user
+ * @author Adam Logan
+ * @date 2023-04-28
+ */
 export function adminAuth() {
   const configuration = {
       method: "get",

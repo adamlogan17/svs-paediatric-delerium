@@ -14,21 +14,21 @@ export function singlePicuCompliance(request: Request, response: Response): void
 
     let condition:string = "picu_id=" + request.params.siteId;
 
-    POOL.query(createSelect("compliance_data", condition, ["entry_date", "score"]), (error:any, results:any) => {
+    // createSelect("compliance_data", condition,  ["entry_date", "score"]
+
+    POOL.query(createSelect("compliance_data", condition, ["entry_date", "AVG(score)"], "entry_date"), (error:any, results:any) => {
         if (error) {
             throw error;
         }
 
         let data = results.rows;
 
-        let dates = data.map((singleEntry:{entry_date:string, score:string}) => singleEntry.entry_date);
-        let compScores = data.map((singleEntry:{entry_date:string, score:string}) => Math.round(parseFloat(singleEntry.score) * 1e2)/1e2);
-        dates.map((date:string) => new Date(date));
-        dates.sort((a:Date,b:Date)=>a.getTime()-b.getTime());
+        // sorts the data in ascending order by date
+        data.sort((a:{entry_date:Date, avg:string},b:{entry_date:Date, avg:string})=>a.entry_date.getTime()-b.entry_date.getTime());
 
         response.send({
-            entryDates: dates,
-            complianceScore: compScores
+            entryDates: data.map((singleEntry:{entry_date:Date}) => singleEntry.entry_date),
+            complianceScore: data.map((singleEntry:{avg:string}) => Math.round(parseFloat(singleEntry.avg) * 1e2)/1e2)
         });
         
     });

@@ -34,7 +34,6 @@ export function singlePicuCompliance(request: Request, response: Response): void
     });
 }
 
-
 /**
  * Gets the anonymised overall compliance score for each PICU
  * @author Adam Logan
@@ -53,9 +52,11 @@ export function allPicuCompliance(request: Request, response: Response): void {
 
         let data = results.rows;
 
+        // Shuffles the array of overall compliance scores and rounds these scores
         let anonymised = shuffleArray(data.map((singleEntry:{overall_compliance:string}) => Math.round(parseFloat(singleEntry.overall_compliance) * 1e2)/1e2));
 
         response.send({
+            // assigns a site number for the anonymised sites
             siteNum: anonymised.map((score, i) => i+1),
             complianceScore: anonymised
         });

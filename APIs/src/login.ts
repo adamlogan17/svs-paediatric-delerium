@@ -7,16 +7,15 @@ import bcrypt from 'bcrypt';
  * Initial login function that creates a JWT token based on the userId and their role
  * @author Adam Logan
  * @date 2023-04-10
- * @param { Request } request Must contain 'username' and 'password' parameters 
- * @param { Response } response If valid, the token and the role of the user, and a error message if not
+ * @param { Request } request Must contain 'username' and 'password' parameters within the body
+ * @param { Response } response If valid, the token, the username and the role of the user, and a error message if not
  * @returns { void }
  */
 export function authenticate(request: Request, response: Response): void {
-    const POOL = createPool("audit", "admin_role", "password");
+    // the admin role is used to login in users
+    const POOL = createPool("audit", "admin_role", "password"); 
 
     const { username, password } = request.body;
-
-    console.log(request.body);
 
     let condition:string = "picu_id=" + username;
 
@@ -25,10 +24,12 @@ export function authenticate(request: Request, response: Response): void {
           response.send("Invalid User");
         }
         else {
+          // compares the hashed password with the plaintext one which is provided
           bcrypt
           .compare(password, results.rows[0].password)
           .then(res => {
             if(res) {
+              // adds the userID and role to the JWT token
               const userToken = jwt.sign(
                 {
                   userId: username,
@@ -62,11 +63,12 @@ export function authenticate(request: Request, response: Response): void {
  * @param { NextFunction } next
  * @returns { void }
  */
-export function authorise(request: any, response: Response, next:NextFunction):void {
+export function authorise(request: Request, response: Response, next:NextFunction):void {
   try {
     // get the token from the authorization header
     console.log("authorise");
-    const token:string = request.headers.authorization.split(" ")[1];
+    const authHeader:string|undefined = request.headers.authorization === undefined ? "error" : request.headers.authorization;
+    const token:string = authHeader.split(" ")[1];
 
     // retrieve the user details of the logged in user
     const user:JwtPayload|string = jwt.verify(token, "REPLACE-WITH-PRIVATE-KEY");
@@ -82,13 +84,20 @@ export function authorise(request: any, response: Response, next:NextFunction):v
     // pass down functionality to the endpoint
     next();
   } catch (err) {
-    response.json({
-      error: new Error("Invalid request!"),
-    });
+    response.json("Invalid request!");
   }
 }
 
-export function adminAuthorise(request: any, response: Response, next:NextFunction): void {
+/**
+ * Used to authorise if a user has a role of admin
+ * @author Adam Logan
+ * @date 2023-04-28
+ * @param { any } request
+ * @param { Response } response
+ * @param { NextFunction } next
+ * @returns { void }
+ */
+export function adminAuthorise(request: Request, response: Response, next:NextFunction): void {
   if(request.params.role == "admin") {
     next();
   } else {
@@ -96,7 +105,16 @@ export function adminAuthorise(request: any, response: Response, next:NextFuncti
   }
 }
 
-export function fieldAuthorise(request: any, response: Response, next:NextFunction): void {
+/**
+ * Used to authorise if a user has a role of field engineer
+ * @author Adam Logan
+ * @date 2023-04-28
+ * @param { Request } request
+ * @param { Response } response
+ * @param { NextFunction } next
+ * @returns { void }
+ */
+export function fieldAuthorise(request: Request, response: Response, next:NextFunction): void {
   if(request.params.role == "field_engineer") {
     next();
   } else {
@@ -112,7 +130,7 @@ export function fieldAuthorise(request: any, response: Response, next:NextFuncti
  * @param { Response } response The userId and role of the user
  * @returns { void }
  */
-export function retrieveUserDetails(request: any, response: Response):void {
+export function retrieveUserDetails(request: Request, response: Response):void {
   const token = request.params.token;
 
   const decodedToken = jwt.verify(token, "REPLACE-WITH-PRIVATE-KEY");

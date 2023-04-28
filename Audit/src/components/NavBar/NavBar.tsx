@@ -1,9 +1,13 @@
 import Container from 'react-bootstrap/Container';
 import Nav from 'react-bootstrap/Nav';
 import Navbar from 'react-bootstrap/Navbar';
-// import NavDropdown from 'react-bootstrap/NavDropdown';
 import PDLongLogo from '../../assets/images/transparent-PD-long-logo.png';
 
+/**
+ * The NavBar to be used site wide and should be placed at the top of the page
+ * @author Adam Logan
+ * @date 2023-04-28
+ */
 function BasicNavBar() {
   return (
     <Navbar bg="light" expand="lg">
@@ -24,17 +28,6 @@ function BasicNavBar() {
             <Nav.Link href="#home">Contact us</Nav.Link>
             <Nav.Link href="/">Home</Nav.Link>
             <Nav.Link href="/login">Login</Nav.Link>
-            {/* <NavDropdown title="Dropdown" id="basic-nav-dropdown">
-              <NavDropdown.Item href="#action/3.1">Action</NavDropdown.Item>
-              <NavDropdown.Item href="#action/3.2">
-                Another action
-              </NavDropdown.Item>
-              <NavDropdown.Item href="#action/3.3">Something</NavDropdown.Item>
-              <NavDropdown.Divider />
-              <NavDropdown.Item href="#action/3.4">
-                Separated link
-              </NavDropdown.Item>
-            </NavDropdown> */}
           </Nav>
         </Navbar.Collapse>
       </Container>

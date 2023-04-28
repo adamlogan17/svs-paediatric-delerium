@@ -1,7 +1,13 @@
 import useGetAPI from "../../hooks/useAPI/useAPI";
 
+
+/**
+ * Displays the output of an API
+ * @author Adam Logan
+ * @date 2023-04-28
+ * ! Not used within the app itself but for testing
+ */
 function ConsumeAPI() {
-    // can't get it to get my local API, think this is might be an issue with the fact that they are both running on localhost
     const posts = useGetAPI([], "https://jsonplaceholder.typicode.com/posts?_limit=10");
 
     return (

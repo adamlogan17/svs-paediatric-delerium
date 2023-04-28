@@ -1,9 +1,7 @@
 import BasicNavBar from '../../components/NavBar/NavBar';
 import TypeDropDown from '../../components/TypeDropDown/TypeDropDown';
-import PButton from '../../components/PButton/PButton';
 import Chart from "chart.js/auto";
 import { CategoryScale } from "chart.js";
-import useGetAPI from '../../hooks/useAPI/useAPI';
 
 import '../../shared/layout.css';
 import LineGraph from '../../components/LineGraph/LineGraph';
@@ -12,6 +10,14 @@ import { useEffect, useState } from 'react';
 
 Chart.register(CategoryScale);
 
+/**
+ * Creates the object required to set the values for a Line Chart, an important note is that the parameters must be the same length
+ * @author Adam Logan
+ * @date 2023-04-28
+ * @param { string[] } xValues The va
+ * @param { number[] } yValues
+ * @returns { any }
+ */
 function getLineChartData(xValues: string[], yValues:number[]) : any {
   return {
     labels: xValues,
@@ -23,7 +29,15 @@ function getLineChartData(xValues: string[], yValues:number[]) : any {
   }
 }
 
+
+/**
+ * Displays a line chart of the compliance data for site 1
+ * @author Adam Logan & Andrew Robb
+ * @date 2023-04-28
+ * TODO Make the data displayed actually show that of the current user and not just site 1
+ */
 function AuditGraphs() {
+  // the below code is required to call the API when the page loads
   const [chartData, setChartData] = useState({
     entryDates: ['1970-01-01T00:00:00.000Z'], complianceScore:[0]
   });

@@ -7,7 +7,7 @@ import { BrowserRouter as Router, Route, Routes} from "react-router-dom";
 import Home from './pages/Home/Home'; // example component being added
 import OtherPage from './pages/OtherPage/OtherPage'; // to demonstrate routing
 import NoPage from './pages/NoPage/NoPage'; // to demonstrate routing
-import Login from './pages/login/login';
+import Login from './pages/Login/Login';
 import Form from './pages/Form/form';
 import Admin from './pages/Admin/Admin';
 import AuditGraphs from './pages/AuditGraphs/AuditGraphs';
@@ -39,7 +39,6 @@ root.render(
           {fieldAccess ? <Route path="/fieldengineer" element={<FieldEngineer />}/>: <></>}
       </Routes>
     </Router>
-  
 );
 
 // If you want to start measuring performance in your app, pass a function

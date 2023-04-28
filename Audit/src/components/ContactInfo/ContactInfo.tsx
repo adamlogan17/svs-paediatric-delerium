@@ -1,8 +1,12 @@
-
+/**
+ * Displays the contact info for the site
+ * @author Adam Logan
+ * @date 2023-04-28
+ */
 function ContactInfo() {
     return (
         <>
-            <h3>The Wellcome-Wolfson Institute for Experimental Medicine</h3>
+            <h3>The Welcome-Wolfson Institute for Experimental Medicine</h3>
             <p>School of Medicine, Dentistry and Biomedical Sciences<br></br>
             Queen's University Belfast<br></br>
             97 Lisburn Road Belfast<br></br>

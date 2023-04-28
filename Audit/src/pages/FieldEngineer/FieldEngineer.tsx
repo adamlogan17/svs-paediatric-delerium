@@ -3,8 +3,8 @@ import BasicNavBar from '../../components/NavBar/NavBar';
 import PButton from '../../components/PButton/PButton';
 
 import '../../shared/layout.css';
-import './Admin.css';
-import { adminAuth } from './Admin';
+import '../../shared/landing.css';
+import { adminAuth } from '../Admin/Admin';
 import axios from 'axios';
 
 export function fieldAuth() {
@@ -22,9 +22,9 @@ export function fieldAuth() {
       .catch((error) => error = new Error());
 }
 
-function FieldAgent() {
+function FieldEngineer() {
   return (
-    <div id='fieldAgent' className='wrapper'>
+    <div id='fieldEngineer' className='wrapper'>
       <BasicNavBar />
       <div className='content'>
         <h1>Field Agent Page</h1>
@@ -41,4 +41,4 @@ function FieldAgent() {
   );
 }
 
-export default FieldAgent;
+export default FieldEngineer;

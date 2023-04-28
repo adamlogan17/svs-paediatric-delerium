@@ -3,7 +3,7 @@ import BasicNavBar from '../../components/NavBar/NavBar';
 import PButton from '../../components/PButton/PButton';
 
 import '../../shared/layout.css';
-import './Admin.css';
+import '../../shared/landing.css';
 import axios from 'axios';
 
 export function adminAuth() {

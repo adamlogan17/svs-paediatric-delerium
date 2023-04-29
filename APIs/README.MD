@@ -1,3 +1,10 @@
+- [APIs](#apis)
+  - [Summary](#summary)
+  - [How to start the project](#how-to-start-the-project)
+  - [How to run tests](#how-to-run-tests)
+  - [File Structure Explanation](#file-structure-explanation)
+  - [Typescript File](#typescript-file)
+
 # APIs
 
 ## Summary

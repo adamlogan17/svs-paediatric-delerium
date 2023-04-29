@@ -1,37 +1,59 @@
 - [svs-paediatric-delerium](#svs-paediatric-delerium)
+  - [Summary](#summary)
   - [How to start the project](#how-to-start-the-project)
     - [Using the Script](#using-the-script)
+      - [**Windows**](#windows)
+        - [*Powershell set up*](#powershell-set-up)
+      - [**Linux**](#linux)
     - [Using Docker](#using-docker)
     - [Running Without Docker](#running-without-docker)
-      - [**Frontend**](#frontend)
-      - [**Backend**](#backend)
-    - [Typescript File](#typescript-file)
   - [Initialising DB](#initialising-db)
   - [Access Database Server](#access-database-server)
     - [CLI](#cli)
     - [pgAdmin4](#pgadmin4)
       - [**Access**](#access)
       - [**View Tables**](#view-tables)
-  - [How to use server](#how-to-use-server)
 
 # svs-paediatric-delerium
+
+## Summary
+
+This is the final year project for the SvS team. Currently the project consists of a prototype Audit system which will display compliance data for delerium treatment within PICUs across the UK & ROI.
 
 ## How to start the project
 
 ### Using the Script
 
-There are 2 scripts, one for ```powershell``` and another for ```bash```, which will delete the existing database volume for this project before starting the project to allow the database to be re-initialised.
+The will delete the existing database volume for this project before starting the project to allow the database to be re-initialised.
 
-If you wish to use the ```powershell``` script you may need to run the following command with administrator access
+The following arguments can be supplied to each script
+
+- ```-b```
+  - Executes in the background
+- ```-c```
+  - Deletes all containers and volumes within docker (not just those related to this project)
+- ```-n```
+  - Deletes all project images (will delete an image named 'postgres' even if it is not related to the project)
+
+
+#### **Windows**
+
+```powershell
+./start-docker.ps1
+```
+
+##### *Powershell set up*
+
+If you wish to use the ```powershell``` script you may need to run the following command with administrator access, within the powershell application.
 
 ```powershell
 Set-ExecutionPolicy RemoteSigned
 ```
 
-To run the script use the command below with the appropriate file extension (```.ps1``` when using ```powershell``` and ```.sh``` when using ```bash```).
+#### **Linux**
 
-```powershell
-./start-docker.ps1
+```bash
+./start-docker.sh
 ```
 
 ### Using Docker
@@ -42,33 +64,11 @@ docker-compose up
 
 ### Running Without Docker
 
-#### **Frontend**
-
-```console
-cd example-frontend
-npm run start
-```
-
-Before the first time you run the program you need to use the command ```npm install```
-
-#### **Backend**
-
-```console
-cd APIs\example-api
-npm run start:dev
-```
-
-### Typescript File
-
-```console
-npx ts-node src/file.ts
-```
-
-Before the first time you run the program you need to use the command ```npm install```
+Please view the respective READMEs to see how to run the projects without Docker.
 
 ## Initialising DB
 
-If the ```database-set-up.sh``` file is causing errors, when starting the docker container, stop the container and run the commands below. Once this is done, then attempt to run the container again. See the stackoverflow answer [here](https://stackoverflow.com/questions/27176781/bash-file-returns-unexpected-token-do-r).
+If the ```database-set-up.sh``` file is causing errors, when starting the docker container, stop the container and run the commands below, within a bash terminal. Once this is done, then attempt to run the container again. See the stackoverflow answer [here](https://stackoverflow.com/questions/27176781/bash-file-returns-unexpected-token-do-r).
 
 ```bash
 vi database-set-up.sh
@@ -82,7 +82,11 @@ If you would like to change the setup of the database alter the ```.sql``` files
 
 ### CLI
 
-To access the database once the container is running use the command ```docker exec -it containerID psql -U postgres``` where ```containerID``` is replaced with the ID of the database container.
+To access the database once the container is running use the below command where ```containerID``` is replaced with the ID of the database container.
+
+```console
+docker exec -it containerID psql -U postgres
+```
 
 ### pgAdmin4
 
@@ -112,7 +116,3 @@ The instructions below must be repeated every time the project is launched.
   - Replace 'severName' with the name given to the server in step 4 within the [Access](#access) section
   - Replace 'databaseName' with the specific name of the database in which the tables are contained in
 - To view the data within the table right click the table name and select 'View/Edit Data'
-
-## How to use server
-
-"See the message from IT admin. EEECS students can login to my server (143.117.69.4) machine in ECIT using their existing EEECS accounts. When they login the format at the login screen is studentnumber@eeecs.qub.ac.uk - they use the password they use when they login to the machines in the CSB or the Ashby.  We can't give access to the ECIT VPN to undergrad students. So students will need to access this machine from the campus."

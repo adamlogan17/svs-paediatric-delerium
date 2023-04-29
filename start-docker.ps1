@@ -2,7 +2,7 @@ param(
     [Parameter(HelpMessage="Executes 'docker-compose' in the background")]
     [switch]$b = $False,
     
-    [Parameter(HelpMessage="Deletes all container and volumes within docker (not just those related to this project)")]
+    [Parameter(HelpMessage="Deletes all containers and volumes within docker (not just those related to this project)")]
     [switch]$c = $False,
 
     [Parameter(HelpMessage="Deletes all project images (will delete an image named 'postgres' even if it is not related to the project)")]

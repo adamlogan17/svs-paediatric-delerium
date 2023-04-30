@@ -3,7 +3,7 @@ import { createInsert, createPool } from "./crud";
 
 
 /**
- * desc
+ * Inserts compliance data into the database
  * @author Adam Logan
  * @date 2023-04-28
  * @param { Request } request - Requires the username and role of the user

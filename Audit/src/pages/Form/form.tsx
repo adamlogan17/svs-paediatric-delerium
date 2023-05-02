@@ -22,7 +22,7 @@ function insertData(data:any[]):void {
   axios(configuration)
       .then((result) => {
           alert("Data inserted!");
-          window.location.href = "/"
+          window.location.href = "/auditGraphs"
       })
       .catch((error) => error = new Error());
 }

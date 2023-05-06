@@ -17,6 +17,7 @@
     - [Shuffle Array](#shuffle-array)
     - [Potential 404 pages](#potential-404-pages)
     - [JSDOC in react](#jsdoc-in-react)
+    - [Markdown Formatting](#markdown-formatting)
   - [Useful vscode extension ids](#useful-vscode-extension-ids)
 
 # useful-resources
@@ -118,6 +119,14 @@
 
 - <https://www.inkoop.io/blog/a-guide-to-js-docs-for-react-js/>
 - <https://gist.github.com/DeruiDENG/074b15de1ebc23ee8d307c14198c1231>
+
+### Markdown Formatting
+
+- <https://www.markdownguide.org/extended-syntax/#fenced-code-blocks>
+- <https://docs.gitlab.com/ee/user/markdown.html#colored-code-and-syntax-highlighting>
+- <https://www.markdownguide.org/basic-syntax/>
+- <https://docs.github.com/en/get-started/writing-on-github/working-with-advanced-formatting/creating-and-highlighting-code-blocks>
+- <https://github.com/github/linguist/blob/master/lib/linguist/languages.yml>
 
 ## Useful vscode extension ids
 

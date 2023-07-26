@@ -1,0 +1,17 @@
+{
+  "swagger":"2.0",
+  "definition": {
+    "info": {
+      "title": "SvS Backend",
+      "version": "1",
+      "description":
+        "This is the backend for the SvS final year project"
+    },
+    "servers": [
+      {
+        "url": "http://localhost:8000"
+      }
+    ]
+  },
+  "apis": ["./src/*.ts"]
+}

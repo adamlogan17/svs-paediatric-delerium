@@ -63,7 +63,7 @@ export function createInsert(table:string, columns:string[], data:string[], upse
     return "'" + element + "'";
   });
 
-  query = "INSERT INTO " + table + " (" + columns.concat() + ") VALUES (" + data.concat() + ")";
+  query = `INSERT INTO ${table} (${columns.concat()}) VALUES (${data.concat()})`;
 
   query = columns.length !== data.length ? FAILEDMSSG : query;
 
@@ -93,7 +93,7 @@ export function createUpdate(table:string, columns:string[], data:string[], pred
     return element + " = '" + data[index] + "'";
   });
 
-  query = "UPDATE " + table + " SET " + updateVals.concat() + " WHERE " + predicate + ";";
+  query = `UPDATE ${table} SET ${updateVals.concat()} WHERE ${predicate} ;`;
   query = columns.length !== data.length ? FAILEDMSSG : query;
 
   return query;
@@ -108,7 +108,7 @@ export function createUpdate(table:string, columns:string[], data:string[], pred
  * @returns { string } The delete SQL statement
  */
 export function createDelete(table: string, predicate?:string) : string {
-  let query:string = "DELETE FROM " + table;
+  let query:string = `DELETE FROM ${table}`;
 
   query = predicate !== undefined ? query + " WHERE " + predicate : query;
 
@@ -126,7 +126,7 @@ export function createDelete(table: string, predicate?:string) : string {
 export function getAll(request: Request, response: Response): void {
   const table:string = request.params.table;
 
-  let userForDb:string = request.params.role === undefined ? "postgres" : request.params.role + "_role";
+  let userForDb:string = request.params.role === undefined ? "postgres" : `${request.params.role}_role`;
 
   let passForDb:string = request.params.role === undefined ? "postgrespw": "password";
 
@@ -157,7 +157,11 @@ export function getAll(request: Request, response: Response): void {
 export function insertData(request: Request, response: Response): void {
   const { table, columns, data } = request.body;
 
-  let userForDb:string = request.params.role === undefined ? "postgres" : request.params.role + "_role";
+  console.log(table);
+  console.log(columns);
+  console.log(data);
+
+  let userForDb:string = request.params.role === undefined ? "postgres" : `${request.params.role}_role`;
 
   let passForDb:string = request.params.role === undefined ? "postgrespw": "password";
 
@@ -189,7 +193,7 @@ export function insertData(request: Request, response: Response): void {
 export function updateData(request: Request, response: Response): void {
   const { table, columns, data, predicate } = request.body;
   
-  let userForDb:string = request.params.role === undefined ? "postgres" : request.params.role + "_role";
+  let userForDb:string = request.params.role === undefined ? "postgres" : `${request.params.role}_role`;
 
   let passForDb:string = request.params.role === undefined ? "postgrespw": "password";
 
@@ -220,7 +224,7 @@ export function deleteData(request: Request, response: Response): void {
   const TABLE:string = request.params.table;
   const PREDICATE:string = request.params.predicate;
   
-  let userForDb:string = request.params.role === undefined ? "postgres" : request.params.role + "_role";
+  let userForDb:string = request.params.role === undefined ? "postgres" : `${request.params.role}_role`;
 
   let passForDb:string = request.params.role === undefined ? "postgrespw": "password";
 

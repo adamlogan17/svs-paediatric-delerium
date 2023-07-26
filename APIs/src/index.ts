@@ -1,6 +1,11 @@
 import express, { Request, Response } from 'express';
 import morgan from "morgan";
 import bp from 'body-parser';
+
+import swaggerJsdoc from 'swagger-jsdoc';
+import swaggerUi from 'swagger-ui-express';
+// import swaggerOptions from '../swagger.json';
+
 import { deleteData, getAll, insertData, updateData } from './crud';
 import { adminAuthorise, authenticate, authorise, fieldAuthorise, retrieveUserDetails } from './login';
 import { allPicuCompliance, singlePicuCompliance } from './auditCharts';
@@ -9,6 +14,29 @@ import { insertCompData } from './complianceScores';
 // Express Initialize
 const app = express();
 const port: number = 8000;
+
+// swagger configuration
+const specs = swaggerJsdoc({
+    swagger:"2.0",
+    definition: {
+      info: {
+        title: "SvS Backend",
+        version: "1",
+        description:"This is the backend for the SvS final year project"
+      },
+      servers: [
+        {
+          url: "http://localhost:8000"
+        }
+      ]
+    },
+    apis: ["./src/*.ts"]
+  });
+app.use(
+  "/swagger-docs",
+  swaggerUi.serve,
+  swaggerUi.setup(specs)
+);
 
 // logs when an API is called from the app
 app.use(morgan("tiny"));
@@ -31,20 +59,82 @@ app.use((req:Request, res:Response, next) => {
     next();
 });
 
+// Routes
 /**
- * Simple API that returns a value
- * @author Adam Logan
+ * @swagger
+ * /test/{val}:
+ *  get:
+ *    summary: Tests the API
+ *    description: Tests the API by responding with the value given along with a hello world message
+ *    parameters:
+ *      - name: val
+ *        in: path
+ *        description: The value to be returned
+ *        schema:
+ *          type: "string"
+ *    responses:
+ *      '200':
+ *          description: OK
  */
 app.get("/test/:val", (req: Request,res: Response)=>{
-    res.send({
+    res.status(200).send({
         hello:"world",
         val: req.params.val
     });
 });
 
 /**
- * Gets all data from a database
- * @author Adam Logan
+ * components:
+ *   schemas:
+ *     NewUser:
+ *       type: object
+ *       properties:
+ *         name:
+ *           type: string
+ *           description: The user's name.
+ *           example: Leanne Graham
+ * /login:
+ *  post:
+ *    summary: Logs a user into the system
+ *    description: Provides a jwt, role and username
+ *    requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             NewUser:
+ *              type: object
+ *              properties:
+ *              username:
+ *                type:string
+ *    responses:
+ *      '200':
+ *          description: OK
+ */
+app.post("/login", authenticate);
+
+/**
+ * @swagger
+ * /{database}/getall/{table}:
+ *  get:
+ *    summary: Gets all data from table
+ *    description: Returns all the rows for the selected table, within the selected database
+ *    parameters:
+ *      - name: database
+ *        in: path
+ *        description: The name of the selected database
+ *        schema:
+ *          type: "string"
+ *        required: true
+ *      - name: table
+ *        in: path
+ *        description: The name of the selected database
+ *        required: true
+ *        schema:
+ *          type: "string"
+ *    responses:
+ *      '200':
+ *          description: OK
  */
 app.get("/:database/getall/:table", getAll);
 
@@ -65,12 +155,6 @@ app.put("/:database/updatedata", updateData);
  * @author Adam Logan
  */
 app.delete("/:database/deletedata/:table/:predicate", deleteData);
-
-/**
- * Will log a user into the system
- * @author Adam Logan
- */
-app.post("/login", authenticate);
 
 /**
  * Tests the 'authorise' function

@@ -1,5 +1,6 @@
 - [useful-resources](#useful-resources)
   - [Useful links](#useful-links)
+    - [Swagger](#swagger)
     - [Setting up project](#setting-up-project)
     - [Database Set Up](#database-set-up)
     - [REST APIs](#rest-apis)
@@ -23,6 +24,12 @@
 # useful-resources
 
 ## Useful links
+
+### Swagger
+
+- <https://blog.logrocket.com/documenting-express-js-api-swagger/#express-js-api-application-setup>
+- <https://swagger.io/docs/specification/basic-structure/>
+- <https://swagger.io/docs/specification/describing-parameters/>
 
 ### Setting up project
 

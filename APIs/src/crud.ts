@@ -63,7 +63,7 @@ export function createInsert(table:string, columns:string[], data:string[], upse
     return "'" + element + "'";
   });
 
-  query = `INSERT INTO ${table} (${columns.concat()}) VALUES (${data.concat()})`;
+  query = `INSERT INTO ${table} (${columns.concat()}) VALUES (${data.concat()}) RETURNING picu_id`;
 
   query = columns.length !== data.length ? FAILEDMSSG : query;
 

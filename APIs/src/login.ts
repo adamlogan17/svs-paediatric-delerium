@@ -20,36 +20,36 @@ export function authenticate(request: Request, response: Response): void {
     let condition:string = "picu_id=" + username;
 
     POOL.query(createSelect("picu", condition, ["picu_role", "password"]), async (error:any, results:any) => {
-        if (error) {
-          response.send("Invalid User");
-        }
-        else {
-          // compares the hashed password with the plaintext one which is provided
-          bcrypt
-          .compare(password, results.rows[0].password)
-          .then(res => {
-            if(res) {
-              // adds the userID and role to the JWT token
-              const userToken = jwt.sign(
-                {
-                  userId: username,
-                  role: results.rows[0].picu_role
-                },
-                "REPLACE-WITH-PRIVATE-KEY",
-                {expiresIn: "1d"}
-              );
-              response.send({
-                token: userToken,
-                role: results.rows[0].picu_role,
-                username: username
-              });
+      if (error) {
+        response.send("Invalid User");
+      }
+      else {
+        // compares the hashed password with the plaintext one which is provided
+        bcrypt
+        .compare(password, results.rows[0].password)
+        .then(res => {
+          if(res) {
+            // adds the userID and role to the JWT token
+            const userToken = jwt.sign(
+              {
+                userId: username,
+                role: results.rows[0].picu_role
+              },
+              "REPLACE-WITH-PRIVATE-KEY",
+              {expiresIn: "1d"}
+            );
+            response.send({
+              token: userToken,
+              role: results.rows[0].picu_role,
+              username: username
+            });
 
-            } else {
-              response.send("Invalid User");
-            }
-          })
-          .catch(err => response.send(err))
-        }
+          } else {
+            response.send("Invalid User");
+          }
+        })
+        .catch(err => response.send(err))
+      }
         
     });
 }
@@ -145,4 +145,12 @@ export function retrieveUserDetails(request: Request, response: Response):void {
       role: user.role
     });
   }
+}
+
+export async function hashPassword(password:string) {
+  const SALTROUNDS = 10;
+
+  const hash = await bcrypt.hash(password , SALTROUNDS);
+
+  return hash;
 }

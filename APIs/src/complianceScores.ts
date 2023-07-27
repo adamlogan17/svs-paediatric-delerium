@@ -9,14 +9,15 @@ import { createInsert, createPool } from "./crud";
  * @param { Request } request - Requires the username and role of the user
  * @param { Response } response - A message detailing if the data has been inserted or not
  * @returns { void }
+ * TODO copy the 'addPicu' and accept a json with key value pairs of rows and the data to be entered
  */
 export function insertCompData(request: Request, response: Response): void {
   const { data } = request.body;
 
   // the columns of the data to be inserted 
   const columns:string[] = ["correct_details", 
-      "comfort_recorded", "comfort_above", "all_params_scored", "totalled_correctly", 
-      "in_score_range", "observer_name", "bed_number", "method", "picu_id", "entry_date"]
+    "comfort_recorded", "comfort_above", "all_params_scored", "totalled_correctly", 
+    "in_score_range", "observer_name", "bed_number", "method", "picu_id", "entry_date"]
 
   // Adds the current username and date to the end of the data to be inserted into the database
   data.push(request.params.username);

@@ -10,6 +10,7 @@ import { deleteData, getAll, insertData, updateData } from './crud';
 import { adminAuthorise, authenticate, authorise, fieldAuthorise, retrieveUserDetails } from './login';
 import { allPicuCompliance, singlePicuCompliance } from './auditCharts';
 import { insertCompData } from './complianceScores';
+import { addPicu } from './picuDbManagement';
 
 // Express Initialize
 const app = express();
@@ -229,6 +230,9 @@ app.get("/chartData/allSites", allPicuCompliance);
  * @author Adam Logan
  */
 app.post("/compData", authorise, insertCompData);
+
+// app.post("/addPicu", authorise, adminAuthorise, addPicu);
+app.post("/addPicu", addPicu);
 
 app.listen(port,()=> {
     console.log(`listen port ${port}`);

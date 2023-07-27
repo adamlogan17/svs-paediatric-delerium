@@ -17,7 +17,7 @@ import { useRef } from 'react';
 function authenticateUser(username:string|undefined, password:string|undefined):void {
     const configuration = {
         method: "post",
-        url: "http://localhost:8000/login", 
+        url: "https://localhost:8000/login", 
         data: {
                 username: username,
                 password: password

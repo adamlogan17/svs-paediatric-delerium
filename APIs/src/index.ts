@@ -1,10 +1,11 @@
 import express, { Request, Response } from 'express';
 import morgan from "morgan";
 import bp from 'body-parser';
+import https from 'https';
+import fs from 'fs';
 
 import swaggerJsdoc from 'swagger-jsdoc';
 import swaggerUi from 'swagger-ui-express';
-// import swaggerOptions from '../swagger.json';
 
 import { deleteData, getAll, insertData, updateData } from './crud';
 import { adminAuthorise, authenticate, authorise, fieldAuthorise, retrieveUserDetails } from './login';
@@ -15,6 +16,12 @@ import { addPicu } from './picuDbManagement';
 // Express Initialize
 const app = express();
 const port: number = 8000;
+
+// apps certs for https
+const options = {
+  key: fs.readFileSync("server.key"),
+  cert: fs.readFileSync("server.cert"),
+};
 
 // swagger configuration
 const specs = swaggerJsdoc({
@@ -244,7 +251,15 @@ app.post("/compData", authorise, insertCompData);
 // app.post("/addPicu", authorise, adminAuthorise, addPicu);
 app.post("/addPicu", addPicu);
 
-app.listen(port,()=> {
-    console.log(`listen port ${port}`);
-    console.log(`Go to http://localhost:${port}/`);
+// Used to activate the endpoints through HTTP
+// app.listen(port,()=> {
+//   console.log(`listen port ${port}`);
+//   console.log(`Go to http://localhost:${port}/`);
+// });
+
+// Used to activate the endpoints through HTTPS
+https.createServer(options, app)
+.listen(port, () => {
+  console.log(`listen port ${port}`);
+  console.log(`Go to http://localhost:${port}/`);
 });

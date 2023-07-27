@@ -16,7 +16,7 @@ import axios from 'axios';
 export function fieldAuth() {
   const configuration = {
       method: "get",
-      url: "http://localhost:8000/test-auth/field-engineer",
+      url: "https://localhost:8000/test-auth/field-engineer",
       headers: { 'Authorization': "bearer " + sessionStorage.getItem('TOKEN') } 
   };
   

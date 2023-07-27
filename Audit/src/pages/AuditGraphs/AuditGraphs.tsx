@@ -46,7 +46,7 @@ function AuditGraphs() {
       const fetchAPI = async () => {
           const configuration = {
                   method: "get",
-                  url: "http://localhost:8000/chartData/singleSite/1",
+                  url: "https://localhost:8000/chartData/singleSite/1",
                   headers: { 'Authorization': "bearer " + sessionStorage.getItem('TOKEN') }
               };
           try {

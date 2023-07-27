@@ -85,32 +85,42 @@ app.get("/test/:val", (req: Request,res: Response)=>{
 });
 
 /**
- * components:
- *   schemas:
- *     NewUser:
- *       type: object
- *       properties:
- *         name:
- *           type: string
- *           description: The user's name.
- *           example: Leanne Graham
+ * @swagger
  * /login:
- *  post:
- *    summary: Logs a user into the system
- *    description: Provides a jwt, role and username
- *    requestBody:
- *       required: true
- *       content:
- *         application/json:
- *           schema:
- *             NewUser:
- *              type: object
- *              properties:
- *              username:
- *                type:string
- *    responses:
- *      '200':
- *          description: OK
+ *   post:
+ *     tags:
+ *       - Users
+ *     description: Accepts a username and password and returns a token
+ *     produces:
+ *       - application/json
+ *     consumes:
+ *       - application/json
+ *     parameters:
+ *       - in: body
+ *         name: body
+ *         description: The username and password to be authenticated
+ *         schema:
+ *           type: object
+ *           properties:
+ *             username:
+ *               type: integer
+ *             password:
+ *               type: string
+ *           required:
+ *             - username
+ *             - password
+ *     responses:
+ *       200:
+ *         description: Successful operation
+ *         schema:
+ *           type: object
+ *           properties:
+ *             token:
+ *               type: string
+ *       401:
+ *         description: Unauthorized - Invalid username or password
+ *       500:
+ *         description: Internal Server Error
  */
 app.post("/login", authenticate);
 

@@ -1,4 +1,3 @@
-import BasicNavBar from '../../components/NavBar/NavBar';
 import TypeDropDown from '../../components/TypeDropDown/TypeDropDown';
 import Chart from "chart.js/auto";
 import { CategoryScale } from "chart.js";
@@ -64,9 +63,6 @@ function AuditGraphs() {
 
   return (
     <div id='form' className='wrapper'>
-
-      <BasicNavBar />
-
       <div className = 'content'>
         <h1>Delirium Compliance - Audit Form</h1>
         <br />

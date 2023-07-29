@@ -1,4 +1,3 @@
-import BasicNavBar from '../../components/NavBar/NavBar';
 import PButton from '../../components/PButton/PButton';
 import axios from 'axios';
 
@@ -19,36 +18,36 @@ function authenticateUser(username:string|undefined, password:string|undefined):
         method: "post",
         url: "https://localhost:8000/login", 
         data: {
-                username: username,
-                password: password
-            }
+          username: username,
+          password: password
+        }
     };
     
     // make the API call
     axios(configuration)
-        .then((result) => {
-            // sets the cookies
-            sessionStorage.setItem("TOKEN", result.data.token);
-            sessionStorage.setItem("ROLE", result.data.role);
-            sessionStorage.setItem("SITE", result.data.username);
+      .then((result) => {
+        // sets the cookies
+        sessionStorage.setItem("TOKEN", result.data.token);
+        sessionStorage.setItem("ROLE", result.data.role);
+        sessionStorage.setItem("SITE", result.data.username);
 
-            if(result.data.token === undefined) {
-                alert("Invalid username or password");
-            } else {
-                alert("Logged in as " + result.data.username + " with the role of " + result.data.role);
-                // redirects the user depending on role
-                if(result.data.role === "admin") {
-                    window.location.href = "/admin";
-                } else if (result.data.role === "field_engineer") {
-                    window.location.href = "/fieldengineer";
-                }
-                else if (result.data.role === "picu") {
-                    window.location.href = "/";
-                }
+        if(result.data.token === undefined) {
+          alert("Invalid username or password");
+        } else {
+          alert("Logged in as " + result.data.username + " with the role of " + result.data.role);
+          // redirects the user depending on role
+          if(result.data.role === "admin") {
+            window.location.href = "/admin";
+          } else if (result.data.role === "field_engineer") {
+            window.location.href = "/fieldengineer";
+          }
+          else if (result.data.role === "picu") {
+            window.location.href = "/";
+          }
 
-            }
-        })
-        .catch((error) => error = new Error());
+        }
+      })
+      .catch((error) => error = new Error());
 }
 
 
@@ -69,7 +68,6 @@ function Login() {
 
     return (
         <div id='login' className='wrapper'>
-        <BasicNavBar />
         <div className='content'>
             <h1>Please Login</h1>
             <br />

@@ -1,12 +1,9 @@
-import BasicNavBar from '../../components/NavBar/NavBar';
-import HeadingText from '../../components/HeadingText/HeadingText'
-import BodyText from '../../components/BodyText/BodyText'
-import PButton from '../../components/PButton/PButton'
-import ContactInfo from '../../components/ContactInfo/ContactInfo'
+import HeadingText from '../../components/HeadingText/HeadingText';
+import BodyText from '../../components/BodyText/BodyText';
+import PButton from '../../components/PButton/PButton';
+import ContactInfo from '../../components/ContactInfo/ContactInfo';
 
 import '../../shared/layout.css';
-
-
 
 /**
  * This is the landing page of the site
@@ -16,8 +13,6 @@ import '../../shared/layout.css';
 function Home() {
   return (
         <div id='home' className='wrapper'>
-          
-          <BasicNavBar />
           <div className = 'content'>
             <div className = 'row' id = 'UpperTextContainer'>
               <div className='col'>

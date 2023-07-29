@@ -1,5 +1,4 @@
 import { Link } from 'react-router-dom';
-import BasicNavBar from '../../components/NavBar/NavBar';
 import PButton from '../../components/PButton/PButton';
 
 import '../../shared/layout.css';
@@ -31,7 +30,6 @@ export function fieldAuth() {
 function FieldEngineer() {
   return (
     <div id='fieldEngineer' className='wrapper'>
-      <BasicNavBar />
       <div className='content'>
         <h1>Field Agent Page</h1>
         <div className='button-container'>

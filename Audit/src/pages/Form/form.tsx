@@ -1,4 +1,3 @@
-import BasicNavBar from '../../components/NavBar/NavBar';
 import PButton from '../../components/PButton/PButton';
 import RadioButton from '../../components/RadioButton/RadioButton';
 
@@ -60,7 +59,6 @@ function Form() {
 
   return (
     <div id='form' className='wrapper'>
-      <BasicNavBar />
       <div className='content'>
         <h1>Delirium Compliance - Audit Form</h1>
         <br />

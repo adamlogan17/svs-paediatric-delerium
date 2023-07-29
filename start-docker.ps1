@@ -25,7 +25,7 @@ if($c -or $n) {
 if($n) {
     # removes all images related to the project
     docker rmi $(docker images -a postgres -q)
-    docker rmi $(docker images -a svs-paediatric-delerium-frontend -q)
+    docker rmi $(docker images -a svs-paediatric-delerium-audit -q)
     docker rmi $(docker images -a svs-paediatric-delerium-apis -q)
 }
 

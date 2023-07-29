@@ -1,5 +1,4 @@
 import { Link } from 'react-router-dom';
-import BasicNavBar from '../../components/NavBar/NavBar';
 import PButton from '../../components/PButton/PButton';
 import TypeDropDown from '../../components/TypeDropDown/TypeDropDown';
 import { useRef } from 'react';
@@ -21,7 +20,6 @@ function AdminPassword() {
 
     return (
         <div id='admin' className='wrapper'>
-            <BasicNavBar />
             <div className='content'>
                 <h1>Password Reset</h1>
                 <div className='select-container'>

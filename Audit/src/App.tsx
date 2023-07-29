@@ -1,22 +1,31 @@
 import AppRouter from './AppRouter';
 
-
 import { createTheme, ThemeProvider } from '@mui/material/styles';
 import BasicNavBar from './components/NavBar/NavBar';
-import { CssBaseline } from '@mui/material';
+import { CssBaseline, IconButton, PaletteMode } from '@mui/material';
+import { createContext, useMemo, useState } from 'react';
+import Brightness7Icon from '@mui/icons-material/Brightness7';
 
-// sets the theme for the entire app, find more out at the link'https://mui.com/material-ui/customization/palette/#customization'
-const theme = {
-  mode:'dark',
+
+
+const getDesignTokens = (mode: PaletteMode) => ({
   palette: {
-    primary: {
-      main: '#009999'
-    },
-    secondary: {
-      main: '#f3f3f3'
-    }
-  }
-}
+    mode,
+    ...(mode === 'light'
+      ? {
+          // palette values for light mode
+          primary: {
+            main:'#009999'
+          }
+        }
+      : {
+          primary: {
+            main: '#009999'
+          }
+        }),
+  },
+});
+
 
 /**
  * The main component of the application.
@@ -28,14 +37,34 @@ const theme = {
  * @returns {JSX.Element} - Rendered component.
  */
 export default function App() {
+  const [mode, setMode] = useState<'light' | 'dark'>(sessionStorage.getItem("MODE") !== 'light' ? 'dark' : 'light');
+  const ColorModeContext = createContext({ toggleColorMode: () => {} });
+  const theme = useMemo(() => createTheme(getDesignTokens(mode)), [mode]);
+
+  const colorMode = useMemo(
+    () => ({
+      toggleColorMode: () => {
+        setMode((prevMode) => {
+          const newMode = prevMode === 'light' ? 'dark' : 'light'
+          sessionStorage.setItem("MODE", newMode);
+          return newMode;
+        });
+      },
+    }),
+    [],
+  );
+
   return (
-    <ThemeProvider theme={createTheme(theme)} >
-      <CssBaseline />
-      
-      <BasicNavBar />
-      <br />
-      {/* Render the current page content using the AppRouter component */}
-      <AppRouter />
-    </ThemeProvider>
+    <ColorModeContext.Provider value={colorMode}>
+      <ThemeProvider theme={createTheme(theme)} >
+        <CssBaseline />
+
+        <BasicNavBar props={{toggleMode: colorMode.toggleColorMode, mode:mode}} />
+        
+        <br />
+        {/* Render the current page content using the AppRouter component */}
+        <AppRouter />
+      </ThemeProvider>
+    </ColorModeContext.Provider>
   )
 }

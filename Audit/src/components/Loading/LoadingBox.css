@@ -1,0 +1,8 @@
+.spinner-container {
+  display: grid;
+  justify-content: center;
+  align-items: center;
+  padding: 10px;
+  height: 350px;
+  width: 100%;
+}

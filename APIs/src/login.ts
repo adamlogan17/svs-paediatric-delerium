@@ -15,16 +15,19 @@ export function authenticate(request: Request, response: Response): void {
     // the admin role is used to login in users
     const POOL = createPool("audit", "admin_role", "password"); 
 
+    console.log(request.body);
+
     const { username, password } = request.body;
 
     let condition:string = "picu_id=" + username;
 
     POOL.query(createSelect("picu", condition, ["picu_role", "password"]), async (error:any, results:any) => {
-      if (error) {
+      if (error || results.rows.length === 0) {
         response.send("Invalid User");
       }
       else {
         // compares the hashed password with the plaintext one which is provided
+        console.log(results);
         bcrypt
         .compare(password, results.rows[0].password)
         .then(res => {

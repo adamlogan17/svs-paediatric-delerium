@@ -12,6 +12,7 @@ import Container from '@mui/material/Container';
 import { useNavigate } from "react-router-dom";
 import { useState } from "react";
 import axios from 'axios';
+import PageLoad from '../../components/Loading/PageLoad';
 
 
 /**
@@ -34,10 +35,14 @@ export default function SignIn() {
    */
   const handleSubmit = (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
-    setIsLoading(true);
+    // setIsLoading(true);
     const data = new FormData(event.currentTarget);
     const username = data.get('username');
     const password = data.get('password');
+
+    console.log("password", password);
+    console.log("username", username);
+
 
     const configuration = {
       method: "post",
@@ -62,12 +67,12 @@ export default function SignIn() {
           alert("Logged in as " + result.data.username + " with the role of " + result.data.role);
           // redirects the user depending on role
           if(result.data.role === "admin") {
-            window.location.href = "/admin";
+            navigate("/admin");
           } else if (result.data.role === "field_engineer") {
-            window.location.href = "/fieldengineer";
+            navigate("/fieldengineer");
           }
           else if (result.data.role === "picu") {
-            window.location.href = "/";
+            navigate("/");
           }
         }
         setIsLoading(false);
@@ -77,6 +82,7 @@ export default function SignIn() {
 
   return (
       <Container  maxWidth="xl">
+        <PageLoad loading={isLoading} />
         <Box
           sx={{
             marginTop: 8,
@@ -85,6 +91,7 @@ export default function SignIn() {
             alignItems: 'center',
           }}
         >
+
           <Avatar sx={{ m: 1, bgcolor: 'primary.main' }}>
             <LockOutlinedIcon />
           </Avatar>

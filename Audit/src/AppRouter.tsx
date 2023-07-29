@@ -9,6 +9,7 @@ import Admin from './pages/Admin/Admin';
 import AuditGraphs from './pages/AuditGraphs/AuditGraphs';
 import FieldEngineer from './pages/FieldEngineer/FieldEngineer';
 import SignIn from "./pages/Login/SignIn";
+import Sandbox from "./pages/Sandbox/Sandbox";
 
 const token:string|null = sessionStorage.getItem("TOKEN");
 const role:string|null = sessionStorage.getItem("ROLE");
@@ -25,6 +26,8 @@ function AppRouter() {
           <Route index path="/" element={<Home />}/>
           <Route path="/login2" element={<Login />}/>
           <Route path="/login" element={<SignIn /> }/>
+
+          <Route path="/sandbox" element={<Sandbox /> }/>
 
           {picuAccess ? <Route path="/form" element={<Form />}/> : <></>}
           {picuAccess ? <Route path="/otherPage" element={<OtherPage />}/> : <></>}

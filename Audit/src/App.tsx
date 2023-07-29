@@ -7,7 +7,7 @@ import { CssBaseline } from '@mui/material';
 
 // sets the theme for the entire app, find more out at the link'https://mui.com/material-ui/customization/palette/#customization'
 const theme = {
-  mode:'light',
+  mode:'dark',
   palette: {
     primary: {
       main: '#009999'

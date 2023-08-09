@@ -70,11 +70,16 @@ export function authorise(request: Request, response: Response, next:NextFunctio
   try {
     // get the token from the authorization header
     console.log("authorise");
+    // console.log(request.headers);
     const authHeader:string|undefined = request.headers.authorization === undefined ? "error" : request.headers.authorization;
-    const token:string = authHeader.split(" ")[1];
+    console.log(authHeader);
+    const token:string = authHeader.includes("Bearer") ? authHeader.split(" ")[1] : authHeader;
+    console.log(token);
+    console.log(typeof(token));
 
     // retrieve the user details of the logged in user
     const user:JwtPayload|string = jwt.verify(token, "REPLACE-WITH-PRIVATE-KEY");
+    console.log(user);
 
     // pass the user down to the endpoints here
     if(typeof user == 'string') {

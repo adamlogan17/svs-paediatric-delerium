@@ -24,22 +24,33 @@ const options = {
 };
 
 // swagger configuration
-const specs = swaggerJsdoc({
-    swagger:"2.0",
+const specs = swaggerJsdoc(
+  {
+    swagger:"3.0",
     definition: {
       info: {
         title: "SvS Backend",
-        version: "1",
+        version: "1.0.0",
         description:"This is the backend for the SvS final year project"
       },
+      securityDefinitions: {
+          Bearer: {
+            type: 'apiKey',
+            in: 'header',
+            name: 'Authorization',
+            description: 'JWT to access the endpoints'
+          }
+        },
       servers: [
         {
-          url: "http://localhost:8000"
+          url: "https://localhost:8000"
         }
       ]
     },
-    apis: ["./src/*.ts"]
-  });
+    apis: ["./src/index.ts"]
+  }
+);
+
 app.use(
   "/swagger-docs",
   swaggerUi.serve,
@@ -175,8 +186,30 @@ app.put("/:database/updatedata", updateData);
 app.delete("/:database/deletedata/:table/:predicate", deleteData);
 
 /**
- * Tests the 'authorise' function
- * @author Adam Logan
+ * @swagger
+ * /test-auth:
+ *   get:
+ *     tags:
+ *       - Authorization
+ *     description: Endpoint that requires authorization.
+ *     security:
+ *       - Bearer: []
+ *     produces:
+ *       - application/json
+ *     responses:
+ *       200:
+ *         description: Message indicating the user is authorized and the user's details.
+ *         schema:
+ *           type: object
+ *           properties:
+ *             message:
+ *               type: string
+ *             user:
+ *               type: string
+ *             role:
+ *               type: string
+ *       401:
+ *         description: Unauthorized access.
  */
 app.get("/test-auth", authorise, (request:any, response) => {
     response.json({ message: "You are authorized to access me" , user: request.params.user, role: request.params.role});
@@ -261,5 +294,5 @@ app.post("/addPicu", addPicu);
 https.createServer(options, app)
 .listen(port, () => {
   console.log(`listen port ${port}`);
-  console.log(`Go to http://localhost:${port}/`);
+  console.log(`Go to https://localhost:${port}/swagger-docs for documentation`);
 });

@@ -9,7 +9,7 @@ import PButton from "../../components/PButton/PButton";
 function testAuth():void {
     const configuration = {
         method: "get",
-        url: "http://localhost:8000/test-auth",
+        url: `${process.env.REACT_APP_API_URL}/test-auth`,
         headers: { 'Authorization': "bearer " + sessionStorage.getItem('TOKEN') } 
     };
     

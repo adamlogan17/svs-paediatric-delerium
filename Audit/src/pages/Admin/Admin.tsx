@@ -14,7 +14,7 @@ import axios from 'axios';
 export function adminAuth() {
   const configuration = {
       method: "get",
-      url: "https://localhost:8000/test-auth/admin",
+      url: `${process.env.REACT_APP_API_URL}/test-auth/admin`,
       headers: { 'Authorization': "bearer " + sessionStorage.getItem('TOKEN') } 
   };
   

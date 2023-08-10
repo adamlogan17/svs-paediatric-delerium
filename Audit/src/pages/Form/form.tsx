@@ -9,7 +9,7 @@ import axios from 'axios';
 function insertData(data:any[]):void {
   const configuration = {
     method: "post",
-    url: "https://localhost:8000/compData", 
+    url: `${process.env.REACT_APP_API_URL}/compData`, 
     headers: { 'Authorization': "bearer " + sessionStorage.getItem('TOKEN') },
     data: {
         table:"compliance_data",

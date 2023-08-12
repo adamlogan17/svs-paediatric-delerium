@@ -66,33 +66,35 @@ export function authenticate(request: Request, response: Response): void {
  * @param { NextFunction } next
  * @returns { void }
  */
-export function authorise(request: Request, response: Response, next:NextFunction):void {
+export function authorise(request: Request, response: Response, next:NextFunction, level:string = 'picu'):void {
   try {
     // get the token from the authorization header
-    console.log("authorise");
-    // console.log(request.headers);
     const authHeader:string|undefined = request.headers.authorization === undefined ? "error" : request.headers.authorization;
-    console.log(authHeader);
     const token:string = authHeader.includes("Bearer") ? authHeader.split(" ")[1] : authHeader;
-    console.log(token);
-    console.log(typeof(token));
 
     // retrieve the user details of the logged in user
     const user:JwtPayload|string = jwt.verify(token, "REPLACE-WITH-PRIVATE-KEY");
     console.log(user);
 
     // pass the user down to the endpoints here
-    if(typeof user == 'string') {
+    console.log(level);
+    console.log(request.params.role);
+    console.log(request.params.role === level);
+    if(typeof user === 'string') {
       request.params.user = user;
-    } else {
+      next();
+    } else if (user.role === level || user.role === "admin") {
+      // As an admin can do everything 
       request.params.username =  user.userId;
       request.params.role =  user.role;
+      next();
+    } else {
+      response.status(401).json("Invalid request!");
     }
 
-    // pass down functionality to the endpoint
-    next();
+    
   } catch (err) {
-    response.json("Invalid request!");
+    response.status(401).json("Invalid request!");
   }
 }
 

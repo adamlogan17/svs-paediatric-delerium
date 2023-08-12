@@ -1,4 +1,4 @@
-import express, { Request, Response } from 'express';
+import express, { NextFunction, Request, Response, response } from 'express';
 import morgan from "morgan";
 import bp from 'body-parser';
 import https from 'https';
@@ -164,8 +164,14 @@ app.post("/login", authenticate);
  *    responses:
  *      '200':
  *          description: OK
+ *      '400':
+ *          description: Invalid parameters
  */
-app.get("/:database/getall/:table", getAll);
+app.get("/:database/getall/:table", async (req: Request,res: Response) => {
+  let result:{allData:any[]}|string = await getAll(req.params.database, req.params.table, req.params.role === undefined ? "postgres" : `${req.params.role}_role`, req.params.role === undefined ? "postgrespw": "password");
+  let status:number = typeof result === 'string' ? 400 : 200;
+  res.status(status).send(result);
+});
 
 /**
  * Inserts data to a database
@@ -211,63 +217,63 @@ app.delete("/:database/deletedata/:table/:predicate", deleteData);
  *       401:
  *         description: Unauthorized access.
  */
-app.get("/test-auth", authorise, (request:any, response) => {
-    response.json({ message: "You are authorized to access me" , user: request.params.user, role: request.params.role});
-});
+// app.get("/test-auth", authorise, (request:any, response) => {
+//     response.json({ message: "You are authorized to access me" , user: request.params.user, role: request.params.role});
+// });
 
-/**
- * Test endpoint to check if a user is an admin
- * @author Adam Logan
- */
-app.get("/test-auth/admin", authorise, adminAuthorise, (request:any, response) => {
-    response.json("You are authorized to access me!");
-});
+// /**
+//  * Test endpoint to check if a user is an admin
+//  * @author Adam Logan
+//  */
+// app.get("/test-auth/admin", authorise, adminAuthorise, (request:any, response) => {
+//     response.json("You are authorized to access me!");
+// });
 
-/**
- * Test endpoint to check if a user is a field engineer
- * @author Adam Logan
- */
-app.get("/test-auth/field-engineer", authorise, fieldAuthorise, (request:any, response) => {
-    response.json("You are authorized to access me!");
-});
+// /**
+//  * Test endpoint to check if a user is a field engineer
+//  * @author Adam Logan
+//  */
+// app.get("/test-auth/field-engineer", authorise, fieldAuthorise, (request:any, response) => {
+//     response.json("You are authorized to access me!");
+// });
 
-/**
- * Tests RBAC for retrieving data from database
- * @author Adam Logan
- */
-app.get("/test-auth/:database/getall/:table", authorise, getAll);
+// /**
+//  * Tests RBAC for retrieving data from database
+//  * @author Adam Logan
+//  */
+// // app.get("/test-auth/:database/getall/:table", authorise, getAll);
 
-/**
- * Tests RBAC for inserting data to the database
- * @author Adam Logan
- */
-app.post("/test-auth/:database/insertdata", authorise, insertData);
+// /**
+//  * Tests RBAC for inserting data to the database
+//  * @author Adam Logan
+//  */
+// app.post("/test-auth/:database/insertdata", authorise, insertData);
 
-/**
- * Tests RBAC for updating data from database
- * @author Adam Logan
- */
-app.put("/test-auth/:database/updatedata", authorise, updateData);
+// /**
+//  * Tests RBAC for updating data from database
+//  * @author Adam Logan
+//  */
+// app.put("/test-auth/:database/updatedata", authorise, updateData);
 
-/**
- * Tests RBAC for deleting data from database
- * @author Adam Logan
- */
-app.delete("/test-auth/:database/deletedata/:table/:predicate", authorise, deleteData);
+// /**
+//  * Tests RBAC for deleting data from database
+//  * @author Adam Logan
+//  */
+// app.delete("/test-auth/:database/deletedata/:table/:predicate", authorise, deleteData);
 
 
-/**
- * Retrieves the user's userId and role from the token provided
- * @author Adam Logan
- */
-app.get("/auth/:token", retrieveUserDetails);
+// /**
+//  * Retrieves the user's userId and role from the token provided
+//  * @author Adam Logan
+//  */
+// app.get("/auth/:token", retrieveUserDetails);
 
-/**
- * Retrieves the compliance data of the site requested
- * TODO If the user has a picu role make sure that their ID matches that of the one they are requesting
- * @author Adam Logan
- */
-app.get("/chartData/singleSite/:siteId", authorise, singlePicuCompliance);
+// /**
+//  * Retrieves the compliance data of the site requested
+//  * TODO If the user has a picu role make sure that their ID matches that of the one they are requesting
+//  * @author Adam Logan
+//  */
+// app.get("/chartData/singleSite/:siteId", authorise, singlePicuCompliance);
 
 /**
  * Retrieves the anonymised compliance data of all the sites
@@ -279,10 +285,69 @@ app.get("/chartData/allSites", allPicuCompliance);
  * TODO Create another endpoint to allow an admin (and possible a field engineer) to insert data for any picu
  * @author Adam Logan
  */
-app.post("/compData", authorise, insertCompData);
+// app.post("/compData", , insertCompData);
 
 // app.post("/addPicu", authorise, adminAuthorise, addPicu);
-app.post("/addPicu", addPicu);
+/**
+ * @swagger
+ * /addPicu:
+ *   post:
+ *     tags:
+ *       - Picu
+ *     name: Add Picu
+ *     summary: Adds a new Picu to the database
+ *     security:
+ *       - Bearer: []
+ *     consumes:
+ *       - application/json
+ *     parameters:
+ *       - name: picu
+ *         in: body
+ *         schema:
+ *           $ref: '#/definitions/Picu'
+ *         required:
+ *           - hospital_name
+ *           - auditor
+ *           - picu_role
+ *           - password
+ *           - ward_name
+ *     responses:
+ *       '200':
+ *         description: Picu successfully added.
+ *       '400':
+ *         description: Error occurred.
+ * definitions:
+ *   Picu:
+ *     properties:
+ *       hospital_name:
+ *         type: string
+ *       auditor:
+ *         type: string
+ *       picu_role:
+ *         type: string
+ *         enum:
+ *           - picu
+ *           - admin
+ *           - field_engineer
+ *       password:
+ *         type: string
+ *       ward_name:
+ *         type: string
+ */
+
+app.post("/addPicu", (request: Request, response: Response, next:NextFunction) => authorise(request, response, next), async (req: Request, res: Response) => {
+  console.log("body", req.body);
+  let x = {
+    hospital_name:"a", 
+    auditor:"b", 
+    picu_role:'picu',
+    password:"c",
+    ward_name:"d",
+  }
+  let result = await addPicu(req.body);
+  let status:number = typeof result === 'string' ? 400 : 200;
+  res.status(status).send(result);
+});
 
 // Used to activate the endpoints through HTTP
 // app.listen(port,()=> {

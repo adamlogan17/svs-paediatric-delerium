@@ -1,5 +1,6 @@
 import { Request, Response } from "express";
 import { Pool } from "pg";
+import errorCodeMessage from "./errorCodeMessage";
 
 /**
  * Creates a pool object to connect to a database
@@ -116,34 +117,31 @@ export function createDelete(table: string, predicate?:string) : string {
 }
 
 /**
- * Gets all the data from a specific table
+ * Fetches all records from a specified table in a database.
+ * 
  * @author Adam Logan
- * @date 2023-03-23
- * @param { Request } request Requires the parameter 'table'
- * @param { Response } response Returns an object with the property 'allData' which contains an array of the returned rows as an object
- * @returns { void }
+ * @function getAll
+ * @param {string} database - The name of the database.
+ * @param {string} table - The name of the table from which to fetch the records.
+ * @param {string} userForDb - The username for the database connection.
+ * @param {string} passForDb - The password for the database connection.
+ * 
+ * @returns {Promise<{allData:any[]}|string>} A promise that resolves with all records from the specified table or an error message.
  */
-export function getAll(request: Request, response: Response): void {
-  const table:string = request.params.table;
+export async function getAll(database:string, table:string, userForDb:string, passForDb:string): Promise<{allData:any[]}|string> {
+  const POOL = createPool(database, userForDb, passForDb);
 
-  let userForDb:string = request.params.role === undefined ? "postgres" : `${request.params.role}_role`;
-
-  let passForDb:string = request.params.role === undefined ? "postgrespw": "password";
-
-  const POOL = createPool(request.params.database, userForDb, passForDb);
-
-  POOL.query(createSelect(table), (error:any, results:any) => {
-    if(error == undefined) {
-      response.send({
-        allData: results.rows
-      });
-    }
-    else if (error.code == 42501) {
-      response.send("Invalid user");
-    } else {
-      response.send(error);
-    }
-  });
+  let results:any;
+  console.log(createSelect(table));
+  try {
+    results = await POOL.query(createSelect(table));
+    results = {
+      allData: results.rows
+    };
+  } catch (e:any) {
+    results = errorCodeMessage(e.code);
+  }
+  return results;
 }
 
 /**

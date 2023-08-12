@@ -1,48 +1,49 @@
-import { Request, Response } from 'express';
 import { createInsert, createPool } from './crud';
 import { hashPassword } from './login';
+import errorCodeMessage from './errorCodeMessage';
 
 const DATABASE = "audit";
 const DBPASSWORD:string = "password";
 
 /**
- * 
- * @param request 
- * @param response 
- * TODO make it possible for a field engineer to do this as well
- * TODO do not allow a field engineer to create an admin account
+ * Represents the attributes of a PICU (Pediatric Intensive Care Unit) record.
  */
-export async function addPicu(request: Request, response: Response): Promise<undefined> {
-  const TABLENAME:string = 'picu';
-  const COLUMNS:string[] = ['hospital_name', 'auditor', 'picu_role', 'password', 'ward_name'];
-  const ROLE_OPTIONS:string[] = ['picu', 'admin', 'field_engineer'];
-  if (!ROLE_OPTIONS.includes(request.body.picu_role)) {
-    response.send("Invalid picu_role given.");
-    return undefined;
-  }
+type Picu = {
+  hospital_name:string, 
+  auditor:string, 
+  picu_role:'picu'|'admin'|'field_engineer',
+  password:string
+  ward_name:string
+}
 
-  request.body.password = await hashPassword("pass1");
-  
-  const data:string[] = COLUMNS.map((column) => request.body[column]);
-  console.log(data);
+/**
+ * Adds a new PICU record to the database.
+ * 
+ * @author Adam Logan
+ * @function addPicu
+ * @param {Picu} dataToAdd - The data of the PICU record to be added.
+ * @returns {Promise<{id: number} | string>} The ID of the added record or an error message.
+ */
+export async function addPicu(dataToAdd:Picu): Promise<{id:number}|string> {
+  const TABLENAME:string = 'picu';
+  const COLUMNS:string[] = Object.keys(dataToAdd) as (keyof Picu)[];
+
+  // Hash the password before storing it
+  dataToAdd.password = await hashPassword(dataToAdd.password);
+
+  const DATA:string[] = Object.values(dataToAdd);
   
   const USER = "admin_role";
 
   const POOL = createPool(DATABASE, USER, DBPASSWORD);
 
-  const sqlStatement:string = createInsert(TABLENAME, COLUMNS, data);
+  const sqlStatement:string = createInsert(TABLENAME, COLUMNS, DATA);
 
-  POOL.query(sqlStatement, (error:any, results:any) => {
-    if(error === undefined) {
-      console.log(results);
-      response.send({
-        id: results.rows[0].picu_id
-      });
-    } 
-    else {
-      response.send(error);
+  try {
+    return {
+      id:(await POOL.query(sqlStatement)).rows[0].picu_id
     }
-  });
-
-  return undefined;
+  } catch (e:any) {
+    return errorCodeMessage(e.code);
+  }
 }

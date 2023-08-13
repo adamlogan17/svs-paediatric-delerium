@@ -13,7 +13,7 @@ export default function errorCodeMessage(code:string):string {
   let result:string = "ERROR: ";
 
   // Logs the error code for debugging purposes.
-  console.log(code);
+  console.log("Error code =", code);
   
   switch (code) {
     case '42P01':

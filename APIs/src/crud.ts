@@ -31,10 +31,10 @@ export function createPool(database:string, user:string="postgres", password:str
  * @param { string } [groupBy] The name of the column which you would like to group by
  * @returns { string } A query that will return the required results
  */
-export function createSelect(table:string, condition?:string, data?:string[], groupBy?:string) : string {
+export function createSelect(table:string, condition?:string, columns?:string[], groupBy?:string) : string {
   let query:string = "SELECT ";
 
-  query += data == undefined ? "*" : data.concat();
+  query += columns == undefined ? "*" : columns.concat();
 
   query += " FROM " + table;
 
@@ -51,22 +51,21 @@ export function createSelect(table:string, condition?:string, data?:string[], gr
  * @date 2023-03-23
  * @param { string } table The table where the data is required to be inserted
  * @param { string[] } columns The column names that are being inserted
- * @param { string[] } data The data to be inserted, must match the length of the 'columns' parameter
+ * @param { string[] } [data] The data to be inserted, must match the length of the 'columns' parameter
  * @param { string } [upsertCol] If a row exists with the same data, the existing row will be updated with the new data
  * @returns { string } A query that inserts data into a table
  * TODO Need to implement the UPSERT functionality
+ * TODO Modify to retuen the primary key
  */
-export function createInsert(table:string, columns:string[], data:string[], upsertCol?:string) : string {
+export function createInsert(table:string, columns:string[], data?:string[], upsertCol?:string) : string {
   const FAILEDMSSG:string = "FAILED";
   let query:string = "";
 
-  data = data.map((element) => {
-    return "'" + element + "'";
-  });
+  data = columns.map((element:string, index:number) => data === undefined ? `$${index + 1}` : `'${data[index]}'`);
 
   query = `INSERT INTO ${table} (${columns.concat()}) VALUES (${data.concat()}) RETURNING picu_id`;
 
-  query = columns.length !== data.length ? FAILEDMSSG : query;
+  query = (data !== undefined && columns.length !== data.length) ? FAILEDMSSG : query;
 
   // UPSERT operation, not yet implemented
   if (upsertCol !== undefined) {
@@ -82,20 +81,18 @@ export function createInsert(table:string, columns:string[], data:string[], upse
  * @date 2023-03-26
  * @param { string } table The table to update the data in
  * @param { string[] } columns The columns that are being changed
- * @param { string[] } data The data to change to, must be the same length as the columns array
- * @param { string } predicate The condition to decide which rows to update
+ * @param { string[] } [data] The data to change to, must be the same length as the columns array
+ * @param { string } [predicate] The condition to decide which rows to update
  * @returns { string } The update SQL statement
  */
-export function createUpdate(table:string, columns:string[], data:string[], predicate:string) : string {
+export function createUpdate(table:string, columns:string[], predicate:string, data?:string[]) : string {
   const FAILEDMSSG:string = "FAILED";
   let query:string = ""
 
-  let updateVals:string[] = columns.map((element:string, index:number) => {
-    return element + " = '" + data[index] + "'";
-  });
+  let updateVals:string[] = columns.map((element:string, index:number) => `${element} = ${data === undefined ? `$${index + 1}` : `'${data[index]}'`}`);
 
   query = `UPDATE ${table} SET ${updateVals.concat()} WHERE ${predicate} ;`;
-  query = columns.length !== data.length ? FAILEDMSSG : query;
+  query = (data !== undefined && columns.length !== data.length) ? FAILEDMSSG : query;
 
   return query;
 }
@@ -132,7 +129,7 @@ export async function getAll(database:string, table:string, userForDb:string, pa
   const POOL = createPool(database, userForDb, passForDb);
 
   let results:any;
-  console.log(createSelect(table));
+
   try {
     results = await POOL.query(createSelect(table));
     results = {
@@ -145,97 +142,99 @@ export async function getAll(database:string, table:string, userForDb:string, pa
 }
 
 /**
- * Inserts data into the database
- * @author Adam Logan
- * @date 2023-03-24
- * @param { Request } request Requires the body to be in the format {"table":"table_name", "columns":["col1","col2"], "data":["data1","data2"]}
- * @param { Response } response Returns a message if the data has been successfully inserted
- * @returns { void }
+ * Inserts data into the specified table of the database.
+ * 
+ * @param {string} database - The name of the database.
+ * @param {string} table - The name of the table.
+ * @param {any} dataToAdd - Data to insert into the table.
+ * @param {string} [user="postgres"] - Username for the database.
+ * @param {string} [password="postgrespq"] - Password for the database.
+ * 
+ * @returns {Promise<string>} A promise that resolves with a success message or rejects with an error.
+ * TODO maybe use this function instead of 'addPicu' and make this function always return the id (maybe just get 'addPicu' to call this function so the 'Picu' type can be kept)
  */
-export function insertData(request: Request, response: Response): void {
-  const { table, columns, data } = request.body;
+export async function insertData(database:string ,table:string, dataToAdd:any, user="postgres", password="postgrespw"): Promise<string> {
+  let role = user === "postgres" ? user : `${user}_role`;
 
-  console.log(table);
-  console.log(columns);
-  console.log(data);
+  const data:string[] = Object.values(dataToAdd);
 
-  let userForDb:string = request.params.role === undefined ? "postgres" : `${request.params.role}_role`;
+  const columns:string[] = Object.keys(dataToAdd);
 
-  let passForDb:string = request.params.role === undefined ? "postgrespw": "password";
+  const POOL = createPool(database, role, password);
 
-  const POOL = createPool(request.params.database, userForDb, passForDb);
-  
-  POOL.query(createInsert(table, columns, data), (error:any, results:any) => {
-    if(error == undefined) {
-      response.send("Successfully Inserted the Data 😊");
-    }
-    else if (error.code == 42501) {
-      response.send("Invalid user");
-    } else {
-      response.send(error);
-    }
-    if (error) {
-      throw error;
-    }
-  });
+  const sqlStatement:string = createInsert(table, columns);
+
+  console.log(sqlStatement);
+
+  let results:string;
+
+  try {
+    await POOL.query(sqlStatement, data);
+    results = "Successfully Inserted the Data 😊";
+  } catch (e:any) {
+    results = errorCodeMessage(e.code);
+  }
+  return results;
 }
 
 /**
- * Updates a specific piece of data
+ * Updates data in a specified table of a database.
+ *
  * @author Adam Logan
- * @date 2023-03-26
- * @param { Request } request Requires the body to be in the format {"table":"table_name", "columns":["col1","col2"], "data":["data1","data2"], "predicate":"condition"}
- * @param { Response } response Returns a message if the data has been successfully updated
- * @returns { void }
+ * @param {string} database - Name of the database to update data in.
+ * @param {string} table - Name of the table where the data needs to be updated.
+ * @param {any} dataToAdd - Object containing the data fields to be updated.
+ * @param {string} predicate - Condition for which rows in the table to update.
+ * @param {string} [user="postgres"] - Username for the database.
+ * @param {string} [password="postgrespq"] - Password for the database.
+ * @returns {Promise<string>} Promise resolving to a success message if the update was successful, or an error message if it wasn't.
  */
-export function updateData(request: Request, response: Response): void {
-  const { table, columns, data, predicate } = request.body;
-  
-  let userForDb:string = request.params.role === undefined ? "postgres" : `${request.params.role}_role`;
+export async function updateData(database:string ,table:string, dataToAdd:any, predicate:string, user="postgres", password="postgrespw"): Promise<string> {  
+  let role = user === "postgres" ? user : `${user}_role`;
 
-  let passForDb:string = request.params.role === undefined ? "postgrespw": "password";
+  const data:string[] = Object.values(dataToAdd);
 
-  const POOL = createPool(request.params.database, userForDb, passForDb);
+  const columns:string[] = Object.keys(dataToAdd);
 
-  POOL.query(createUpdate(table, columns, data, predicate), (error:any, results:any) => {
-    if(error == undefined) {
-      response.send("Successfully Updated the Data 😊");
-    }
-    else if (error.code == 42501) {
-      response.send("Invalid user");
-    } else {
-      response.send(error);
-    }
-    
-  });
+  const POOL = createPool(database, role, password);
+
+  const sqlStatement:string = createUpdate(table, columns,predicate);
+
+  let results:string;
+
+  try {
+    await POOL.query(sqlStatement, data);
+    results = "Successfully Updated the Data 😊";
+  } catch (e:any) {
+    results = errorCodeMessage(e.code);
+  }
+  return results;
 }
 
 /**
- * Deletes a specific piece of data
- * @author Adam Logan
- * @date 2023-03-27
- * @param { Request } request Requires the parameter 'table' and 'predicate' which is the condition that will delete data if it is true
- * @param { Response } response Returns a message if the data has been successfully deleted
- * @returns { void }
+ * Deletes data from a specified table of a database.
+ *
+ * @param {string} database - Name of the database to delete data from.
+ * @param {string} table - Name of the table where the data needs to be deleted.
+ * @param {string} predicate - Condition specifying which rows to delete.
+ * @param {string} [user="postgres"] - Username for the database.
+ * @param {string} [password="postgrespq"] - Password for the database.
+ * @returns {Promise<string>} Promise resolving to a success message if the deletion was successful, or an error message if it wasn't.
  */
-export function deleteData(request: Request, response: Response): void {
-  const TABLE:string = request.params.table;
-  const PREDICATE:string = request.params.predicate;
-  
-  let userForDb:string = request.params.role === undefined ? "postgres" : `${request.params.role}_role`;
+export async function deleteData(database:string ,table:string, predicate:string, user="postgres", password="postgrespw"): Promise<string> {
+  let role = user === "postgres" ? user : `${user}_role`;
 
-  let passForDb:string = request.params.role === undefined ? "postgrespw": "password";
+  const POOL = createPool(database, role, password);
 
-  const POOL = createPool(request.params.database, userForDb, passForDb);
+  const sqlStatement:string = createDelete(table, predicate);
 
-  POOL.query(createDelete(TABLE, PREDICATE), (error:any, results:any) => {
-    if(error == undefined) {
-      response.send("Successfully Deleted the Data 😊");
-    }
-    else if (error.code == 42501) {
-      response.send("Invalid user");
-    } else {
-      response.send(error);
-    }
-  });
+  let results:string;
+
+  try {
+    await POOL.query(sqlStatement);
+    results = "Successfully Deleted the Data 😊";
+  } catch (e:any) {
+    results = errorCodeMessage(e.code);
+  }
+  return results;
 }

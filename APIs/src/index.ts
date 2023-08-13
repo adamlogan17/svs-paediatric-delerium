@@ -8,7 +8,7 @@ import swaggerJsdoc from 'swagger-jsdoc';
 import swaggerUi from 'swagger-ui-express';
 
 import { deleteData, getAll, insertData, updateData } from './crud';
-import { adminAuthorise, authenticate, authorise, fieldAuthorise, retrieveUserDetails } from './login';
+import { authenticate, authorise } from './login';
 import { allPicuCompliance, singlePicuCompliance } from './auditCharts';
 import { insertCompData } from './complianceScores';
 import { addPicu } from './picuDbManagement';
@@ -43,7 +43,7 @@ const specs = swaggerJsdoc(
         },
       servers: [
         {
-          url: "https://localhost:8000"
+          url: `https://localhost:${port}`
         }
       ]
     },
@@ -83,6 +83,8 @@ app.use((req:Request, res:Response, next) => {
  * @swagger
  * /test/{val}:
  *  get:
+ *    tags: 
+ *      - Testing
  *    summary: Tests the API
  *    description: Tests the API by responding with the value given along with a hello world message
  *    parameters:
@@ -107,7 +109,8 @@ app.get("/test/:val", (req: Request,res: Response)=>{
  * /login:
  *   post:
  *     tags:
- *       - Users
+ *       - Authorization
+ *     summary: Allows users to log into the system
  *     description: Accepts a username and password and returns a token
  *     produces:
  *       - application/json
@@ -118,15 +121,10 @@ app.get("/test/:val", (req: Request,res: Response)=>{
  *         name: body
  *         description: The username and password to be authenticated
  *         schema:
- *           type: object
- *           properties:
- *             username:
- *               type: integer
- *             password:
- *               type: string
- *           required:
- *             - username
- *             - password
+ *          $ref: '#/definitions/Login'
+ *         required:
+ *          - username
+ *          - password
  *     responses:
  *       200:
  *         description: Successful operation
@@ -135,10 +133,19 @@ app.get("/test/:val", (req: Request,res: Response)=>{
  *           properties:
  *             token:
  *               type: string
+ *             role:
+ *               type: string
+ *             username:
+ *               type: string
  *       401:
  *         description: Unauthorized - Invalid username or password
- *       500:
- *         description: Internal Server Error
+ * definitions:
+ *   Login:
+ *     properties:
+ *      username:
+ *        type: string
+ *      password:
+ *        type: string
  */
 app.post("/login", authenticate);
 
@@ -146,8 +153,9 @@ app.post("/login", authenticate);
  * @swagger
  * /{database}/getall/{table}:
  *  get:
+ *    tags:
+ *      - CRUD
  *    summary: Gets all data from table
- *    description: Returns all the rows for the selected table, within the selected database
  *    parameters:
  *      - name: database
  *        in: path
@@ -174,29 +182,133 @@ app.get("/:database/getall/:table", async (req: Request,res: Response) => {
 });
 
 /**
- * Inserts data to a database
- * @author Adam Logan
+ * @swagger
+ * /{database}/{table}/insertdata:
+ *   post:
+ *     summary: Inserts data into the specified database and table.
+ *     tags: 
+ *       - CRUD
+ *     parameters:
+ *       - in: path
+ *         name: database
+ *         required: true
+ *         description: Name of the database.
+ *         schema:
+ *           type: string
+ *       - in: path
+ *         name: table
+ *         required: true
+ *         description: Name of the table.
+ *         schema:
+ *           type: string
+ *       - in: body
+ *         name: data
+ *         required: true
+ *         description: The data to insert, with the key being the column name.
+ *         schema:
+ *           type: object
+ *           properties:
+ *             key:
+ *               type: string
+ *     responses:
+ *       200:
+ *         description: Data successfully inserted.
+ *       400:
+ *         description: There was an error inserting the data.
  */
-app.post("/:database/insertdata", insertData);
+app.post("/:database/:table/insertdata", async (req: Request,res: Response) => {
+  let result:string = await insertData(req.params.database, req.params.table,req.body);
+  let status:number = result.includes("ERROR") ? 400 : 200;
+  res.status(status).send(result);
+});
 
 /**
- * Updates data in the database
- * @author Adam Logan
+ * @swagger
+ * /{database}/{table}/updatedata:
+ *   put:
+ *     summary: Update data in a specific table in a database.
+ *     tags:
+ *       - CRUD
+ *     parameters:
+ *       - in: path
+ *         name: database
+ *         required: true
+ *         schema:
+ *           type: string
+ *         description: Name of the database.
+ *       - in: path
+ *         name: table
+ *         required: true
+ *         schema:
+ *           type: string
+ *         description: Name of the table.
+ *       - in: body
+ *         name: data
+ *         required: true
+ *         description: Data to update.
+ *         schema:
+ *           type: object
+ *           properties:
+ *             data:
+ *               type: object
+ *               description: The data fields to be updated.
+ *             predicate:
+ *               type: string
+ *               description: Condition for which rows to update.
+ *     responses:
+ *       200:
+ *         description: Successfully Updated the Data.
+ *       400:
+ *         description: Error occurred during the data update.
  */
-app.put("/:database/updatedata", updateData);
+app.put("/:database/:table/updatedata", async (req: Request,res: Response) => {
+  let result:string = await updateData(req.params.database, req.params.table,req.body.data, req.body.predicate);
+  let status:number = result.includes("ERROR") ? 400 : 200;
+  res.status(status).send(result);
+});
 
 /**
- * Deletes the data in the database
- * @author Adam Logan
+ * @swagger
+ * /{database}/deletedata/{table}/{predicate}:
+ *   delete:
+ *     summary: Deletes data from a specified table of a database.
+ *     tags:
+ *       - CRUD
+ *     parameters:
+ *       - name: database
+ *         in: path
+ *         description: Name of the database.
+ *         required: true
+ *         type: string
+ *       - name: table
+ *         in: path
+ *         description: Name of the table where the data needs to be deleted from.
+ *         required: true
+ *         type: string
+ *       - name: predicate
+ *         in: path
+ *         description: Condition specifying which rows to delete.
+ *         required: true
+ *         type: string
+ *     responses:
+ *       200:
+ *         description: Data deleted successfully.
+ *       400:
+ *         description: Error in deleting data.
  */
-app.delete("/:database/deletedata/:table/:predicate", deleteData);
+app.delete("/:database/deletedata/:table/:predicate", async (req: Request,res: Response) => {
+  let result:string = await deleteData(req.params.database, req.params.table,req.params.predicate);
+  let status:number = result.includes("ERROR") ? 400 : 200;
+  res.status(status).send(result);
+});
 
 /**
  * @swagger
  * /test-auth:
  *   get:
  *     tags:
- *       - Authorization
+ *       - Testing
+ *     summary: Tests authentication
  *     description: Endpoint that requires authorization.
  *     security:
  *       - Bearer: []
@@ -217,63 +329,60 @@ app.delete("/:database/deletedata/:table/:predicate", deleteData);
  *       401:
  *         description: Unauthorized access.
  */
-// app.get("/test-auth", authorise, (request:any, response) => {
-//     response.json({ message: "You are authorized to access me" , user: request.params.user, role: request.params.role});
-// });
+app.get("/test-auth", (request: Request, response: Response, next:NextFunction) => authorise(request, response, next), (request:any, response) => {
+  response.json({ message: "You are authorized to access me" , user: request.params.username, role: request.params.role});
+});
 
-// /**
-//  * Test endpoint to check if a user is an admin
-//  * @author Adam Logan
-//  */
-// app.get("/test-auth/admin", authorise, adminAuthorise, (request:any, response) => {
-//     response.json("You are authorized to access me!");
-// });
+/**
+ * @swagger
+ * /test-auth/admin:
+ *   get:
+ *     tags:
+ *       - Testing
+ *     summary: Tests Admin authentication
+ *     description: Endpoint that requires authorization.
+ *     security:
+ *       - Bearer: []
+ *     produces:
+ *       - application/json
+ *     responses:
+ *       200:
+ *         description: Message indicating the user is authorized and the user's details.
+ *       401:
+ *         description: Unauthorized access.
+ */
+app.get("/test-auth/admin", (request: Request, response: Response, next:NextFunction) => authorise(request, response, next, "admin"), (request:any, response) => {
+  response.json({ message: "You are authorized to access me" , user: request.params.username, role: request.params.role});
+});
 
-// /**
-//  * Test endpoint to check if a user is a field engineer
-//  * @author Adam Logan
-//  */
-// app.get("/test-auth/field-engineer", authorise, fieldAuthorise, (request:any, response) => {
-//     response.json("You are authorized to access me!");
-// });
+/**
+ * @swagger
+ * /test-auth/field-engineer:
+ *   get:
+ *     tags:
+ *       - Testing
+ *     summary: Tests field engineer authentication
+ *     description: Endpoint that requires authorization.
+ *     security:
+ *       - Bearer: []
+ *     produces:
+ *       - application/json
+ *     responses:
+ *       200:
+ *         description: Message indicating the user is authorized and the user's details.
+ *       401:
+ *         description: Unauthorized access.
+ */
+app.get("/test-auth/field-engineer", (request: Request, response: Response, next:NextFunction) => authorise(request, response, next, "field_engineer"), (request:any, response) => {
+  response.json({ message: "You are authorized to access me" , user: request.params.username, role: request.params.role});
+});
 
-// /**
-//  * Tests RBAC for retrieving data from database
-//  * @author Adam Logan
-//  */
-// // app.get("/test-auth/:database/getall/:table", authorise, getAll);
-
-// /**
-//  * Tests RBAC for inserting data to the database
-//  * @author Adam Logan
-//  */
-// app.post("/test-auth/:database/insertdata", authorise, insertData);
-
-// /**
-//  * Tests RBAC for updating data from database
-//  * @author Adam Logan
-//  */
-// app.put("/test-auth/:database/updatedata", authorise, updateData);
-
-// /**
-//  * Tests RBAC for deleting data from database
-//  * @author Adam Logan
-//  */
-// app.delete("/test-auth/:database/deletedata/:table/:predicate", authorise, deleteData);
-
-
-// /**
-//  * Retrieves the user's userId and role from the token provided
-//  * @author Adam Logan
-//  */
-// app.get("/auth/:token", retrieveUserDetails);
-
-// /**
-//  * Retrieves the compliance data of the site requested
-//  * TODO If the user has a picu role make sure that their ID matches that of the one they are requesting
-//  * @author Adam Logan
-//  */
-// app.get("/chartData/singleSite/:siteId", authorise, singlePicuCompliance);
+/**
+ * Retrieves the compliance data of the site requested
+ * TODO If the user has a picu role make sure that their ID matches that of the one they are requesting
+ * @author Adam Logan
+ */
+app.get("/chartData/singleSite/:siteId", (request: Request, response: Response, next:NextFunction) => authorise(request, response, next), singlePicuCompliance);
 
 /**
  * Retrieves the anonymised compliance data of all the sites
@@ -287,7 +396,6 @@ app.get("/chartData/allSites", allPicuCompliance);
  */
 // app.post("/compData", , insertCompData);
 
-// app.post("/addPicu", authorise, adminAuthorise, addPicu);
 /**
  * @swagger
  * /addPicu:
@@ -334,16 +442,7 @@ app.get("/chartData/allSites", allPicuCompliance);
  *       ward_name:
  *         type: string
  */
-
 app.post("/addPicu", (request: Request, response: Response, next:NextFunction) => authorise(request, response, next), async (req: Request, res: Response) => {
-  console.log("body", req.body);
-  let x = {
-    hospital_name:"a", 
-    auditor:"b", 
-    picu_role:'picu',
-    password:"c",
-    ward_name:"d",
-  }
   let result = await addPicu(req.body);
   let status:number = typeof result === 'string' ? 400 : 200;
   res.status(status).send(result);

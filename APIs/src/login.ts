@@ -98,65 +98,6 @@ export function authorise(request: Request, response: Response, next:NextFunctio
   }
 }
 
-/**
- * Used to authorise if a user has a role of admin
- * @author Adam Logan
- * @date 2023-04-28
- * @param { any } request
- * @param { Response } response
- * @param { NextFunction } next
- * @returns { void }
- */
-export function adminAuthorise(request: Request, response: Response, next:NextFunction): void {
-  if(request.params.role == "admin") {
-    next();
-  } else {
-    response.json("Invalid request!");
-  }
-}
-
-/**
- * Used to authorise if a user has a role of field engineer
- * @author Adam Logan
- * @date 2023-04-28
- * @param { Request } request
- * @param { Response } response
- * @param { NextFunction } next
- * @returns { void }
- */
-export function fieldAuthorise(request: Request, response: Response, next:NextFunction): void {
-  if(request.params.role == "field_engineer") {
-    next();
-  } else {
-    response.json("Invalid request!");
-  }
-}
-
-/**
- * Retrieves the user's userId and role based on the JWT provided
- * @author Adam Logan
- * @date 2023-04-10
- * @param { any } request Must contain the 'token' parameter which should have the argument of a JWT
- * @param { Response } response The userId and role of the user
- * @returns { void }
- */
-export function retrieveUserDetails(request: Request, response: Response):void {
-  const token = request.params.token;
-
-  const decodedToken = jwt.verify(token, "REPLACE-WITH-PRIVATE-KEY");
-
-  const user:JwtPayload|string = decodedToken;
-
-  if(typeof user == 'string') {
-    response.send(user);
-  } else {
-    response.send({
-      username: user.userId,
-      role: user.role
-    });
-  }
-}
-
 export async function hashPassword(password:string) {
   const SALTROUNDS = 10;
 

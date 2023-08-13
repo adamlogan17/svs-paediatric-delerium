@@ -104,7 +104,7 @@ The instructions below must be repeated every time the project is launched.
 
 3. Select 'Add New Server'
 4. Enter any name you would like for the server to be called
-5. Select the 'Configuration' tab and enter the below details, the default values for the other fields mentioned below should be left
+5. Select the 'Connection' tab and enter the below details, the default values for the other fields mentioned below should be left
 
     - Host name/address = svs_postgres
     - Username = postgres

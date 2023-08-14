@@ -1,4 +1,4 @@
-import { createInsert, createPool } from './crud';
+import { createInsert, createPool, insertData } from './crud';
 import { hashPassword } from './login';
 import errorCodeMessage from './errorCodeMessage';
 
@@ -22,28 +22,14 @@ type Picu = {
  * @author Adam Logan
  * @function addPicu
  * @param {Picu} dataToAdd - The data of the PICU record to be added.
- * @returns {Promise<{id: number} | string>} The ID of the added record or an error message.
+ * @returns {Promise<{picu_id: number} | string>} The ID of the added record or an error message.
  */
-export async function addPicu(dataToAdd:Picu): Promise<{id:number}|string> {
-  const TABLENAME:string = 'picu';
-  const COLUMNS:string[] = Object.keys(dataToAdd) as (keyof Picu)[];
+export async function addPicu(dataToAdd:Picu, role:string): Promise<{picu_id:number}|string> {
+  const table:string = 'picu';
+  const columnsToReturn = ['picu_id'];
 
   // Hash the password before storing it
   dataToAdd.password = await hashPassword(dataToAdd.password);
 
-  const DATA:string[] = Object.values(dataToAdd);
-  
-  const USER = "admin_role";
-
-  const POOL = createPool(DATABASE, USER, DBPASSWORD);
-
-  const sqlStatement:string = createInsert(TABLENAME, COLUMNS, DATA);
-
-  try {
-    return {
-      id:(await POOL.query(sqlStatement)).rows[0].picu_id
-    }
-  } catch (e:any) {
-    return errorCodeMessage(e.code);
-  }
+  return await insertData(DATABASE, table, dataToAdd, columnsToReturn, role, DBPASSWORD);
 }

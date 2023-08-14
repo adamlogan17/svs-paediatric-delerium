@@ -165,7 +165,7 @@ app.post("/login", authenticate);
  *        required: true
  *      - name: table
  *        in: path
- *        description: The name of the selected database
+ *        description: The name of the selected table
  *        required: true
  *        schema:
  *          type: "string"
@@ -208,8 +208,13 @@ app.get("/:database/getall/:table", async (req: Request,res: Response) => {
  *         schema:
  *           type: object
  *           properties:
- *             key:
- *               type: string
+ *             data:
+ *               type: object
+ *               description: The data fields to be inserted
+ *             returnCols:
+ *               type: array
+ *               items:
+ *                type: string
  *     responses:
  *       200:
  *         description: Data successfully inserted.
@@ -217,8 +222,8 @@ app.get("/:database/getall/:table", async (req: Request,res: Response) => {
  *         description: There was an error inserting the data.
  */
 app.post("/:database/:table/insertdata", async (req: Request,res: Response) => {
-  let result:string = await insertData(req.params.database, req.params.table,req.body);
-  let status:number = result.includes("ERROR") ? 400 : 200;
+  let result:string = req.body.returnCols !== undefined ? await insertData(req.params.database, req.params.table,req.body.data,req.body.returnCols) : await insertData(req.params.database, req.params.table,req.body.data);
+  let status:number = typeof result === 'string' ? 400 : 200;
   res.status(status).send(result);
 });
 
@@ -442,8 +447,8 @@ app.get("/chartData/allSites", allPicuCompliance);
  *       ward_name:
  *         type: string
  */
-app.post("/addPicu", (request: Request, response: Response, next:NextFunction) => authorise(request, response, next), async (req: Request, res: Response) => {
-  let result = await addPicu(req.body);
+app.post("/addPicu", (request: Request, response: Response, next:NextFunction) => authorise(request, response, next, 'admin'), async (req: Request, res: Response) => {
+  let result = await addPicu(req.body, req.params.role);
   let status:number = typeof result === 'string' ? 400 : 200;
   res.status(status).send(result);
 });

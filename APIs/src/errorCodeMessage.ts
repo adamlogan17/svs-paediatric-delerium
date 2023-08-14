@@ -28,6 +28,9 @@ export default function errorCodeMessage(code:string):string {
     case '42703':
       result += "Column does not exist in database";
       break;
+    case '42501':
+      result += "Permission Denied";
+      break;
     default:
       result += "Unknown Error";
   }

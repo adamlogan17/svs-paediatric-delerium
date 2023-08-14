@@ -51,26 +51,22 @@ export function createSelect(table:string, condition?:string, columns?:string[],
  * @date 2023-03-23
  * @param { string } table The table where the data is required to be inserted
  * @param { string[] } columns The column names that are being inserted
+ * @param { string[] } [returnCols] The columns that are returned when the data is inserted
  * @param { string[] } [data] The data to be inserted, must match the length of the 'columns' parameter
  * @param { string } [upsertCol] If a row exists with the same data, the existing row will be updated with the new data
  * @returns { string } A query that inserts data into a table
- * TODO Need to implement the UPSERT functionality
- * TODO Modify to retuen the primary key
  */
-export function createInsert(table:string, columns:string[], data?:string[], upsertCol?:string) : string {
+export function createInsert(table:string, columns:string[], returnCols?:string[], data?:string[]) : string {
   const FAILEDMSSG:string = "FAILED";
   let query:string = "";
 
   data = columns.map((element:string, index:number) => data === undefined ? `$${index + 1}` : `'${data[index]}'`);
 
-  query = `INSERT INTO ${table} (${columns.concat()}) VALUES (${data.concat()}) RETURNING picu_id`;
+  query = `INSERT INTO ${table} (${columns.concat()}) VALUES (${data.concat()})`;
+
+  query = returnCols !== undefined ? query + `RETURNING ${returnCols.concat()}` : query;
 
   query = (data !== undefined && columns.length !== data.length) ? FAILEDMSSG : query;
-
-  // UPSERT operation, not yet implemented
-  if (upsertCol !== undefined) {
-    // query = !columns.includes(upsertCol) ? FAILEDMSSG : query;
-  }
 
   return query
 }
@@ -144,16 +140,18 @@ export async function getAll(database:string, table:string, userForDb:string, pa
 /**
  * Inserts data into the specified table of the database.
  * 
+ * @author Adam Logan
  * @param {string} database - The name of the database.
  * @param {string} table - The name of the table.
  * @param {any} dataToAdd - Data to insert into the table.
+ * @param {string[]} [returnCols] - Optional array of columns to return after insertion.
  * @param {string} [user="postgres"] - Username for the database.
  * @param {string} [password="postgrespq"] - Password for the database.
  * 
- * @returns {Promise<string>} A promise that resolves with a success message or rejects with an error.
+ * @returns {Promise<any>} The result of the insertion operation.
  * TODO maybe use this function instead of 'addPicu' and make this function always return the id (maybe just get 'addPicu' to call this function so the 'Picu' type can be kept)
  */
-export async function insertData(database:string ,table:string, dataToAdd:any, user="postgres", password="postgrespw"): Promise<string> {
+export async function insertData(database:string ,table:string, dataToAdd:any, returnCols?:string[], user="postgres", password="postgrespw"): Promise<any> {
   let role = user === "postgres" ? user : `${user}_role`;
 
   const data:string[] = Object.values(dataToAdd);
@@ -162,15 +160,14 @@ export async function insertData(database:string ,table:string, dataToAdd:any, u
 
   const POOL = createPool(database, role, password);
 
-  const sqlStatement:string = createInsert(table, columns);
-
-  console.log(sqlStatement);
+  const sqlStatement:string = returnCols !== undefined ? createInsert(table, columns,returnCols) : createInsert(table, columns);
 
   let results:string;
 
   try {
-    await POOL.query(sqlStatement, data);
-    results = "Successfully Inserted the Data 😊";
+    let returnedData = await POOL.query(sqlStatement, data);
+    console.log(returnedData);
+    results = returnedData.rows[0] !== undefined ? returnedData.rows[0] : "Successfully Inserted the Data 😊";
   } catch (e:any) {
     results = errorCodeMessage(e.code);
   }

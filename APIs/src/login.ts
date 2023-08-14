@@ -89,12 +89,12 @@ export function authorise(request: Request, response: Response, next:NextFunctio
       request.params.role =  user.role;
       next();
     } else {
-      response.status(401).json("Invalid request!");
+      response.status(401).json("ERROR: Permission Denied");
     }
 
     
   } catch (err) {
-    response.status(401).json("Invalid request!");
+    response.status(401).json("ERROR: Permission Denied");
   }
 }
 

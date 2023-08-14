@@ -12,6 +12,13 @@ package-lock.json
 # production
 /build
 
+# IDEs and editors
+/.idea
+.vscode/
+*.swp
+*.swo
+*.sublime*
+
 # misc
 .DS_Store
 .env.local

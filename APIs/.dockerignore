@@ -1,2 +1,19 @@
-node_modules
-npm-debug.log
+# Logs
+*.log
+
+# Node module dependencies
+node_modules/
+
+# Development environment files
+.npm/
+.npmrc
+.pnpm-debug.log*
+yarn-error.log
+
+# Editor/IDE configuration
+.vscode/
+.idea/
+
+# Git
+.git/
+.gitignore

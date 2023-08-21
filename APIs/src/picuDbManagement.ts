@@ -28,6 +28,18 @@ export async function addPicu(dataToAdd:Picu, role:string): Promise<{picu_id:num
   const table:string = 'picu';
   const columnsToReturn = ['picu_id'];
 
+  for (const [key, value] of Object.entries(dataToAdd)) {
+    if (value === '') {
+      return `ERROR: ${key} is empty.`;
+    }
+  }
+
+  // Checks the password is valid
+  const passwordRegex = /^(?=.*[A-Z])(?=.*[a-z])(?=.*[!@#$%^&*()_+\-=\[\]{};':"\\|,.<>\/?]+)(?=.*\d).{8}$/;
+  if (!passwordRegex.test(dataToAdd.password)) {
+    return "ERROR: Password must be at least 8 characters long and contain at least one uppercase letter, one lowercase letter and one number.";
+  }
+
   // Hash the password before storing it
   dataToAdd.password = await hashPassword(dataToAdd.password);
 

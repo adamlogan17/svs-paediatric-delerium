@@ -149,7 +149,6 @@ export async function getAll(database:string, table:string, userForDb:string, pa
  * @param {string} [password="postgrespq"] - Password for the database.
  * 
  * @returns {Promise<any>} The result of the insertion operation.
- * TODO maybe use this function instead of 'addPicu' and make this function always return the id (maybe just get 'addPicu' to call this function so the 'Picu' type can be kept)
  */
 export async function insertData(database:string ,table:string, dataToAdd:any, returnCols?:string[], user="postgres", password="postgrespw"): Promise<any> {
   let role = user === "postgres" ? user : `${user}_role`;

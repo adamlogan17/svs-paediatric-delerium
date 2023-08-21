@@ -449,7 +449,7 @@ app.get("/chartData/allSites", allPicuCompliance);
  */
 app.post("/addPicu", (request: Request, response: Response, next:NextFunction) => authorise(request, response, next, 'admin'), async (req: Request, res: Response) => {
   let result = await addPicu(req.body, req.params.role);
-  let status:number = typeof result === 'string' ? 400 : 200;
+  let status:number = typeof result === 'string' ? 400 : 201;
   res.status(status).send(result);
 });
 

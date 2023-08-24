@@ -9,6 +9,7 @@ import { Autocomplete, Avatar, Box, Button, Container, TextField, Typography } f
 import PageLoad from '../../components/Loading/PageLoad';
 import { useState } from 'react';
 import ConfirmDialog from '../../components/ConfirmAddPicuDialog/ConfirmAddPicuDialog';
+import { enqueueSnackbar } from 'notistack';
 
 type RoleAutoComplete = {
   label: 'PICU'|'Admin'|'Field Engineer';
@@ -118,6 +119,8 @@ export default function AddPicu() {
         if(error.response.data.includes("Password")) {
           setPasswordError(error.response.data.replace("ERROR: ", ""));
           setError(true);
+        } else {
+          enqueueSnackbar(error.response.data, { variant: 'error' });
         }
         setIsLoading(false);
       });

@@ -2,11 +2,10 @@ import AppRouter from './AppRouter';
 
 import { createTheme, ThemeProvider } from '@mui/material/styles';
 import BasicNavBar from './components/NavBar/NavBar';
-import { CssBaseline, IconButton, PaletteMode } from '@mui/material';
-import { createContext, useMemo, useState } from 'react';
-import Brightness7Icon from '@mui/icons-material/Brightness7';
-
-
+import { CssBaseline, PaletteMode } from '@mui/material';
+import React, { createContext, useMemo, useState } from 'react';
+import { SnackbarProvider } from 'notistack';
+import BaseSnackBarElement from './components/SnackBarVarients/BaseSnackbarVarient';
 
 const getDesignTokens = (mode: PaletteMode) => ({
   palette: {
@@ -25,6 +24,24 @@ const getDesignTokens = (mode: PaletteMode) => ({
         }),
   },
 });
+
+/**
+ * Below is used to add a custom variant to the notistack snackbar, with 'varientName' being the name of the variant to queue
+ * It then must be added to the customVarients object below, with the component to be rendered
+ */
+// declare module "notistack" {
+//   interface VariantOverrides {
+//     varientName: true;
+//   }
+// }
+
+const customVarients = {
+  error: BaseSnackBarElement,
+  info: BaseSnackBarElement,
+  success: BaseSnackBarElement,
+  warning: BaseSnackBarElement,
+  default: BaseSnackBarElement,
+}
 
 
 /**
@@ -59,11 +76,14 @@ export default function App() {
       <ThemeProvider theme={createTheme(theme)} >
         <CssBaseline />
 
-        <BasicNavBar props={{toggleMode: colorMode.toggleColorMode, mode:mode}} />
-        
-        <br />
-        {/* Render the current page content using the AppRouter component */}
-        <AppRouter />
+        <SnackbarProvider maxSnack={3} Components={customVarients}>
+          <BasicNavBar props={{toggleMode: colorMode.toggleColorMode, mode:mode}} />
+          
+          <br />
+          {/* Render the current page content using the AppRouter component */}
+          <AppRouter />
+        </SnackbarProvider>
+
       </ThemeProvider>
     </ColorModeContext.Provider>
   )

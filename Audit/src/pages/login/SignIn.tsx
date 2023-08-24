@@ -53,7 +53,6 @@ export default function SignIn() {
       }
     };
     
-    // make the API call
     axios(configuration)
       .then((result) => {
         // sets the cookies
@@ -64,15 +63,17 @@ export default function SignIn() {
         if(result.data.token === undefined) {
           setIncorrectDetails(true);
         } else {
-          alert("Logged in as " + result.data.username + " with the role of " + result.data.role);
           // redirects the user depending on role
           if(result.data.role === "admin") {
             navigate("/admin");
+            navigate(0);
           } else if (result.data.role === "field_engineer") {
             navigate("/fieldengineer");
+            navigate(0);
           }
           else if (result.data.role === "picu") {
             navigate("/");
+            navigate(0);
           }
         }
         setIsLoading(false);

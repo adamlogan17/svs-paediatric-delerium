@@ -11,7 +11,7 @@ import { deleteData, getAll, insertData, updateData } from './crud';
 import { authenticate, authorise } from './login';
 import { allPicuCompliance, singlePicuCompliance } from './auditCharts';
 import { insertCompData } from './complianceScores';
-import { addPicu } from './picuDbManagement';
+import { addPicu, nextPicu } from './picuDbManagement';
 
 // Express Initialize
 const app = express();
@@ -451,6 +451,30 @@ app.post("/addPicu", (request: Request, response: Response, next:NextFunction) =
   let result = await addPicu(req.body, req.params.role);
   let status:number = typeof result === 'string' ? 400 : 201;
   res.status(status).send(result);
+});
+
+/**
+ * @swagger
+ * /getNextPicu:
+ *   get:
+ *     tags:
+ *       - Picu
+ *     name: Add Picu
+ *     summary: Gets the next PICU ID, used when adding a new PICU to the database
+ *     security:
+ *       - Bearer: []
+ *     responses:
+ *       '200':
+ *         description: The next PICU ID.
+ *       '400':
+ *         description: Error occurred.
+ */
+app.get("/getNextPicu", (request: Request, response: Response, next:NextFunction) => authorise(request, response, next, 'admin'), async (req: Request, res: Response) => {
+  console.log("in endpoint");
+  let result = await nextPicu(req.params.role);
+  console.log("past result");
+  console.log("result", result);
+  res.status(201).send(result);
 });
 
 // Used to activate the endpoints through HTTP

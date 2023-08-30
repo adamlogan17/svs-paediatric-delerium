@@ -6,14 +6,25 @@ const DATABASE = "audit";
 const DBPASSWORD:string = "password";
 
 /**
- * Represents the attributes of a PICU (Pediatric Intensive Care Unit) record.
+ * @typedef Picu
+ * 
+ * Represents a PICU (Paediatric Intensive Care Unit) entity in the system. This can be used for
+ * storing information related to a particular PICU.
+ * 
+ * @property {string} hospital_name - The name of the hospital where the PICU is located.
+ * @property {string} ward_name - The specific name of the PICU ward.
+ * @property {string} picu_role - Role assigned within the PICU database.
+ * @property {string} auditor - The individual responsible for auditing within this PICU.
+ * @property {string} password - Password associated with the PICU, possibly for access control.
+ * @property {string} [picu_id] - Optional unique identifier for the PICU.
  */
 type Picu = {
   hospital_name:string, 
   auditor:string, 
   picu_role:'picu'|'admin'|'field_engineer',
   password:string
-  ward_name:string
+  ward_name:string,
+  picu_id?:string
 }
 
 /**
@@ -35,7 +46,7 @@ export async function addPicu(dataToAdd:Picu, role:string): Promise<{picu_id:num
   }
 
   // Checks the password is valid
-  const passwordRegex = /^(?=.*[A-Z])(?=.*[a-z])(?=.*[!@#$%^&*()_+\-=\[\]{};':"\\|,.<>\/?]+)(?=.*\d).{8}$/;
+  const passwordRegex = /^(?=.*[A-Z])(?=.*[a-z])(?=.*[!@#$%^&*()_+\-=\[\]{};':"\\|,.<>\/?]+)(?=.*\d).{8,}$/;
   if (!passwordRegex.test(dataToAdd.password)) {
     return "ERROR: Password must be at least 8 characters long and contain at least one uppercase letter, one lowercase letter and one number.";
   }
@@ -44,4 +55,10 @@ export async function addPicu(dataToAdd:Picu, role:string): Promise<{picu_id:num
   dataToAdd.password = await hashPassword(dataToAdd.password);
 
   return await insertData(DATABASE, table, dataToAdd, columnsToReturn, role, DBPASSWORD);
+}
+
+export async function nextPicu(role:string) {
+  const POOL = createPool(DATABASE, role + "_role", DBPASSWORD);
+
+  return (await POOL.query("SELECT nextval('picu_picu_id_seq');")).rows[0].nextval;
 }

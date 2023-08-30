@@ -1,27 +1,42 @@
-import { useNavigate } from 'react-router-dom';
+import AddIcon from '@mui/icons-material/Add';
 
-import LockOutlinedIcon from '@mui/icons-material/LockOutlined';
-
-import '../../shared/layout.css';
-import '../../shared/landing.css';
-import axios from 'axios';
+import axios, { AxiosResponse } from 'axios';
 import { Autocomplete, Avatar, Box, Button, Container, TextField, Typography } from '@mui/material';
 import PageLoad from '../../components/Loading/PageLoad';
 import { useState } from 'react';
-import ConfirmDialog from '../../components/ConfirmAddPicuDialog/ConfirmAddPicuDialog';
+import ConfirmAddPicuDialog from '../../components/ConfirmDialog/ConfirmAddPicuDialog.';
 import { enqueueSnackbar } from 'notistack';
 
-type RoleAutoComplete = {
-  label: 'PICU'|'Admin'|'Field Engineer';
-  role: 'picu'|'admin'|'field_engineer';
-}
-
+/**
+ * Retrieves a string value associated with a key from FormData. 
+ * If the value doesn't exist or is falsy, an empty string is returned.
+ * 
+ * @author Adam Logan
+ * @function getStringValue
+ * 
+ * @param {string} key - The key to retrieve the value for from FormData.
+ * @param {FormData} data - The FormData object from which the value should be retrieved.
+ * @returns {string} The string value associated with the key, or an empty string if it doesn't exist.
+ */
 function getStringValue(key: string, data:FormData):string {
   let value = data.get(key);
   value = value ? value.toString().trim() : "";
   return value;
 }
 
+/**
+ * Checks a given condition and sets an error message if the condition is true.
+ * It also sets a loading state to false, typically used to stop loading spinners.
+ * 
+ * @author Adam Logan
+ * @function checkAndSetError
+ * 
+ * @param {boolean} condition - The condition to check. If true, an error message is set.
+ * @param {Function} setErrorFunction - Function to set the error message.
+ * @param {string} errorMessage - The error message to set if the condition is true.
+ * @param {Function} setIsLoading - Function to set the loading state.
+ * @returns {boolean} True or false depending on the provided condition.
+ */
 function checkAndSetError(condition:boolean, setErrorFunction:Function, errorMessage:string, setIsLoading:Function) {
   if (condition) {
     setErrorFunction(errorMessage);
@@ -33,14 +48,22 @@ function checkAndSetError(condition:boolean, setErrorFunction:Function, errorMes
 }
 
 /**
- * TODO Add the picu first and the change the dialog box to include the ID, and then if the user hits cancel, delete the picu
+ * `AddPicu` is a React functional component responsible for rendering a form to add a new PICU (Paediatric Intensive Care Unit) user.
+ * The form captures details such as the hospital name, ward name, role, auditor, and password.
+ * Once submitted, the form performs a series of validations to ensure the provided data is correct before proceeding.
+ * Successful submission results in the addition of a new PICU user.
+ * 
+ * @function AddPicu
+ * @author Adam Logan
+ * @component
+ * 
+ * @returns {JSX.Element} The rendered component
+ * 
  * TODO Separate the avatar and title into its own component
  * TODO Separate the form button into its own component
- * TODO Maybe separate the text-fields into their own component, but there may no point in doing so
+ * TODO Maybe separate the text-fields into their own component, but there may be no point in doing so
  */
 export default function AddPicu() {
-  const navigate = useNavigate();
-
   // Page loading
   const [isLoading, setIsLoading] = useState(false);
   
@@ -55,18 +78,33 @@ export default function AddPicu() {
   
   // Confirm dialog
   const [isOpen, setIsOpen] = useState(false);
-  const [confirmFoo, setConfirmFoo] = useState(():void => {});
-  const [confirmTitle, setConfirmTitle] = useState("");
-  const [confirmDescription, setConfirmDescription] = useState("");
+  const [picuDetails, setPicuDetails] = useState<Picu>({hospital_name:"", ward_name:"", picu_role:"", auditor:"", password:"", picu_id:""});
+  const [dialogError, setDialogError] = useState("");
 
   const roleOptions:RoleAutoComplete[] = [{label:'PICU', role:'picu'}, {label:'Admin', role:'admin'}, {label:'Field Engineer', role:'field_engineer'}];
   
+  if(dialogError !== "") {
+    setError(true);
+    setPasswordError(dialogError);
+    setDialogError("");
+    setIsLoading(false);
+  } else if (isLoading && !isOpen) {
+    setIsLoading(false);
+  }
 
-  function handleSubmit(event:React.FormEvent<HTMLFormElement>) {
+  /**
+   * Callback function to handle form submission
+   * Validates provided input, makes an API call to fetch the next available PICU ID, 
+   * and sets the required details to be used by the confirmation dialog.
+   * 
+   * @param {React.FormEvent<HTMLFormElement>} event The form event
+   */
+  async function handleSubmit(event:React.FormEvent<HTMLFormElement>) {
     event.preventDefault();
-    // setIsLoading(true);
+    setIsLoading(true);
     let error:boolean = false;
 
+    // gets the values from the form
     const data = new FormData(event.currentTarget);
     const hospital_name:string = getStringValue('hospital_name', data);
     const ward_name:string = getStringValue('ward_name', data);
@@ -75,8 +113,7 @@ export default function AddPicu() {
     const password:string = getStringValue('password', data);
     const check_password:string = getStringValue('check_password', data);
 
-    const role:string = roleOptions.find((role) => role.label === roleLabel)?.role || "";
-
+    // checks the values and sets the error messages
     error = checkAndSetError(hospital_name === "", setHospitalError, "Hospital name is required", setIsLoading) || error;
     error = checkAndSetError(ward_name === "", setWardError, "Ward name is required", setIsLoading) || error;
     error = checkAndSetError(roleLabel === "", setRoleError, "Role is required", setIsLoading) || error;
@@ -86,51 +123,31 @@ export default function AddPicu() {
 
     setError(error);
     if (!error) {
-      setConfirmTitle("Confirm User Details");
-      setConfirmDescription(`Would you like to and the user with the following details?\nHospital Name: ${hospital_name}\nWard Name: ${ward_name}\nRole: ${roleLabel}\nAuditor: ${auditor}\nPassword: ${password}`);
+      // makes the API call to get the next available PICU ID
+      const configuration = {
+        method: "get",
+        url: `${process.env.REACT_APP_API_URL}/getNextPicu`,
+        headers: { 'Authorization': `Bearer ${sessionStorage.getItem('TOKEN')}` },
+      };
+      
+      const id:AxiosResponse<any, any>|void = await axios(configuration)
+        .then((result) => {
+          return result;
+        })
+        .catch((error) => {
+          console.log(error);
+          enqueueSnackbar(error.message, { variant: 'error' });
+        });
 
       setIsOpen(true);
-      setConfirmFoo(() => addPicu(hospital_name, ward_name, role, auditor, password));
+      setPicuDetails({hospital_name, ward_name, picu_role:roleLabel, auditor, password, picu_id:id ? id.data.toString() : '0'});
     }
-  }
-
-  function addPicu(hospital_name:string, ward_name:string, picu_role:string, auditor:string, password:string) : void {
-    alert("add");
-    const configuration = {
-      method: "post",
-      url: `${process.env.REACT_APP_API_URL}/addPicu`,
-      headers: { 'Authorization': `Bearer ${sessionStorage.getItem('TOKEN')}` },
-      data: {
-        hospital_name: hospital_name,
-        ward_name: ward_name,
-        picu_role: picu_role,
-        auditor: auditor,
-        password: password
-      }   
-    };
-    
-    axios(configuration)
-      .then((result) => {
-        alert(result.data);
-        return false;
-      })
-      .catch((error) => {
-        console.log(error.response.data);
-        if(error.response.data.includes("Password")) {
-          setPasswordError(error.response.data.replace("ERROR: ", ""));
-          setError(true);
-        } else {
-          enqueueSnackbar(error.response.data, { variant: 'error' });
-        }
-        setIsLoading(false);
-      });
   }
 
   return (
     <Container  maxWidth="xl">
       <PageLoad loading={isLoading} />
-      <ConfirmDialog open={isOpen} handleClose={() => setIsOpen(false)} title={confirmTitle} description={confirmDescription} handleConfirm={() => confirmFoo} />
-
+      <ConfirmAddPicuDialog open={isOpen} handleClose={() => { setIsOpen(false)}} picuDetails={picuDetails} roleOptions={roleOptions} handlePasswordError={setDialogError}/>
 
       <Box
         sx={{
@@ -142,7 +159,7 @@ export default function AddPicu() {
       >
 
         <Avatar sx={{ m: 1, bgcolor: error ? 'error.main' : 'primary.main' }}>
-          <LockOutlinedIcon />
+          <AddIcon />
         </Avatar>
 
         <Typography component="h1" variant="h5">

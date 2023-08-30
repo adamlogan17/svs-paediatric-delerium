@@ -13,6 +13,7 @@ import { useNavigate } from "react-router-dom";
 import { useState } from "react";
 import axios from 'axios';
 import PageLoad from '../../components/Loading/PageLoad';
+import { enqueueSnackbar } from 'notistack';
 
 
 /**
@@ -21,6 +22,7 @@ import PageLoad from '../../components/Loading/PageLoad';
  * @author Adam Logan
  * @component
  * @function SignIn
+ * 
  * @returns {JSX.Element} - Rendered component.
  */
 export default function SignIn() {
@@ -78,7 +80,7 @@ export default function SignIn() {
         }
         setIsLoading(false);
       })
-      .catch((error) => error = new Error());
+      .catch((error) => enqueueSnackbar(error.message, { variant: "error" }));
   }
 
   return (

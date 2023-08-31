@@ -79,12 +79,12 @@ export async function nextPicu(role:string) {
  * @function getAllIds
  * @author Adam Logan
  * @param {string} role - The role for which the database pool will be created.
- * @returns {Promise<{picu_id:string}[]>} - An array of relevant PICU IDs.
+ * @returns {Promise<{picu_id:string,picu_role:string}[]>} - An array of relevant PICU IDs.
  */
 export async function getAllIds(role:string): Promise<{picu_id:string, picu_role:string}[]> {
   const POOL = createPool(DATABASE, role + "_role", DBPASSWORD);
 
-  const sqlStatement = createSelect("picu", "", ["picu_id"]);
+  const sqlStatement = createSelect("picu", "", ["picu_id", "picu_role"]);
 
   const allIds = (await POOL.query(sqlStatement)).rows;
 

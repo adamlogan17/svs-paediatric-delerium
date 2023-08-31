@@ -11,6 +11,7 @@ import FieldEngineer from './pages/FieldEngineer/FieldEngineer';
 import SignIn from "./pages/Login/SignIn";
 import Sandbox from "./pages/Sandbox/Sandbox";
 import AddPicu from "./pages/Admin/AddPicu";
+import ForgottenPassword from "./pages/ForgottenPassword/ForgottenPassword";
 
 const token:string|null = sessionStorage.getItem("TOKEN");
 const role:string|null = sessionStorage.getItem("ROLE");
@@ -50,6 +51,12 @@ function AppRouter() {
         {fieldAccess && (
           <>
             <Route path="/fieldengineer" element={<FieldEngineer />} />
+          </>
+        )}
+
+        {(adminAccess || fieldAccess) && (
+          <>
+            <Route path="/forgot-password" element={<ForgottenPassword />} />
           </>
         )}
       </Routes>

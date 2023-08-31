@@ -11,14 +11,13 @@ import axios from 'axios';
  * @date 2023-04-28
  * TODO Change the 'Link' component to a MUI link component
  */
-export function adminAuth() {
+export function adminAuth() {  
   const configuration = {
     method: "get",
     url: `${process.env.REACT_APP_API_URL}/test-auth/admin`,
     headers: { 'Authorization': "bearer " + sessionStorage.getItem('TOKEN') } 
   };
   
-  // make the API call
   axios(configuration)
     .then((result) => {
       alert(result.data);
@@ -35,7 +34,7 @@ function Admin() {
         <h1>Admin Page</h1>
         <div className='button-container'>
         <PButton text='Add a PICU' primaryColour='#025858' secondaryColour='#013e3e' width='100%' onButtonClick={() => navigate("/add-picu")}/>
-          <PButton text='Reset a PICU account password' primaryColour='#025858' secondaryColour='#013e3e' width='100%' onButtonClick={() => adminAuth()}/>
+          <PButton text='Reset a PICU account password' primaryColour='#025858' secondaryColour='#013e3e' width='100%' onButtonClick={() => navigate("/forgot-password")}/>
           <PButton text='View / Edit Compliance Data' primaryColour='#025858' secondaryColour='#013e3e' width='100%' onButtonClick={() => adminAuth()}/>
           <PButton text='Admin Audit Log' primaryColour='#025858' secondaryColour='#013e3e'  width='100%' onButtonClick={() => adminAuth()} />
         </div>

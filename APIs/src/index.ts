@@ -8,10 +8,10 @@ import swaggerJsdoc from 'swagger-jsdoc';
 import swaggerUi from 'swagger-ui-express';
 
 import { deleteData, getAll, insertData, updateData } from './crud';
-import { authenticate, authorise } from './login';
+import { authenticate, authorise, updatePicuPassword } from './login';
 import { allPicuCompliance, singlePicuCompliance } from './auditCharts';
 import { insertCompData } from './complianceScores';
-import { addPicu, nextPicu } from './picuDbManagement';
+import { addPicu, getAllIds, nextPicu } from './picuDbManagement';
 
 // Express Initialize
 const app = express();
@@ -449,7 +449,7 @@ app.get("/chartData/allSites", allPicuCompliance);
  */
 app.post("/addPicu", (request: Request, response: Response, next:NextFunction) => authorise(request, response, next, 'admin'), async (req: Request, res: Response) => {
   let result = await addPicu(req.body, req.params.role);
-  let status:number = typeof result === 'string' ? 400 : 201;
+  let status:number = result.toString().includes("Error") ? 400 : 201;
   res.status(status).send(result);
 });
 
@@ -470,11 +470,65 @@ app.post("/addPicu", (request: Request, response: Response, next:NextFunction) =
  *         description: Error occurred.
  */
 app.get("/getNextPicu", (request: Request, response: Response, next:NextFunction) => authorise(request, response, next, 'admin'), async (req: Request, res: Response) => {
-  console.log("in endpoint");
   let result = await nextPicu(req.params.role);
-  console.log("past result");
-  console.log("result", result);
   res.status(201).send(result);
+});
+
+/**
+ * @swagger
+ * /getPicuIds:
+ *   get:
+ *     tags:
+ *       - Picu
+ *     summary: Gets all PICU IDs, along with their roles
+ *     security:
+ *       - Bearer: []
+ *     responses:
+ *       '200':
+ *         description: The next PICU ID.
+ *       '400':
+ *         description: Error occurred.
+ */
+app.get("/getPicuIds", (request: Request, response: Response, next:NextFunction) => authorise(request, response, next, 'field_engineer'), async (req: Request, res: Response) => {
+  let result = await getAllIds(req.params.role);
+  res.status(201).send(result);
+});
+
+/**
+ * @swagger
+ * /updatePicuPassword:
+ *   put:
+ *     tags:
+ *       - Authorization
+ *     summary: Update the password for a given PICU ID.
+ *     security:
+ *       - Bearer: []
+ *     parameters:
+ *       - in: body
+ *         name: body
+ *         description: PICU ID and the new password.
+ *         schema:
+ *           type: object
+ *           required:
+ *             - picu_id
+ *             - newPassword
+ *           properties:
+ *             picu_id:
+ *               type: string
+ *               description: The ID of the PICU whose password needs updating.
+ *             newPassword:
+ *               type: string
+ *               description: The new password.
+ *     responses:
+ *       201:
+ *         description: Password updated successfully.
+ *       400:
+ *         description: An error occurred.
+ */
+app.put("/updatePicuPassword", (request: Request, response: Response, next:NextFunction) => authorise(request, response, next, 'field_engineer'), async (req: Request, res: Response) => {
+  let result = await updatePicuPassword(req.body.picu_id, req.body.newPassword, req.params.role);
+  let status:number = result.toString().includes("Error") ? 400 : 201;
+  res.status(status).send(result);
 });
 
 // Used to activate the endpoints through HTTP

@@ -1,4 +1,4 @@
-import { createInsert, createPool, insertData } from './crud';
+import { createInsert, createPool, createSelect, insertData } from './crud';
 import { hashPassword } from './login';
 import errorCodeMessage from './errorCodeMessage';
 
@@ -45,20 +45,55 @@ export async function addPicu(dataToAdd:Picu, role:string): Promise<{picu_id:num
     }
   }
 
-  // Checks the password is valid
-  const passwordRegex = /^(?=.*[A-Z])(?=.*[a-z])(?=.*[!@#$%^&*()_+\-=\[\]{};':"\\|,.<>\/?]+)(?=.*\d).{8,}$/;
-  if (!passwordRegex.test(dataToAdd.password)) {
-    return "ERROR: Password must be at least 8 characters long and contain at least one uppercase letter, one lowercase letter and one number.";
-  }
-
   // Hash the password before storing it
   dataToAdd.password = await hashPassword(dataToAdd.password);
+
+  // checks if an error was returned from the hashing function
+  if(dataToAdd.password.length !== 60 || dataToAdd.password.includes("Error")) {
+    return dataToAdd.password;
+  }
 
   return await insertData(DATABASE, table, dataToAdd, columnsToReturn, role, DBPASSWORD);
 }
 
+/**
+ * Retrieves the next PICU ID from the database sequence.
+ * 
+ * @function nextPicu
+ * @author Adam Logan
+ * @param {string} role - The role for which the database pool will be created.
+ * @returns {Promise<number>} - The next value in the sequence.
+ */
 export async function nextPicu(role:string) {
   const POOL = createPool(DATABASE, role + "_role", DBPASSWORD);
 
   return (await POOL.query("SELECT nextval('picu_picu_id_seq');")).rows[0].nextval;
+}
+
+/**
+ * Retrieves all the PICU IDs based on a given role.
+ * 
+ * The returned IDs are filtered based on 
+ * the user's role to provide only relevant entries.
+ * 
+ * @function getAllIds
+ * @author Adam Logan
+ * @param {string} role - The role for which the database pool will be created.
+ * @returns {Promise<{picu_id:string}[]>} - An array of relevant PICU IDs.
+ */
+export async function getAllIds(role:string): Promise<{picu_id:string, picu_role:string}[]> {
+  const POOL = createPool(DATABASE, role + "_role", DBPASSWORD);
+
+  const sqlStatement = createSelect("picu", "", ["picu_id"]);
+
+  const allIds = (await POOL.query(sqlStatement)).rows;
+
+  return allIds.filter((id:any) => {
+    if (role === "admin") {
+      return true;
+    }
+    else if (role === "field_engineer") {
+      return id.picu_role === "picu";
+    }
+  });
 }

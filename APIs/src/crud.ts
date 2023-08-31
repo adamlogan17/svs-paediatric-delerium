@@ -1,4 +1,3 @@
-import { Request, Response } from "express";
 import { Pool } from "pg";
 import errorCodeMessage from "./errorCodeMessage";
 
@@ -38,7 +37,7 @@ export function createSelect(table:string, condition?:string, columns?:string[],
 
   query += " FROM " + table;
 
-  query += condition !== undefined ? " WHERE " + condition: "";
+  query += condition !== undefined ? condition.trim() !== "" ? " WHERE " + condition : "" : "";
 
   query += groupBy !== undefined ? " GROUP BY " + groupBy : "";
 

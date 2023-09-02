@@ -4,9 +4,9 @@ import axios, { AxiosResponse } from 'axios';
 import { Autocomplete, Avatar, Box, Button, Container, TextField, Typography } from '@mui/material';
 import PageLoad from '../../components/Loading/PageLoad';
 import { useState } from 'react';
-import ConfirmAddPicuDialog from '../../components/ConfirmDialog/ConfirmAddPicuDialog.';
 import { enqueueSnackbar } from 'notistack';
 import { getStringValue, checkAndSetError } from '../../utility/form';
+import ConfirmDialog from '../../components/ConfirmDialog/ConfirmDialog';
 
 /**
  * `AddPicu` is a React functional component responsible for rendering a form to add a new PICU (Paediatric Intensive Care Unit) user.
@@ -101,14 +101,64 @@ export default function AddPicu() {
         });
 
       setIsOpen(true);
-      setPicuDetails({hospital_name, ward_name, picu_role:roleLabel, auditor, password, picu_id:id ? id.data.toString() : '0'});
+      const role:string = roleOptions.find((role) => role.label === roleLabel)?.role || "";
+
+      setPicuDetails({hospital_name, ward_name, picu_role:role, auditor, password, picu_id:id ? id.data.toString() : '0'});
     }
   }
+
+
+  /**
+   * Sends a request to add a new PICU (Paediatric Intensive Care Unit) entry to the backend.
+   * If an error occurs during the request, especially one related to password issues, it's handled by 
+   * invoking the setPasswordError function. All other errors are displayed as error notifications.
+   *
+   * @function addPicu
+   * @author Adam Logan
+   * 
+   * @param {Picu} details - Object containing the details of the PICU to be added.
+   */
+  function addPicu(details:Picu) : void {
+    const configuration = {
+      method: "post",
+      url: `${process.env.REACT_APP_API_URL}/addPicu`,
+      headers: { 'Authorization': `Bearer ${sessionStorage.getItem('TOKEN')}` },
+      data: details   
+    };
+    
+    axios(configuration)
+      .then((result) => {
+        enqueueSnackbar("PICU added successfully", { variant: 'success' });
+      })
+      .catch((error) => {
+        if(error.response.data.includes("Password")) {
+          setPasswordError(error.response.data.replace("ERROR: ", ""));
+        } else {
+          enqueueSnackbar(error.response.data, { variant: 'error' });
+        }
+      });
+  }
+
+  const chosenRoleLabel = roleOptions.filter((role:RoleAutoComplete) => role.role === picuDetails.picu_role);
 
   return (
     <Container  maxWidth="xl">
       <PageLoad loading={isLoading} />
-      <ConfirmAddPicuDialog open={isOpen} handleClose={() => { setIsOpen(false)}} picuDetails={picuDetails} roleOptions={roleOptions} handlePasswordError={setDialogError}/>
+      {/* <ConfirmAddPicuDialog open={isOpen} handleClose={() => { setIsOpen(false)}} picuDetails={picuDetails} roleOptions={roleOptions} handlePasswordError={setDialogError}/> */}
+      <ConfirmDialog open={isOpen} handleClose={() => { setIsOpen(false)}} handleConfirm={() => addPicu(picuDetails)} title='Confrim User Details' description={
+        <>
+          Would you like to and the user with the following details?
+          <br />
+          {/* <br /> */}
+          <ul>
+            {picuDetails.picu_id && (<li>Username: {picuDetails.picu_id}</li>)}
+            <li>Hospital Name: {picuDetails.hospital_name}</li>
+            <li>Ward Name: {picuDetails.ward_name}</li>
+            <li>Role: {chosenRoleLabel.length === 1 ? chosenRoleLabel[0].label : ""}</li>
+            <li>Auditor: {picuDetails.auditor}</li>
+          </ul>
+        </>} />
+
 
       <Box
         sx={{

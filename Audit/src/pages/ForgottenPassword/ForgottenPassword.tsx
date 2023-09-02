@@ -1,14 +1,12 @@
-import AddIcon from '@mui/icons-material/Add';
-
-import axios, { AxiosResponse } from 'axios';
+import axios from 'axios';
 import { Autocomplete, Avatar, Box, Button, Container, TextField, Typography } from '@mui/material';
 import PasswordIcon from '@mui/icons-material/Password';
 
 import PageLoad from '../../components/Loading/PageLoad';
 import { useEffect, useState } from 'react';
-import ConfirmAddPicuDialog from '../../components/ConfirmDialog/ConfirmAddPicuDialog.';
 import { enqueueSnackbar } from 'notistack';
 import { getStringValue, checkAndSetError } from '../../utility/form';
+import ConfirmDialog from '../../components/ConfirmDialog/ConfirmDialog';
 
 /**
  * `AddPicu` is a React functional component responsible for rendering a form to add a new PICU (Paediatric Intensive Care Unit) user.
@@ -20,6 +18,17 @@ import { getStringValue, checkAndSetError } from '../../utility/form';
  * @author Adam Logan
  * @component
  * 
+ */
+/**
+ * React component that provides an interface for resetting the password of a specific PICU.
+ * It offers a form where users can input the PICU ID, and the new password. 
+ * After validation, it presents a confirmation dialog. On confirmation, an HTTP request 
+ * is made to reset the password.
+ *
+ * @component
+ * @function ForgottenPassword
+ * 
+ * @author Adam Logan
  * @returns {JSX.Element} The rendered component
  */
 export default function ForgottenPassword() {
@@ -34,7 +43,7 @@ export default function ForgottenPassword() {
   
   // Confirm dialog
   const [isOpen, setIsOpen] = useState(false);
-  const [picuDetails, setPicuDetails] = useState<Picu>({hospital_name:"", ward_name:"", picu_role:"", auditor:"", password:"", picu_id:""});
+  const [resetDetails, setResetDetails] = useState({password:"", id:""});
   const [dialogError, setDialogError] = useState("");
 
   const [idOptions, setIdOptions] = useState<RoleAutoComplete[]>([]);
@@ -45,15 +54,15 @@ export default function ForgottenPassword() {
       url: `${process.env.REACT_APP_API_URL}/getPicuIds`,
       headers: { 'Authorization': "Bearer " + sessionStorage.getItem('TOKEN') } 
     };
-        
+
     axios(configuration)
       .then((result) => {
         const allIds = result.data.map((element:{picu_id:string}) => (element.picu_id.toString()));
         allIds.sort((a:string, b:string) => (parseInt(a) - parseInt(b)));
         setIdOptions(allIds);
       })
-      .catch((error) => console.log(error));
-}, []);
+      .catch((error) => enqueueSnackbar(error.message, { variant: 'error' }));
+  }, []);
   
   
   if(dialogError !== "") {
@@ -67,60 +76,70 @@ export default function ForgottenPassword() {
 
   /**
    * Callback function to handle form submission
-   * Validates provided input, makes an API call to fetch the next available PICU ID, 
-   * and sets the required details to be used by the confirmation dialog.
+   * Validates provided input, and if valid, opens the confirmation dialog
    * 
    * @param {React.FormEvent<HTMLFormElement>} event The form event
    */
   async function handleSubmit(event:React.FormEvent<HTMLFormElement>) {
     event.preventDefault();
     setIsLoading(true);
-    // let error:boolean = false;
+    let error:boolean = false;
 
-    // // gets the values from the form
-    // const data = new FormData(event.currentTarget);
-    // const hospital_name:string = getStringValue('hospital_name', data);
-    // const ward_name:string = getStringValue('ward_name', data);
-    // const roleLabel:string = getStringValue('role', data);
-    // const auditor:string = getStringValue('auditor', data);
-    // const password:string = getStringValue('password', data);
-    // const check_password:string = getStringValue('check_password', data);
+    // gets the values from the form
+    const data = new FormData(event.currentTarget);
+    const id:string = getStringValue('id', data);
+    const password:string = getStringValue('password', data);
+    const check_password:string = getStringValue('check_password', data);
 
-    // // checks the values and sets the error messages
-    // error = checkAndSetError(hospital_name === "", setHospitalError, "Hospital name is required", setIsLoading) || error;
-    // error = checkAndSetError(ward_name === "", setWardError, "Ward name is required", setIsLoading) || error;
-    // error = checkAndSetError(roleLabel === "", setRoleError, "Role is required", setIsLoading) || error;
-    // error = checkAndSetError(auditor === "", setAuditorError, "Auditor is required", setIsLoading) || error;
-    // error = checkAndSetError(password === "", setPasswordError, "Password is required", setIsLoading) || error;
-    // error = checkAndSetError(check_password === "" || password !== check_password, setCheckPasswordError, "Required and must match password", setIsLoading) || error;
+    // checks the values and sets the error messages
+    error = checkAndSetError(id === "", setIdError, "ID is required", setIsLoading) || error;
+    error = checkAndSetError(password === "", setPasswordError, "Password is required", setIsLoading) || error;
+    error = checkAndSetError(check_password === "" || password !== check_password, setCheckPasswordError, "Required and must match password", setIsLoading) || error;
 
-    // setError(error);
-    // if (!error) {
-    //   // makes the API call to get the next available PICU ID
-    //   const configuration = {
-    //     method: "get",
-    //     url: `${process.env.REACT_APP_API_URL}/getNextPicu`,
-    //     headers: { 'Authorization': `Bearer ${sessionStorage.getItem('TOKEN')}` },
-    //   };
-      
-    //   const id:AxiosResponse<any, any>|void = await axios(configuration)
-    //     .then((result) => {
-    //       return result;
-    //     })
-    //     .catch((error) => {
-    //       console.log(error);
-    //       enqueueSnackbar(error.message, { variant: 'error' });
-    //     });
+    setError(error);
+    if (!error) {
+      setIsLoading(false);
+      setIsOpen(true);
+      setResetDetails({password:password, id:id})
+    }
+  }
 
-    //   setIsOpen(true);
-    //   setPicuDetails({hospital_name, ward_name, picu_role:roleLabel, auditor, password, picu_id:id ? id.data.toString() : '0'});
-    // }
+  /**
+ * Sends a request to reset the password for a given PICU ID.
+ * 
+ * @param {string} id - The PICU ID for which the password needs to be reset.
+ * @param {string} password - The new password for the PICU ID.
+ */
+  function resetPassword(id:string, password:string) {
+    const configuration = {
+      method: "put",
+      url: `${process.env.REACT_APP_API_URL}/updatePicuPassword`,
+      headers: { 'Authorization': `Bearer ${sessionStorage.getItem('TOKEN')}` },
+      data: {
+        "picu_id": id,
+        "newPassword": password
+      }
+    };
+
+    alert(password);
+    
+    axios(configuration)
+      .then((result) => {
+        enqueueSnackbar("Password has been reset", { variant: 'success' });
+      })
+      .catch((error) => {
+        if(error.response.data.includes("Password")) {
+          setPasswordError(error.response.data.replace("ERROR: ", ""));
+        } else {
+          enqueueSnackbar(error.response.data, { variant: 'error' });
+        }
+      });
   }
 
   return (
     <Container  maxWidth="xl">
       <PageLoad loading={isLoading} />
-      {/* <ConfirmAddPicuDialog open={isOpen} handleClose={() => { setIsOpen(false)}} picuDetails={picuDetails} roleOptions={roleOptions} handlePasswordError={setDialogError}/> */}
+      <ConfirmDialog open={isOpen} title='Reset Password' description={<>Are you sure you would like to reset the password for PICU {resetDetails.id}?</>} handleClose={() => { setIsOpen(false)}} handleConfirm={() => resetPassword(resetDetails.id, resetDetails.password)} />
 
       <Box
         sx={{

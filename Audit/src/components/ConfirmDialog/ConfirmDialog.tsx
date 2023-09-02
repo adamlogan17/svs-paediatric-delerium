@@ -22,7 +22,7 @@ import DialogTitle from '@mui/material/DialogTitle';
  * 
  * TODO Maybe change the type of the callback functions to Function
  */
-export default function ConfirmDialog(props:{open:boolean, handleClose:() => void, title:string, description:JSX.Element, handleConfirm:() => void}) {
+export default function ConfirmDialog(props:{open:boolean, handleClose:() => void, title:string, description:JSX.Element, handleConfirm:Function}) {
   return (
     <Dialog
       open={props.open}

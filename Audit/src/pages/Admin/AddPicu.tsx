@@ -7,6 +7,7 @@ import { useState } from 'react';
 import { enqueueSnackbar } from 'notistack';
 import { getStringValue, checkAndSetError } from '../../utility/form';
 import ConfirmDialog from '../../components/ConfirmDialog/ConfirmDialog';
+import PasswordTextField from '../../components/PasswordTextField/PasswordTextField';
 
 /**
  * `AddPicu` is a React functional component responsible for rendering a form to add a new PICU (Paediatric Intensive Care Unit) user.
@@ -216,30 +217,11 @@ export default function AddPicu() {
             error = {auditorError !== ""}
             helperText = {auditorError}
           />
-          <TextField
-            margin="normal"
-            required
-            fullWidth
-            name="password"
-            label="Password"
-            type="password"
-            id="password"
-            autoComplete="current-password"
-            error = {passwordError !== ""}
-            helperText = {passwordError}
-          />
-          <TextField
-            margin="normal"
-            required
-            fullWidth
-            name="check_password"
-            label="Retype Password"
-            type="password"
-            id="check_password"
-            autoComplete="current-password"
-            error = {checkPasswordError !== ""}
-            helperText = {checkPasswordError}
-          />
+
+          <PasswordTextField id="password" error={passwordError !== ""} helperText={passwordError} label="Password" />
+
+          <PasswordTextField id="check_password" error={checkPasswordError !== ""} helperText={checkPasswordError} label="Password" />
+
           <Button
             type="submit"
             fullWidth

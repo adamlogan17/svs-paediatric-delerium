@@ -14,6 +14,7 @@ import { useState } from "react";
 import axios from 'axios';
 import PageLoad from '../../components/Loading/PageLoad';
 import { enqueueSnackbar } from 'notistack';
+import PasswordTextField from '../../components/PasswordTextField/PasswordTextField';
 
 
 /**
@@ -112,18 +113,9 @@ export default function SignIn() {
             name="username"
             error = {incorrectDetails}
           />
-          <TextField
-            margin="normal"
-            required
-            fullWidth
-            name="password"
-            label="Password"
-            type="password"
-            id="password"
-            autoComplete="current-password"
-            error = {incorrectDetails}
-            helperText = {incorrectDetails ? "Incorrect Username or Password" : "" }
-          />
+
+          <PasswordTextField id="password" error={incorrectDetails} helperText={incorrectDetails ? "Incorrect Username or Password" : "" } label="Password" />
+          
           <Button
             type="submit"
             fullWidth

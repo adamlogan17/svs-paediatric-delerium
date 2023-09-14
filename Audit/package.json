@@ -32,7 +32,7 @@
     "test": "react-scripts test",
     "eject": "react-scripts eject",
     "coverage": "npm test -- --coverage",
-    "docs": "typedoc --options typedoc.conf.json --out docs/site && typedoc --options typedoc.conf.json --plugin typedoc-plugin-markdown --out docs/markdown"
+    "docs": "typedoc --options typedoc.config.json --out docs/site && typedoc --options typedoc.config.json --plugin typedoc-plugin-markdown --out docs/markdown"
   },
   "eslintConfig": {
     "extends": [

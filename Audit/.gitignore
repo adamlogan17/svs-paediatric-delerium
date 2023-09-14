@@ -19,6 +19,9 @@ package-lock.json
 *.swo
 *.sublime*
 
+# documentation
+/docs
+
 # misc
 .DS_Store
 .env.local

@@ -3,6 +3,7 @@
   - [How to start the project](#how-to-start-the-project)
   - [File Structure Explanation](#file-structure-explanation)
   - [Available Scripts](#available-scripts)
+    - [```npm run docs```](#npm-run-docs)
     - [```npm start```](#npm-start)
     - [```npm test```](#npm-test)
     - [```npm run build```](#npm-run-build)
@@ -38,6 +39,10 @@ npm start
 ## Available Scripts
 
 In the project directory, you can run:
+
+### ```npm run docs```
+
+Creates documentation for the site, based on the JSDOC comments within the code. See [here](https://typedoc.org/guides/overview/) for information on TypeDoc.
 
 ### ```npm start```
 

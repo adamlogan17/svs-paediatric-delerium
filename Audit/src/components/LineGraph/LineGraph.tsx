@@ -6,7 +6,7 @@ import { Line } from "react-chartjs-2";
  * @author Adam Logan & Andrew Robb
  * @date 2023-04-28
  * @param { { chartData?:any } } props
- * @prop { any } [chartData] The data, and configuration of the data, that is to be displayed
+ * @prop { any } [props.chartData] The data, and configuration of the data, that is to be displayed
  */
 function LineGraph(props:{ chartData?:any }) {
   return (

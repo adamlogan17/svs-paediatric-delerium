@@ -6,12 +6,12 @@ import useHover from '../../hooks/useAPI/useHover';
  * @author Adam Logan
  * @date 2023-04-28
  * @param { {text:string, onButtonClick?:any, primaryColour?:string, secondaryColour?:string, textColor?:string, width?:string} } props
- * @prop { string } text The text to be displayed on the function
- * @prop { any } [onButtonClick] The function which is called when the button is clicked
- * @prop { sting } [primaryColour] The background hex code of the button (default is "#009999")
- * @prop { sting } [primaryColour] The background hex code of the button when a mouse hovers over the button (default is "#007e7e")
- * @prop { string } [textColor] The hex code of the text
- * @prop { string } [width] The width of the button
+ * @prop { string } props.text The text to be displayed on the function
+ * @prop { any } [props.onButtonClick] The function which is called when the button is clicked
+ * @prop { sting } [props.primaryColour] The background hex code of the button (default is "#009999")
+ * @prop { sting } [props.primaryColour] The background hex code of the button when a mouse hovers over the button (default is "#007e7e")
+ * @prop { string } [props.textColor] The hex code of the text
+ * @prop { string } [props.width] The width of the button
  */
 function PButton(props:{text:string, onButtonClick?:any, primaryColour?:string, secondaryColour?:string, textColor?:string, width?:string}) {
   const checkHover = useHover();

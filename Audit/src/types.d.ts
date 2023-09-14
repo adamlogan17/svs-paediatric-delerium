@@ -34,3 +34,35 @@ type Picu = {
   password:string, 
   picu_id?:string
 }
+
+/**
+ * Defines the various levels of severity.for the 'Alert' MUI component.
+ * 
+ * @author Adam Logan
+ * 
+ * @typedef {object} Severity
+ * @property {"error"} - Represents an error message.
+ * @property {"success"} - Represents a success message.
+ * @property {"info"} - Represents an informational message.
+ * @property {"warning"} - Represents a warning message.
+ * @property {undefined} - Represents an unspecified severity.
+ */
+type Severity = "error" | "success" | "info" | "warning" | undefined;
+
+/**
+ * Defines the properties for the BaseAlert component.
+ * 
+ * @author Adam Logan
+ * 
+ * @typedef {object} BaseAlertProps
+ * @property {string} message - The alert message to be displayed.
+ * @property {Function} closeAction - Callback function to execute when the close button is clicked.
+ * @property {any} [severity] - Represents the level of alert severity.
+ * @property {React.ReactNode} [icon] - Optional custom icon for the alert.
+ */
+type BaseAlertProps = {
+  message:string;
+  closeAction:Function;
+  severity?:any;
+  icon?:React.ReactNode;
+}

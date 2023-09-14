@@ -1,0 +1,14 @@
+{
+  "out": "./docs",
+  "exclude": ["**/node_modules/**/*", "**/tests/**/*"],
+  "theme": "default",
+  "name": "Audit System",
+  "readme": "README.md",
+  "excludePrivate": true,
+  "excludeProtected": true,
+  "excludeExternals": true,
+  "includeVersion": true,
+  "tsconfig": "tsconfig.json",
+  "entryPoints": ["./src"],
+  "entryPointStrategy": "expand"
+}

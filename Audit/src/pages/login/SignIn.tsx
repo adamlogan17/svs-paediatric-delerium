@@ -25,6 +25,8 @@ import PasswordTextField from '../../components/PasswordTextField/PasswordTextFi
  * @function SignIn
  * 
  * @returns {JSX.Element} - Rendered component.
+ * 
+ * TODO Add a media query to the Box component to make the TextFields the same size, no matter how many is in them.
  */
 export default function SignIn() {
   const navigate = useNavigate();
@@ -85,7 +87,7 @@ export default function SignIn() {
   }
 
   return (
-    <Container  maxWidth="xl">
+    <Container component="main" maxWidth="xl" sx={{backgroundColor:'aqua'}}>
       <PageLoad loading={isLoading} />
       <Box
         sx={{
@@ -93,6 +95,7 @@ export default function SignIn() {
           display: 'flex',
           flexDirection: 'column',
           alignItems: 'center',
+          backgroundColor:'brown'
         }}
       >
 
@@ -103,7 +106,7 @@ export default function SignIn() {
         <Typography component="h1" variant="h5">
           Sign in
         </Typography>
-        <Box component="form" onSubmit={handleSubmit} noValidate sx={{ mt: 3 }}>
+        <Box component="form" onSubmit={handleSubmit} noValidate>
           <TextField
             margin="normal"
             required

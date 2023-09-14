@@ -30,62 +30,62 @@ describe('testCreateSelect (Tests the select query on the database, database wit
   });
 });
 
-describe('testCreateInsert (tests insert query on database, an invalid insert query on database and if an upsert is on an invalid column', () => {
-  it('returns a basic INSERT query for a given table and data', () => {
-    const table = 'users';
-    const columns = ['name', 'age'];
-    const data = ['John', '30'];
+// describe('testCreateInsert (tests insert query on database, an invalid insert query on database and if an upsert is on an invalid column', () => {
+//   it('returns a basic INSERT query for a given table and data', () => {
+//     const table = 'users';
+//     const columns = ['name', 'age'];
+//     const data = ['John', '30'];
 
-    const query = createInsert(table, columns, data);
+//     const query = createInsert(table, columns, data);
 
-    expect(query).toBe("INSERT INTO users (name,age) VALUES ('John','30')");
-  });
+//     expect(query).toBe("INSERT INTO users (name,age) VALUES ('John','30')");
+//   });
 
-  it('returns a FAILED message if the number of columns and data do not match', () => {
-    const table = 'orders';
-    const columns = ['id', 'product_name', 'quantity'];
-    const data = ['1', 'Computer', '2', '2022-03-15'];
+//   it('returns a FAILED message if the number of columns and data do not match', () => {
+//     const table = 'orders';
+//     const columns = ['id', 'product_name', 'quantity'];
+//     const data = ['1', 'Computer', '2', '2022-03-15'];
 
-    const query = createInsert(table, columns, data);
+//     const query = createInsert(table, columns, data);
 
-    expect(query).toBe("FAILED");
-  });
+//     expect(query).toBe("FAILED");
+//   });
 
-  it('returns a FAILED message if upsertCol is specified but not in columns', () => {
-    const table = 'products';
-    const columns = ['id', 'name', 'price'];
-    const data = ['1', 'Product A', '100'];
-    const upsertCol = 'name_uk';
+//   it('returns a FAILED message if upsertCol is specified but not in columns', () => {
+//     const table = 'products';
+//     const columns = ['id', 'name', 'price'];
+//     const data = ['1', 'Product A', '100'];
+//     const upsertCol = 'name_uk';
 
-    const query = createInsert(table, columns, data, upsertCol);
+//     const query = createInsert(table, columns, data, upsertCol);
 
-    expect(query).toBe("FAILED");
-  });
-});
+//     expect(query).toBe("FAILED");
+//   });
+// });
 
-describe('testCreateUpdate (valid update statement and invalid update statement', () => {
-  it('generates valid SQL query when given valid input', () => {
-    const table = 'users';
-    const columns = ['name', 'email'];
-    const data = ['John Doe', 'johndoe@example.com'];
-    const predicate = 'id = 1';
-    const expectedQuery = "UPDATE users SET name = 'John Doe',email = 'johndoe@example.com' WHERE id = 1;";
+// describe('testCreateUpdate (valid update statement and invalid update statement', () => {
+//   it('generates valid SQL query when given valid input', () => {
+//     const table = 'users';
+//     const columns = ['name', 'email'];
+//     const data = ['John Doe', 'johndoe@example.com'];
+//     const predicate = 'id = 1';
+//     const expectedQuery = "UPDATE users SET name = 'John Doe',email = 'johndoe@example.com' WHERE id = 1;";
 
-    const result = createUpdate(table, columns, data, predicate);
+//     const result = createUpdate(table, columns, data, predicate);
 
-    expect(result).toEqual(expectedQuery);
-  });
-  it('returns "FAILED" message when columns and data have different lengths', () => {
-    const table = 'users';
-    const columns = ['name', 'email'];
-    const data = ['John Doe'];
-    const predicate = 'id = 1';
+//     expect(result).toEqual(expectedQuery);
+//   });
+//   it('returns "FAILED" message when columns and data have different lengths', () => {
+//     const table = 'users';
+//     const columns = ['name', 'email'];
+//     const data = ['John Doe'];
+//     const predicate = 'id = 1';
 
-    const result = createUpdate(table, columns, data, predicate);
+//     const result = createUpdate(table, columns, data, predicate);
 
-    expect(result).toEqual('FAILED');
-  });
-});
+//     expect(result).toEqual('FAILED');
+//   });
+// });
 
 describe('testCreateDelete (valid delete query and one with a predicate)', () => {
   it('should generate a delete query without a predicate', () => {

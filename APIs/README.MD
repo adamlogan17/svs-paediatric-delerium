@@ -4,6 +4,7 @@
   - [How to run tests](#how-to-run-tests)
   - [File Structure Explanation](#file-structure-explanation)
   - [Typescript File](#typescript-file)
+  - [TODO](#todo)
 
 # APIs
 
@@ -40,3 +41,8 @@ npx ts-node file.ts
 ```
 
 Before the first time you run the program you need to use the command ```npm install```
+
+## TODO
+
+- Need to see the correct place to store the test folder and the ```jest.config.js``` file
+  - Change the ```rootDir``` back to ```./src``` when the above issue is fixed

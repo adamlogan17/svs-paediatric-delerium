@@ -18,3 +18,5 @@ dist/
 *.bak
 *.sublime*
 
+# Documentation
+/docs

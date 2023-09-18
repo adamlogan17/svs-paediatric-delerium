@@ -1,6 +1,7 @@
 - [APIs](#apis)
   - [Summary](#summary)
   - [How to start the project](#how-to-start-the-project)
+  - [Documentation](#documentation)
   - [How to run tests](#how-to-run-tests)
   - [File Structure Explanation](#file-structure-explanation)
   - [Typescript File](#typescript-file)
@@ -19,6 +20,14 @@ Run the below commands.
 ```console
 npm install
 npm run start:dev
+```
+
+## Documentation
+
+The below command, creates documentation for the site, based on the JSDOC comments within the code. See [here](https://typedoc.org/guides/overview/) for information on TypeDoc.
+
+```console
+npm run docs
 ```
 
 ## How to run tests

@@ -7,7 +7,7 @@ import './login.css';
 import { useRef } from 'react';
 
 /**
- * Calls the 'login' API and, if successful, sets the role, username and JWT token in session storage
+ * Calls the 'login' API and, if successful, sets the role, username and JWT token in session storage test
  * @author Adam Logan
  * @date 2023-04-28
  * @param { string|undefined } username The username provided

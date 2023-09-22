@@ -21,9 +21,9 @@ import PasswordTextField from '../../components/PasswordTextField/PasswordTextFi
  * 
  * @returns {JSX.Element} The rendered component
  * 
- * TODO Separate the avatar and title into its own component
- * TODO Separate the form button into its own component
- * TODO Maybe separate the text-fields into their own component, but there may be no point in doing so
+ * @todo Separate the avatar and title into its own component
+ * @todo Separate the form button into its own component
+ * @todo Maybe separate the text-fields into their own component, but there may be no point in doing so
  */
 export default function AddPicu() {
   // Page loading

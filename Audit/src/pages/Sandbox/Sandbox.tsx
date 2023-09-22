@@ -1,5 +1,6 @@
 import Button from '@mui/material/Button';
 import { VariantType, useSnackbar } from 'notistack';
+import EditTable from '../../components/EditTable/EditTable';
 
 export default function Sandbox(props:any) {
   const { enqueueSnackbar } = useSnackbar();
@@ -16,9 +17,11 @@ export default function Sandbox(props:any) {
 
   return (
     <div>
-      <Button onClick={handleClick}>Show snackbar</Button>
+      {/* <Button onClick={handleClick}>Show snackbar</Button>
       <Button onClick={handleClickVariant('success')}>Show success snackbar</Button>
-      <Button onClick={handleClickVariant('error')}>Show success default</Button>
+      <Button onClick={handleClickVariant('error')}>Show success default</Button> */}
+
+      <EditTable />
 
     </div>
   );

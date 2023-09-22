@@ -24,15 +24,18 @@ type RoleAutoComplete = {
  * @property {string} picu_role - Role assigned within the PICU, within the database.
  * @property {string} auditor - The individual responsible for auditing within this PICU.
  * @property {string} password - Password associated with the PICU, possibly for access control.
- * @property {string} [picu_id] - Optional unique identifier for the PICU.
+ * @property {string|number} [picu_id] - Optional unique identifier for the PICU.
+ * @property {number|null} [overall_compliance] - Optional overall compliance score for the PICU, which is calculated within the database.
  */
 type Picu = {
+  [key: string]: string|number|null|undefined; // allows the Picu['key'] syntax to work
   hospital_name:string, 
   ward_name:string, 
   picu_role:string, 
   auditor:string, 
-  password:string, 
-  picu_id?:string
+  password?:string, 
+  picu_id?:string|number,
+  overall_compliance?:number|null,
 }
 
 /**

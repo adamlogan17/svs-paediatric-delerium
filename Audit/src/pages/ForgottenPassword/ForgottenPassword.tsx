@@ -10,17 +10,6 @@ import ConfirmDialog from '../../components/ConfirmDialog/ConfirmDialog';
 import PasswordTextField from '../../components/PasswordTextField/PasswordTextField';
 
 /**
- * `AddPicu` is a React functional component responsible for rendering a form to add a new PICU (Paediatric Intensive Care Unit) user.
- * The form captures details such as the hospital name, ward name, role, auditor, and password.
- * Once submitted, the form performs a series of validations to ensure the provided data is correct before proceeding.
- * Successful submission results in the addition of a new PICU user.
- * 
- * @function AddPicu
- * @author Adam Logan
- * @component
- * 
- */
-/**
  * React component that provides an interface for resetting the password of a specific PICU.
  * It offers a form where users can input the PICU ID, and the new password. 
  * After validation, it presents a confirmation dialog. On confirmation, an HTTP request 

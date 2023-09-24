@@ -11,8 +11,9 @@ import ConfirmDialog from '../ConfirmDialog/ConfirmDialog';
 /**
  * 
  * @todo Add other option for textfield, to be a checkbox for boolean values
+ * @todo Cannot deselect all after implementing the disableDelete prop
  */
-export default function EditTable(props:{initialData:any[], uniqueIdName:string, columnNameMap:any, customInputFields:any[], noEditFields:string[], validateData:(data:any) => string[], deleteData:(ids:number[]) => void, updateData:(data:any) => void}) {
+export default function EditTable(props:{initialData:any[], uniqueIdName:string, columnNameMap:any, customInputFields:any[], noEditFields:string[], validateData:(data:any) => string[], deleteData:(ids:number[]) => void, updateData:(data:any) => void, disableDelete?:any[]}) {
   const [data, setData] = useState<any[]>(props.initialData);
   const [editId, setEditId] = useState<number | null>(null);
   const [tempData, setTempData] = useState<any | null>(null);
@@ -77,12 +78,15 @@ export default function EditTable(props:{initialData:any[], uniqueIdName:string,
 
   function handleSelectAllClick(event: ChangeEvent<HTMLInputElement>) {
     if (event.target.checked) {
-      const newSelected = data.map((element:any) => element[props.uniqueIdName]);
+      const newSelected = data
+        .map((element: any) => element[props.uniqueIdName])
+        .filter((id) => !props.disableDelete?.includes(id)) as number[];
       setSelected(newSelected);
       return;
     }
     setSelected([]);
   };
+
 
   return (
     <Paper sx={{margin:'auto'}}>
@@ -121,10 +125,11 @@ export default function EditTable(props:{initialData:any[], uniqueIdName:string,
                 <TableCell padding="checkbox">
                   <Checkbox
                     color="primary"
+                    disabled={props.disableDelete?.includes(row[props.uniqueIdName])}
                     onClick={(e:any) => {
                       itemSelection(e.target.checked, Number(row[props.uniqueIdName]));
                     }}
-                    checked={selected.includes(Number(row[props.uniqueIdName]))}
+                    checked={selected.includes(Number(row[props.uniqueIdName])) && !props.disableDelete?.includes(row[props.uniqueIdName])}
                   />
                 </TableCell>
                       

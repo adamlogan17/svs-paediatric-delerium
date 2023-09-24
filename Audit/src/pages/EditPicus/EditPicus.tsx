@@ -54,7 +54,7 @@ function updatePicu(picuToUpdate:Picu) {
   }
 
   delete modifiedPicu.overall_compliance;
-  
+
   axios.put(`${process.env.REACT_APP_API_URL}/updatePicu`, picuToUpdate, {
     headers: { 'Authorization': `Bearer ${sessionStorage.getItem('TOKEN')}` }
   })
@@ -99,6 +99,7 @@ export default function EditPicus() {
       </Typography>
 
       <div style={{width:'90%', margin:'auto'}}>
+        {data.length > 0 && 
         <EditTable
           deleteData={deletePicu}
           initialData={data}
@@ -108,7 +109,8 @@ export default function EditPicus() {
           noEditFields={noEditFields}
           validateData={validateData}
           updateData={updatePicu}
-        />
+          disableDelete={[Number(sessionStorage.getItem('USERNAME'))]}
+        />}
       </div>
     </>
   );

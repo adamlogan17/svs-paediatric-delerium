@@ -1,4 +1,8 @@
+import { useEffect, useState } from 'react';
 import EditTable from '../../components/EditTable/EditTable';
+import axios from 'axios';
+import { enqueueSnackbar } from 'notistack';
+import { Typography } from '@mui/material';
 
 
 const customInputFields:any[] = [
@@ -27,19 +31,48 @@ function validateData(data:any) {
 }
 
 export default function EditPicus() {
+  const [data, setData] = useState<Picu[]>([]);
+  console.log(`${process.env.REACT_APP_API_URL}/audit/getall/picu`);
+
+  useEffect(() => {
+    axios.get(`${process.env.REACT_APP_API_URL}/audit/getall/picu`)
+      .then((response:any) => {
+        const picus:Picu[] = [];
+        console.log(response.data.allData);
+        for (let picu of response.data.allData) {
+          picus.push({
+            picu_id: picu.picu_id,
+            ward_name: picu.ward_name,
+            hospital_name: picu.hospital_name,
+            auditor: picu.auditor,
+            picu_role: picu.picu_role,
+            overall_compliance: picu.overall_compliance === null ? 0 : Math.round(picu.overall_compliance * 100) / 100
+          });
+        }
+        console.log(picus);
+        setData(picus.sort((a, b) => Number(a.picu_id) - Number(b.picu_id)));
+      })
+      .catch((error:any) => {
+        enqueueSnackbar("System Error", { variant: "error" });
+      });
+  }, []);
+  
   return (
     <>
-      <h1>Test</h1>
+      <Typography component="h1" variant="h5">
+        Edit PICUs
+      </Typography>
 
-      <EditTable
-        initialData={[{hello:"hello"}]}
-        uniqueIdName={uniqueIdName}
-        columnNameMap={columnNameMap}
-        customInputFields={customInputFields}
-        noEditFields={noEditFields}
-        validateData={validateData}
-      />
-
+      <div style={{width:'90%', margin:'auto'}}>
+        <EditTable
+          initialData={data}
+          uniqueIdName={uniqueIdName}
+          columnNameMap={columnNameMap}
+          customInputFields={customInputFields}
+          noEditFields={noEditFields}
+          validateData={validateData}
+        />
+      </div>
     </>
   );
 }

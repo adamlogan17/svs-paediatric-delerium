@@ -1,6 +1,7 @@
 import { Toolbar, Tooltip, IconButton, Typography } from "@mui/material";
 import { alpha } from '@mui/material/styles';
-import DeleteIcon from '@mui/icons-material/Delete';  
+import DeleteIcon from '@mui/icons-material/Delete';
+import FileDownloadIcon from '@mui/icons-material/FileDownload';
 
 export default function EnhancedToolbar(props: {numSelected:number, title:string, handleDelete:() => void}) {
   return (
@@ -32,10 +33,16 @@ export default function EnhancedToolbar(props: {numSelected:number, title:string
           {props.title}
         </Typography>
       )}
-      {props.numSelected > 0 && (
+      {props.numSelected > 0 ? (
         <Tooltip title="Delete">
           <IconButton onClick={props.handleDelete}>
             <DeleteIcon />
+          </IconButton>
+        </Tooltip>
+      ) : (
+        <Tooltip title="Download">
+          <IconButton>
+            <FileDownloadIcon />
           </IconButton>
         </Tooltip>
       )}

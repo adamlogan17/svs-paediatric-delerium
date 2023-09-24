@@ -11,7 +11,7 @@ import { deleteData, getAll, insertData, updateData } from './crud';
 import { authenticate, authorise, updatePicuPassword } from './login';
 import { allPicuCompliance, singlePicuCompliance } from './auditCharts';
 import { insertCompData } from './complianceScores';
-import { addPicu, deletePicus, getAllIds, nextPicu } from './picuDbManagement';
+import { addPicu, deletePicus, editPicu, getAllIds, nextPicu } from './picuDbManagement';
 
 // Express Initialize
 const app = express();
@@ -78,6 +78,35 @@ app.use((req:Request, res:Response, next) => {
     next();
 });
 
+/**
+ * @swagger
+ * definitions:
+ *   Picu:
+ *     properties:
+ *       picu_id:
+ *         type: string
+ *       hospital_name:
+ *         type: string
+ *       auditor:
+ *         type: string
+ *       picu_role:
+ *         type: string
+ *         enum:
+ *           - picu
+ *           - admin
+ *           - field_engineer
+ *       password:
+ *         type: string
+ *       ward_name:
+ *         type: string
+ *   Login:
+ *     properties:
+ *       username:
+ *         type: string
+ *       password:
+ *         type: string
+ */
+
 // Routes
 /**
  * @swagger
@@ -138,14 +167,7 @@ app.get("/test/:val", (req: Request,res: Response)=>{
  *             username:
  *               type: string
  *       401:
- *         description: Unauthorized - Invalid username or password
- * definitions:
- *   Login:
- *     properties:
- *      username:
- *        type: string
- *      password:
- *        type: string
+ *         description: Unauthorized - Invalid username or password   
  */
 app.post("/login", authenticate);
 
@@ -429,23 +451,6 @@ app.get("/chartData/allSites", allPicuCompliance);
  *         description: Picu successfully added.
  *       '400':
  *         description: Error occurred.
- * definitions:
- *   Picu:
- *     properties:
- *       hospital_name:
- *         type: string
- *       auditor:
- *         type: string
- *       picu_role:
- *         type: string
- *         enum:
- *           - picu
- *           - admin
- *           - field_engineer
- *       password:
- *         type: string
- *       ward_name:
- *         type: string
  */
 app.post("/addPicu", (request: Request, response: Response, next:NextFunction) => authorise(request, response, next, 'admin'), async (req: Request, res: Response) => {
   let result = await addPicu(req.body, req.params.role);
@@ -566,6 +571,42 @@ app.delete("/deletePicu", (request: Request, response: Response, next:NextFuncti
   res.status(status).send(result);
 });
 
+/**
+ * @swagger
+ * /updatePicu:
+ *   put:
+ *     tags:
+ *       - Picu
+ *     summary: Update a PICU's details based on the provided data.
+ *     security:
+ *       - Bearer: []
+ *     parameters:
+ *       - in: body
+ *         name: body
+ *         description: The data to update for the PICU.
+ *         schema:
+ *           type: object
+ *           required:
+ *            - hospital_name
+ *            - auditor
+ *            - picu_role
+ *            - picu_id
+ *            - ward_name
+ *           properties:
+ *             data:
+ *               $ref: '#/definitions/Picu'
+ *     responses:
+ *       201:
+ *         description: PICU updated successfully.
+ *       400:
+ *         description: An error occurred.
+ */
+app.put("/updatePicu", (request: Request, response: Response, next:NextFunction) => authorise(request, response, next, 'admin'), async (req: Request, res: Response) => {
+  let result = await editPicu(req.body, req.params.role);
+  let status:number = result.toString().includes("Error") ? 400 : 201;
+  res.status(status).send(result);
+});
+
 // Used to activate the endpoints through HTTP
 // app.listen(port,()=> {
 //   console.log(`listen port ${port}`);
@@ -578,3 +619,4 @@ https.createServer(options, app)
   console.log(`listen port ${port}`);
   console.log(`Go to https://localhost:${port}/swagger-docs for documentation`);
 });
+

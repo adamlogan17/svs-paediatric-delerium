@@ -46,6 +46,28 @@ function deletePicu(picuIds:number[]) {
   );
 }
 
+function updatePicu(picuToUpdate:Picu) {
+  const modifiedPicu:Picu = {...picuToUpdate};
+  // convert the picuToUpdate.picu_id to a string, it is currently a number
+  if (modifiedPicu.picu_id !== undefined && modifiedPicu.picu_id !== null) {
+    modifiedPicu.picu_id = modifiedPicu.picu_id.toString();
+  }
+
+  delete modifiedPicu.overall_compliance;
+  
+  axios.put(`${process.env.REACT_APP_API_URL}/updatePicu`, picuToUpdate, {
+    headers: { 'Authorization': `Bearer ${sessionStorage.getItem('TOKEN')}` }
+  })
+    .then((response:any) => {
+      enqueueSnackbar(`PICU ${picuToUpdate.picu_id} has been updated.`, { variant: "success" });
+    })
+    .catch((error:any) => {
+      console.log(error);
+      enqueueSnackbar("System Error", { variant: "error" });
+    }
+  );
+}
+
 export default function EditPicus() {
   const [data, setData] = useState<Picu[]>([]);
   useEffect(() => {
@@ -63,7 +85,6 @@ export default function EditPicus() {
             overall_compliance: picu.overall_compliance === null ? 0 : Math.round(picu.overall_compliance * 100) / 100
           });
         }
-        console.log(picus);
         setData(picus.sort((a, b) => Number(a.picu_id) - Number(b.picu_id)));
       })
       .catch((error:any) => {
@@ -86,6 +107,7 @@ export default function EditPicus() {
           customInputFields={customInputFields}
           noEditFields={noEditFields}
           validateData={validateData}
+          updateData={updatePicu}
         />
       </div>
     </>

@@ -1,4 +1,4 @@
-import { createInsert, createPool, createSelect, deleteData, insertData } from './crud';
+import { createInsert, createPool, createSelect, deleteData, insertData, updateData } from './crud';
 import { hashPassword } from './login';
 import errorCodeMessage from './errorCodeMessage';
 
@@ -15,20 +15,57 @@ const DBPASSWORD:string = "password";
  * @property {string} ward_name - The specific name of the PICU ward.
  * @property {string} picu_role - Role assigned within the PICU database.
  * @property {string} auditor - The individual responsible for auditing within this PICU.
- * @property {string} password - Password associated with the PICU, possibly for access control.
+ * @property {string} [password] - Password associated with the PICU, possibly for access control.
  * @property {string} [picu_id] - Optional unique identifier for the PICU.
  */
 type Picu = {
   hospital_name:string, 
   auditor:string, 
   picu_role:'picu'|'admin'|'field_engineer',
-  password:string
+  password?:string
   ward_name:string,
   picu_id?:string
 }
 
+/**
+ * Updates a PICU record in the database.
+ * 
+ * @function editPicu
+ * @author Adam Logan
+ * @param {Picu} dataToEdit - An object containing the data to edit for a specific PICU, must include the picu_id.
+ * @param {string} role - The role for which the database pool will be created. 
+ * @returns {Promise<string>} - A message indicating the success or failure of the update.
+ */
+export async function editPicu(dataToEdit:Picu, role:string): Promise<string> {
+  for (const [key, value] of Object.entries(dataToEdit)) {
+    if (key === 'password') {
+      return `ERROR: ${key} cannot be edited.`;
+    }
+
+    if (value === '') {
+      return `ERROR: ${key} is empty.`;
+    }
+  }
+
+  // Extract picu_id and remove it from the data to be edited
+  const id = dataToEdit.picu_id;
+  delete dataToEdit.picu_id;
+
+  return await updateData(DATABASE, 'picu', dataToEdit, `picu_id = ${Number(id)}`, role, DBPASSWORD);
+}
+
+
+
+/**
+ * Deletes a selection of PICUs from the database.
+ * 
+ * @function deletePicus
+ * @author Adam Logan
+ * @param {number[]} ids - The IDs of the PICUs to be deleted.
+ * @param {string} role - The role for which the database pool will be created. 
+ * @returns {Promise<string>} A message indicating the success or failure of the deletion.
+ */
 export async function deletePicus(ids:number[], role:string): Promise<string> {
-  console.log(ids.join());
   return await deleteData(DATABASE, 'picu', `picu_id IN (${ids.join()})`, role, DBPASSWORD);
 }
 
@@ -38,6 +75,7 @@ export async function deletePicus(ids:number[], role:string): Promise<string> {
  * @author Adam Logan
  * @function addPicu
  * @param {Picu} dataToAdd - The data of the PICU record to be added.
+ * @param {string} role - The role for which the database pool will be created. 
  * @returns {Promise<{picu_id: number} | string>} The ID of the added record or an error message.
  */
 export async function addPicu(dataToAdd:Picu, role:string): Promise<{picu_id:number}|string> {
@@ -48,6 +86,10 @@ export async function addPicu(dataToAdd:Picu, role:string): Promise<{picu_id:num
     if (value === '') {
       return `ERROR: ${key} is empty.`;
     }
+  }
+
+  if(dataToAdd.password === undefined) {
+    return `ERROR: password is empty.`;
   }
 
   // Hash the password before storing it

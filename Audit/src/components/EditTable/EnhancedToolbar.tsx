@@ -55,7 +55,7 @@ export default function EnhancedToolbar(props: {numSelected:number, title:string
         open={isOpen} 
         handleClose={() => { setIsOpen(false)}} 
         handleConfirm={props.handleDelete} 
-        title='Confrim User Details' 
+        title='Confrim Delete Records' 
         description={<>Would you like to delete the {props.numSelected} item(s)?</>} 
       />
 

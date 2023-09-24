@@ -6,12 +6,13 @@ import SaveIcon from '@mui/icons-material/Save';
 import EditIcon from '@mui/icons-material/Edit';
 import CancelIcon from '@mui/icons-material/Cancel';
 import EnhancedToolbar from './EnhancedToolbar';
+import ConfirmDialog from '../ConfirmDialog/ConfirmDialog';
 
 /**
  * 
  * @todo Add other option for textfield, to be a checkbox for boolean values
  */
-export default function EditTable(props:{initialData:any[], uniqueIdName:string, columnNameMap:any, customInputFields:any[], noEditFields:string[], validateData:(data:any) => string[], deleteData:(ids:number[]) => void}) {
+export default function EditTable(props:{initialData:any[], uniqueIdName:string, columnNameMap:any, customInputFields:any[], noEditFields:string[], validateData:(data:any) => string[], deleteData:(ids:number[]) => void, updateData:(data:any) => void}) {
   const [data, setData] = useState<any[]>(props.initialData);
   const [editId, setEditId] = useState<number | null>(null);
   const [tempData, setTempData] = useState<any | null>(null);
@@ -19,6 +20,7 @@ export default function EditTable(props:{initialData:any[], uniqueIdName:string,
   const [selected, setSelected] = useState<number[]>([]);
   const [page, setPage] = useState(0);
   const [rowsPerPage, setRowsPerPage] = useState(5);
+  const [editOpen, setEditOpen] = useState(false);
 
   // Avoid a layout jump when reaching the last page with empty rows.
   const emptyRows = page > 0 ? Math.max(0, (1 + page) * rowsPerPage - data.length) : 0;
@@ -40,6 +42,8 @@ export default function EditTable(props:{initialData:any[], uniqueIdName:string,
 
   function saveEdit() {
     if (tempData && (props.validateData(tempData).length === 0)) {
+      props.updateData(tempData);
+
       setData(prev => prev.map(row => (row[props.uniqueIdName] === editId ? tempData : row)));
       setEditId(null);
       setTempData(null);
@@ -82,7 +86,8 @@ export default function EditTable(props:{initialData:any[], uniqueIdName:string,
 
   return (
     <Paper sx={{margin:'auto'}}>
-        
+      <ConfirmDialog open={editOpen} handleClose={() => { setEditOpen(false)}} handleConfirm={saveEdit} title='Confrim Edit Record' description={<>Would you like to edit record {editId}?</>} />
+
       <EnhancedToolbar numSelected={selected.length} title='PICU' handleDelete={() => handleDelete(selected)} />
       <TableContainer>
         <Table>
@@ -162,7 +167,7 @@ export default function EditTable(props:{initialData:any[], uniqueIdName:string,
                     ))}
 
                     <TableCell>
-                      <IconButton onClick={saveEdit}>
+                      <IconButton onClick={() => setEditOpen(true)}>
                         <SaveIcon />
                       </IconButton>
 

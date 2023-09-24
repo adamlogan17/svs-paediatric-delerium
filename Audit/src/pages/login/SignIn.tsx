@@ -63,7 +63,7 @@ export default function SignIn() {
         // sets the cookies
         sessionStorage.setItem("TOKEN", result.data.token);
         sessionStorage.setItem("ROLE", result.data.role);
-        sessionStorage.setItem("SITE", result.data.username);
+        sessionStorage.setItem("USERNAME", result.data.username);
 
         if(result.data.token === undefined) {
           setIncorrectDetails(true);

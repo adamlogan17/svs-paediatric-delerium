@@ -11,7 +11,7 @@ import { deleteData, getAll, insertData, updateData } from './crud';
 import { authenticate, authorise, updatePicuPassword } from './login';
 import { allPicuCompliance, singlePicuCompliance } from './auditCharts';
 import { insertCompData } from './complianceScores';
-import { addPicu, getAllIds, nextPicu } from './picuDbManagement';
+import { addPicu, deletePicus, getAllIds, nextPicu } from './picuDbManagement';
 
 // Express Initialize
 const app = express();
@@ -527,6 +527,41 @@ app.get("/getPicuIds", (request: Request, response: Response, next:NextFunction)
  */
 app.put("/updatePicuPassword", (request: Request, response: Response, next:NextFunction) => authorise(request, response, next, 'field_engineer'), async (req: Request, res: Response) => {
   let result = await updatePicuPassword(req.body.picu_id, req.body.newPassword, req.params.role);
+  let status:number = result.toString().includes("Error") ? 400 : 201;
+  res.status(status).send(result);
+});
+
+/**
+ * @swagger
+ * /deletePicu:
+ *   delete:
+ *     tags:
+ *       - Picu
+ *     summary: Delete multiple PICUs based on provided PICU IDs.
+ *     security:
+ *       - Bearer: []
+ *     parameters:
+ *       - in: body
+ *         name: body
+ *         description: Array of PICU IDs to delete.
+ *         schema:
+ *           type: object
+ *           required:
+ *             - picu_ids
+ *           properties:
+ *             picu_ids:
+ *               type: array
+ *               description: The IDs of the PICUs to delete.
+ *               items:
+ *                 type: number
+ *     responses:
+ *       200:
+ *         description: PICUs deleted successfully.
+ *       400:
+ *         description: An error occurred.
+ */
+app.delete("/deletePicu", (request: Request, response: Response, next:NextFunction) => authorise(request, response, next, 'admin'), async (req: Request, res: Response) => {
+  let result = await deletePicus(req.body.picu_ids, req.params.role);
   let status:number = result.toString().includes("Error") ? 400 : 201;
   res.status(status).send(result);
 });

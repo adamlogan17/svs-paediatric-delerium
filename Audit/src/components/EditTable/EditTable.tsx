@@ -11,7 +11,7 @@ import EnhancedToolbar from './EnhancedToolbar';
  * 
  * @todo Add other option for textfield, to be a checkbox for boolean values
  */
-export default function EditTable(props:{initialData:any[], uniqueIdName:string, columnNameMap:any, customInputFields:any[], noEditFields:string[], validateData:(data:any) => string[]}) {
+export default function EditTable(props:{initialData:any[], uniqueIdName:string, columnNameMap:any, customInputFields:any[], noEditFields:string[], validateData:(data:any) => string[], deleteData:(ids:number[]) => void}) {
   const [data, setData] = useState<any[]>(props.initialData);
   const [editId, setEditId] = useState<number | null>(null);
   const [tempData, setTempData] = useState<any | null>(null);
@@ -55,6 +55,7 @@ export default function EditTable(props:{initialData:any[], uniqueIdName:string,
   const handleDelete = (ids: number[]) => {
     setData(prev => prev.filter(row => !ids.includes(Number(row[props.uniqueIdName]))));
     ids.forEach(id => itemSelection(false, id));
+    props.deleteData(ids);
   };
 
   function itemSelection(add: boolean, picuId: number) {
@@ -81,6 +82,7 @@ export default function EditTable(props:{initialData:any[], uniqueIdName:string,
 
   return (
     <Paper sx={{margin:'auto'}}>
+        
       <EnhancedToolbar numSelected={selected.length} title='PICU' handleDelete={() => handleDelete(selected)} />
       <TableContainer>
         <Table>
@@ -101,8 +103,8 @@ export default function EditTable(props:{initialData:any[], uniqueIdName:string,
             </TableRow>
           </TableHead>
           <TableBody>
-            {visibleRows.map((row, key) => (
-              <TableRow key={key} sx={
+            {visibleRows.map((row, index) => (
+              <TableRow key={index} sx={
                 {
                   height:'100px',
                   ...(selected.includes(Number(row[props.uniqueIdName])) && {
@@ -178,13 +180,13 @@ export default function EditTable(props:{initialData:any[], uniqueIdName:string,
                       <>
                         {props.customInputFields.some((obj:any) => obj.key === key && obj.type === "autocomplete") && 
                         (
-                          <TableCell key={index}>
+                          <TableCell>
                             {props.customInputFields.filter(obj => obj.key === key)[0].options.find((option:any) => option.value === row[key]).label}
                           </TableCell>
                         )}
 
                         {props.customInputFields.some((obj:any) => obj.key !== key) && (
-                          <TableCell key={index}>
+                          <TableCell>
                             {row[key]}
                           </TableCell>
                         )}

@@ -30,10 +30,24 @@ function validateData(data:any) {
   return Object.entries(data).filter(([key, value]) => value === "").map(([key]) => key);
 }
 
+function deletePicu(picuIds:number[]) {
+  axios.delete(`${process.env.REACT_APP_API_URL}/deletePicu`, {
+    headers: { 'Authorization': `Bearer ${sessionStorage.getItem('TOKEN')}` },
+    data: {
+      picu_ids: picuIds
+    }
+  })
+    .then((response:any) => {
+      enqueueSnackbar("The data has been deleted", { variant: "success" });
+    })
+    .catch((error:any) => {
+      enqueueSnackbar("System Error", { variant: "error" });
+    }
+  );
+}
+
 export default function EditPicus() {
   const [data, setData] = useState<Picu[]>([]);
-  console.log(`${process.env.REACT_APP_API_URL}/audit/getall/picu`);
-
   useEffect(() => {
     axios.get(`${process.env.REACT_APP_API_URL}/audit/getall/picu`)
       .then((response:any) => {
@@ -65,6 +79,7 @@ export default function EditPicus() {
 
       <div style={{width:'90%', margin:'auto'}}>
         <EditTable
+          deleteData={deletePicu}
           initialData={data}
           uniqueIdName={uniqueIdName}
           columnNameMap={columnNameMap}

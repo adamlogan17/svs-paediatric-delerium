@@ -1,4 +1,4 @@
-import { createInsert, createPool, createSelect, insertData } from './crud';
+import { createInsert, createPool, createSelect, deleteData, insertData } from './crud';
 import { hashPassword } from './login';
 import errorCodeMessage from './errorCodeMessage';
 
@@ -25,6 +25,11 @@ type Picu = {
   password:string
   ward_name:string,
   picu_id?:string
+}
+
+export async function deletePicus(ids:number[], role:string): Promise<string> {
+  console.log(ids.join());
+  return await deleteData(DATABASE, 'picu', `picu_id IN (${ids.join()})`, role, DBPASSWORD);
 }
 
 /**

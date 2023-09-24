@@ -121,14 +121,6 @@ export default function Sandbox(props:any) {
       {/* <Button onClick={handleClick}>Show snackbar</Button>
       <Button onClick={handleClickVariant('success')}>Show success snackbar</Button>
       <Button onClick={handleClickVariant('error')}>Show success default</Button> */}
-      <EditTable
-        initialData={initialData}
-        uniqueIdName={uniqueIdName}
-        columnNameMap={columnNameMap}
-        customInputFields={customInputFields}
-        noEditFields={noEditFields}
-        validateData={validateData}
-      />
 
       <br />
       <br />

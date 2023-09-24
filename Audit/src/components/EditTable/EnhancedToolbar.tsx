@@ -2,8 +2,12 @@ import { Toolbar, Tooltip, IconButton, Typography } from "@mui/material";
 import { alpha } from '@mui/material/styles';
 import DeleteIcon from '@mui/icons-material/Delete';
 import FileDownloadIcon from '@mui/icons-material/FileDownload';
+import ConfirmDialog from "../ConfirmDialog/ConfirmDialog";
+import { useState } from "react";
 
 export default function EnhancedToolbar(props: {numSelected:number, title:string, handleDelete:() => void}) {
+  const [isOpen, setIsOpen] = useState(false);
+
   return (
     <Toolbar
       sx={{
@@ -35,7 +39,7 @@ export default function EnhancedToolbar(props: {numSelected:number, title:string
       )}
       {props.numSelected > 0 ? (
         <Tooltip title="Delete">
-          <IconButton onClick={props.handleDelete}>
+          <IconButton onClick={() => setIsOpen(true)}>
             <DeleteIcon />
           </IconButton>
         </Tooltip>
@@ -46,6 +50,15 @@ export default function EnhancedToolbar(props: {numSelected:number, title:string
           </IconButton>
         </Tooltip>
       )}
+
+      <ConfirmDialog 
+        open={isOpen} 
+        handleClose={() => { setIsOpen(false)}} 
+        handleConfirm={props.handleDelete} 
+        title='Confrim User Details' 
+        description={<>Would you like to delete the {props.numSelected} item(s)?</>} 
+      />
+
     </Toolbar>
   );
 }

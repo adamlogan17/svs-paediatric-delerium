@@ -1,163 +1,227 @@
-import { useState } from 'react';
-import { Paper, Table, TableBody, TableCell, TableHead, TableRow, TextField, IconButton, SxProps, Theme, Autocomplete } from '@mui/material';
+import { ChangeEvent, useMemo, useState } from 'react';
+import { Paper, Table, TableBody, TableCell, TableHead, TableRow, TextField, IconButton, SxProps, Theme, Autocomplete, Checkbox, TablePagination, TableContainer } from '@mui/material';
+import { alpha } from '@mui/material/styles';
 
 import SaveIcon from '@mui/icons-material/Save';
 import EditIcon from '@mui/icons-material/Edit';
 import CancelIcon from '@mui/icons-material/Cancel';
-
-const initialData: Picu[] = [
-  {
-    picu_id: 3,
-    ward_name: "Maseru",
-    hospital_name: "Lesotho",
-    auditor: "Sam Matekane",
-    picu_role: "picu",
-    overall_compliance: 12
-  },
-  {
-    picu_id: 4,
-    ward_name: "Rabat",
-    hospital_name: "Morocco",
-    auditor: "Aziz Akhannouch",
-    picu_role: "picu",
-    overall_compliance: 12
-  },
-];
-
-const customInputFields:any[] = [
-  {
-    key:"picu_role",
-    type:"autocomplete",
-    options: [{label:'PICU', value:'picu'}, {label:'Admin', value:'admin'}, {label:'Field Engineer', value:'field_engineer'}]
-  }
-]
-
-const noEditFields:string[] = ["picu_id", "overall_compliance"];
-
-function validateData(data:any) {
-  // let error:boolean = false;
-  return Object.entries(data).filter(([key, value]) => value === "").map(([key]) => key);
-}
+import EnhancedToolbar from './EnhancedToolbar';
 
 /**
  * 
- * @todo Validate the props
  * @todo Add other option for textfield, to be a checkbox for boolean values
- * @todo display the label value for the autocomplete, when not editing
  */
-export default function EditTable() {
-  const [data, setData] = useState<Picu[]>(initialData);
+export default function EditTable(props:{initialData:any[], uniqueIdName:string, columnNameMap:any, customInputFields:any[], noEditFields:string[], validateData:(data:any) => string[]}) {
+  const [data, setData] = useState<any[]>(props.initialData);
   const [editId, setEditId] = useState<number | null>(null);
-  const [tempData, setTempData] = useState<Picu | null>(null);
+  const [tempData, setTempData] = useState<any | null>(null);
   const [error, setError] = useState<string[] | null>(null);
+  const [selected, setSelected] = useState<number[]>([]);
+  const [page, setPage] = useState(0);
+  const [rowsPerPage, setRowsPerPage] = useState(5);
 
-  const startEdit = (id: number, row: Picu) => {
+  // Avoid a layout jump when reaching the last page with empty rows.
+  const emptyRows = page > 0 ? Math.max(0, (1 + page) * rowsPerPage - data.length) : 0;
+
+  const visibleRows = useMemo(
+    () =>
+      data.slice(
+        page * rowsPerPage,
+        page * rowsPerPage + rowsPerPage,
+      ),
+    [page, rowsPerPage, data],
+  );
+
+  function startEdit(id: number, row: Picu) {
     setEditId(id);
     setTempData({ ...row });
     setError(null);
   };
 
-  const saveEdit = () => {
-    if (tempData && (validateData(tempData).length === 0)) {
-      setData(prev => prev.map(row => (row.picu_id === editId ? tempData : row)));
+  function saveEdit() {
+    if (tempData && (props.validateData(tempData).length === 0)) {
+      setData(prev => prev.map(row => (row[props.uniqueIdName] === editId ? tempData : row)));
       setEditId(null);
       setTempData(null);
     } else {
-      setError(validateData(tempData));
+      setError(props.validateData(tempData));
     }
   };
 
   let cellStyle:SxProps<Theme> = {
-    width: `${100/Object.keys(data[0]).length + 1}%`
+    width: `${100/Object.keys(data[0]).length + 1}%`,
   }
 
-  const handleDelete = (id: number) => {
-    setData(prev => prev.filter(row => row.picu_id !== id));
+  const handleDelete = (ids: number[]) => {
+    setData(prev => prev.filter(row => !ids.includes(Number(row[props.uniqueIdName]))));
+    ids.forEach(id => itemSelection(false, id));
+  };
+
+  function itemSelection(add: boolean, picuId: number) {
+    setSelected((prev) => add ? [...prev,  picuId] : prev.filter(id => id !== picuId));
+  }
+
+  function handleChangePage(event: any, newPage: number) {
+    setPage(newPage);
+  };
+
+  function handleChangeRowsPerPage(event: ChangeEvent<HTMLInputElement>) {
+    setRowsPerPage(parseInt(event.target.value, 10));
+    setPage(0);
+  };
+
+  function handleSelectAllClick(event: ChangeEvent<HTMLInputElement>) {
+    if (event.target.checked) {
+      const newSelected = data.map((element:any) => element[props.uniqueIdName]);
+      setSelected(newSelected);
+      return;
+    }
+    setSelected([]);
   };
 
   return (
-    <Paper sx={{width:'80%', margin:'auto'}}>
-      <Table>
-        <TableHead>
-          <TableRow>
-            {Object.keys(data[0]).map((key:string, index:number) => (
-              <TableCell sx={cellStyle} key={index}>{key}</TableCell>
-            ))}
-            <TableCell sx={cellStyle}>Edit</TableCell>
-          </TableRow>
-        </TableHead>
-        <TableBody>
-          {data.map(row => (
-            <TableRow key={row.picu_id} sx={{height:'100px'}}>
-              {editId === row.picu_id ? (
-                <>
-                  {Object.keys(row).map((key:string, index:number) => (
-                    noEditFields.includes(key) ? 
-                      (
-                        <TableCell key={index}>{row[key]}</TableCell>
-                      ) : (
-                        <>
-                          {customInputFields.some((obj:any) => obj.key === key && obj.type === "autocomplete") && 
-                          (
-                            <TableCell key={index}>
-                              <Autocomplete
-                                options={customInputFields.filter(obj => obj.key === key)[0].options} 
-                                onChange={(event, newValue:any) => {
-                                  if(newValue === null) {
-                                    newValue = { value: ""}
-                                  }
-                                  setTempData(prev => ({ ...prev!, [key]: newValue.value }));
-                                }}
-                                value={customInputFields.filter(obj => obj.key === key)[0].options.find((option:any) => option.value === tempData?.[key])}
-                                renderInput={(params) => <TextField {...params} error={error?.includes(key)} />}
-                              />
-                            </TableCell>
-                          )}
-
-                          {customInputFields.some((obj:any) => obj.key !== key) && (
-                            <TableCell key={index}>
-                              <TextField
-                                value={tempData?.[key]}
-                                onChange={e => setTempData(prev => ({ ...prev!, [key]: e.target.value }))}
-                                error={error?.includes(key)}
-                              />
-                            </TableCell>
-                          )}
-                        </>
-                      )
-                  ))}
-
-                  <TableCell>
-                    <IconButton onClick={saveEdit}>
-                      <SaveIcon />
-                    </IconButton>
-
-                    <IconButton onClick={() => {
-                      setEditId(null);
-                      setError(null);
-                    }}>
-                      <CancelIcon />
-                    </IconButton>
-                  </TableCell>
-                </>
-              ) : (
-                <>
-                  {Object.keys(row).map((key, index) => (
-                    <TableCell key={index}>
-                      {row[key]}
-                    </TableCell>
-                  ))}
-                  <TableCell>
-                    <IconButton onClick={() => startEdit(row.picu_id !== undefined ? Number(row.picu_id) : 0, row)}>
-                      <EditIcon />
-                    </IconButton>
-                  </TableCell>
-                </>
-              )}
+    <Paper sx={{margin:'auto'}}>
+      <EnhancedToolbar numSelected={selected.length} title='PICU' handleDelete={() => handleDelete(selected)} />
+      <TableContainer>
+        <Table>
+          <TableHead>
+            <TableRow>
+              <TableCell padding='checkbox'>
+              <Checkbox
+                color="primary"
+                indeterminate={selected.length > 0 && selected.length < data.length}
+                checked={data.length > 0 && selected.length === data.length}
+                onChange={handleSelectAllClick}
+              />
+              </TableCell>
+              {Object.keys(data[0]).map((key:string, index:number) => (
+                <TableCell sx={cellStyle} key={index}>{props.columnNameMap[key]}</TableCell>
+              ))}
+              <TableCell sx={cellStyle}>Edit</TableCell>
             </TableRow>
-          ))}
-        </TableBody>
-      </Table>
+          </TableHead>
+          <TableBody>
+            {visibleRows.map((row, key) => (
+              <TableRow key={key} sx={
+                {
+                  height:'100px',
+                  ...(selected.includes(Number(row[props.uniqueIdName])) && {
+                    bgcolor: (theme) =>
+                      alpha(theme.palette.primary.main, theme.palette.action.activatedOpacity),
+                  }),
+                }}>
+                
+                <TableCell padding="checkbox">
+                  <Checkbox
+                    color="primary"
+                    onClick={(e:any) => {
+                      itemSelection(e.target.checked, Number(row[props.uniqueIdName]));
+                    }}
+                    checked={selected.includes(Number(row[props.uniqueIdName]))}
+                  />
+                </TableCell>
+                      
+                {editId === row[props.uniqueIdName] ? (
+                  <>
+                    {Object.keys(row).map((key:string, index:number) => (
+                      props.noEditFields.includes(key) ? 
+                        (
+                          <TableCell key={index}>{row[key]}</TableCell>
+                        ) : (
+                          <>
+                            {props.customInputFields.some((obj:any) => obj.key === key && obj.type === "autocomplete") && 
+                            (
+                              <TableCell key={index}>
+                                <Autocomplete
+                                  options={props.customInputFields.filter(obj => obj.key === key)[0].options} 
+                                  onChange={(e, newValue:any) => {
+                                    if(newValue === null) {
+                                      newValue = { value: ""}
+                                    }
+                                    setTempData((prev:any) => ({ ...prev!, [key]: newValue.value }));
+                                  }}
+                                  value={props.customInputFields.filter(obj => obj.key === key)[0].options.find((option:any) => option.value === tempData?.[key])}
+                                  renderInput={(params) => <TextField {...params} error={error?.includes(key)} />}
+                                />
+                              </TableCell>
+                            )}
+
+                            {props.customInputFields.some((obj:any) => obj.key !== key) && (
+                              <TableCell key={index}>
+                                <TextField
+                                  value={tempData?.[key]}
+                                  onChange={e => setTempData((prev:any) => ({ ...prev!, [key]: e.target.value }))}
+                                  error={error?.includes(key)}
+                                />
+                              </TableCell>
+                            )}
+                          </>
+                        )
+                    ))}
+
+                    <TableCell>
+                      <IconButton onClick={saveEdit}>
+                        <SaveIcon />
+                      </IconButton>
+
+                      <IconButton onClick={() => {
+                        setEditId(null);
+                        setError(null);
+                      }}>
+                        <CancelIcon />
+                      </IconButton>
+                    </TableCell>
+                  </>
+                ) : (
+                  <>
+                    {Object.keys(row).map((key, index) => (
+                      <>
+                        {props.customInputFields.some((obj:any) => obj.key === key && obj.type === "autocomplete") && 
+                        (
+                          <TableCell key={index}>
+                            {props.customInputFields.filter(obj => obj.key === key)[0].options.find((option:any) => option.value === row[key]).label}
+                          </TableCell>
+                        )}
+
+                        {props.customInputFields.some((obj:any) => obj.key !== key) && (
+                          <TableCell key={index}>
+                            {row[key]}
+                          </TableCell>
+                        )}
+                      </>
+                    ))}
+                    <TableCell>
+                      <IconButton onClick={() => startEdit(row.picu_id !== undefined ? Number(row.picu_id) : 0, row)}>
+                        <EditIcon />
+                      </IconButton>
+                    </TableCell>
+                  </>
+                )}
+              </TableRow>
+            ))}
+
+            {emptyRows > 0 && (
+              <TableRow
+                style={{
+                  height: `${100 * emptyRows}px`,
+                }}
+              >
+                <TableCell colSpan={Object.keys(data[0]).length + 2} />
+              </TableRow>
+            )}
+
+          </TableBody>
+        </Table>
+      </TableContainer>
+      <TablePagination
+          rowsPerPageOptions={[5, 10, 25]}
+          component="div"
+          count={data.length}
+          rowsPerPage={rowsPerPage}
+          page={page}
+          onPageChange={handleChangePage}
+          onRowsPerPageChange={handleChangeRowsPerPage}
+        />
     </Paper>
   );
 }

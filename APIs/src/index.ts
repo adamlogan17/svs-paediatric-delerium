@@ -26,6 +26,8 @@ interface APICallDetail {
   status: number;
   userIP: string;
   userAgent: string;
+  userRole: string;
+  username: string;
 }
 
 
@@ -92,7 +94,7 @@ app.use((req:Request, res:Response, next) => {
     next();
 });
 
-app.use((req:Request, res:Response, next) => {
+app.use((req:Request, res:Response, next) =>{
   const now = new Date();
   const apiCallDetail: APICallDetail = {
     date: now.toISOString().split('T')[0], // Separate date
@@ -102,6 +104,8 @@ app.use((req:Request, res:Response, next) => {
     status: res.statusCode,
     userIP: req.ip,
     userAgent: req.headers['user-agent'] || '',
+    username: req.params.username,
+    userRole: req.params.role,
   };
 
   // Add the API call detail to the array
@@ -137,15 +141,6 @@ app.get("/test/:val", (req: Request,res: Response)=>{
     });
 });
 
-app.get('/api/route1', (req:Request, res:Response) => {
-  // Your API logic for route1
-  res.send('Route 1 response');
-});
-
-app.get('/api/route2', (req:Request, res:Response) => {
-  // Your API logic for route2
-  res.send('Route 2 response');
-});
 
 /**
  * @swagger
@@ -585,6 +580,8 @@ function saveApiCallDetailsToDatabase() {
     console.log(`Status: ${apiCallDetail.status}`);
     console.log(`UserIP: ${apiCallDetail.userIP}`);
     console.log(`UserAgent: ${apiCallDetail.userAgent}`);
+    console.log(`UserRole: ${apiCallDetail.userRole}`);
+    console.log(`Username: ${apiCallDetail.username}`);
     console.log('-------------------');
   });
 

@@ -3,12 +3,12 @@ import { BrowserRouter as Router, Route, Routes} from "react-router-dom";
 import Home from './pages/Home/Home'; // example component being added
 import OtherPage from './pages/OtherPage/OtherPage'; // to demonstrate routing
 import NoPage from './pages/NoPage/NoPage'; // to demonstrate routing
-import Login from './pages/Login/Login';
+import Login from './pages/LogIn/LogIn';
 import Form from './pages/Form/form';
 import Admin from './pages/Admin/Admin';
 import AuditGraphs from './pages/AuditGraphs/AuditGraphs';
 import FieldEngineer from './pages/FieldEngineer/FieldEngineer';
-import SignIn from "./pages/Login/SignIn";
+import SignIn from "./pages/LogIn/SignIn";
 import Sandbox from "./pages/Sandbox/Sandbox";
 import AddPicu from "./pages/Admin/AddPicu";
 import ForgottenPassword from "./pages/ForgottenPassword/ForgottenPassword";

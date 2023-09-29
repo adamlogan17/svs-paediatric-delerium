@@ -7,7 +7,7 @@ import fs from 'fs';
 import swaggerJsdoc from 'swagger-jsdoc';
 import swaggerUi from 'swagger-ui-express';
 
-import { deleteData, getAll, insertData, updateData } from './crud';
+import { deleteData, getAll, getPicuData, insertData, updateData } from './crud';
 import { authenticate, authorise, updatePicuPassword } from './login';
 import { allPicuCompliance, singlePicuCompliance } from './auditCharts';
 import { insertCompData } from './complianceScores';
@@ -177,6 +177,38 @@ app.post("/login", authenticate);
  */
 app.get("/:database/getall/:table", async (req: Request,res: Response) => {
   let result:{allData:any[]}|string = await getAll(req.params.database, req.params.table, req.params.role === undefined ? "postgres" : `${req.params.role}_role`, req.params.role === undefined ? "postgrespw": "password");
+  let status:number = typeof result === 'string' ? 400 : 200;
+  res.status(status).send(result);
+});
+
+/**
+ * @swagger
+ * /{database}/getpicudata/{table}:
+ *  get:
+ *    tags:
+ *      - CRUD
+ *    summary: Gets specific picu data from table
+ *    parameters:
+ *      - name: database
+ *        in: path
+ *        description: The name of the selected database
+ *        schema:
+ *          type: "string"
+ *        required: true
+ *      - name: table
+ *        in: path
+ *        description: The name of the selected table
+ *        required: true
+ *        schema:
+ *          type: "string"
+ *    responses:
+ *      '200':
+ *          description: OK
+ *      '400':
+ *          description: Invalid parameters
+ */
+app.get("/:database/getpicudata/:table", async (req: Request,res: Response) => {
+  let result:{allData:any[]}|string = await getPicuData(req.params.database, req.params.table, req.params.role === undefined ? "postgres" : `${req.params.role}_role`, req.params.role === undefined ? "postgrespw": "password", req.params.picuID);
   let status:number = typeof result === 'string' ? 400 : 200;
   res.status(status).send(result);
 });

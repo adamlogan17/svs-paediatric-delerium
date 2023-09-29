@@ -137,6 +137,35 @@ export async function getAll(database:string, table:string, userForDb:string, pa
 }
 
 /**
+ * Fetches all records from a specified table in a database.
+ * 
+ * @author Andrew Robb
+ * @function getPICUData
+ * @param {string} database - The name of the database.
+ * @param {string} table - The name of the table from which to fetch the records.
+ * @param {string} userForDb - The username for the database connection.
+ * @param {string} passForDb - The password for the database connection.
+ * 
+ * @returns {Promise<{allData:any[]}|string>} A promise that resolves with all records from the specified table or an error message.
+ */
+export async function getPicuData(database:string, table:string, userForDb:string, passForDb:string, picuID:string): Promise<{allData:any[]}|string> {
+  const POOL = createPool(database, userForDb, passForDb);
+
+  let condition:string = `picu_id=${picuID}`;
+  let results:any;
+
+  try {
+    results = await POOL.query(createSelect(table, condition));
+    results = {
+      specificData: results.rows
+    };
+  } catch (e:any) {
+    results = errorCodeMessage(e.code);
+  }
+  return results;
+}
+
+/**
  * Inserts data into the specified table of the database.
  * 
  * @author Adam Logan

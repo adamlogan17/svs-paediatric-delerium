@@ -28,7 +28,7 @@ async function getComplianceData(id:string):Promise<{entryDates:string[],complia
       const configuration = {
           method: "get",
           url: `${process.env.REACT_APP_API_URL}/chartData/singleSite/${id}`,
-          headers: { 'Authorization': "bearer " + sessionStorage.getItem('TOKEN') }
+          headers: { 'Authorization': "Bearer " + sessionStorage.getItem('TOKEN') }
               };
           try {
               let response = await axios(configuration);
@@ -59,9 +59,8 @@ function LineGraph(props:{ id:string|null }) {
     let data = await getComplianceData(id);
     setChartData(data);
   }
-
-
-  fetchData('1');
+  console.log("prop", props.id);
+  fetchData(props.id === null ? '0' : props.id);
 }, []); // Or [] if effect doesn't need props or state
 
   console.log(chartData);

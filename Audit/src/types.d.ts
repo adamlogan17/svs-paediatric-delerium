@@ -13,6 +13,11 @@ type RoleAutoComplete = {
   role: 'picu'|'admin'|'field_engineer';
 }
 
+type AutoCompleteValues = {
+  label:string,
+  value:any
+}
+
 /**
  * @typedef Picu
  * 

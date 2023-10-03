@@ -8,6 +8,7 @@ import axios from 'axios';
 import { useEffect, useState } from 'react';
 import { adminAuth } from '../Admin/Admin';
 import { enqueueSnackbar } from 'notistack';
+import { Autocomplete, TextField } from '@mui/material';
 
 Chart.register(CategoryScale);
 
@@ -57,21 +58,8 @@ function getPicuCompData(username:string|undefined, password:string|undefined):v
  * TODO Make the data displayed actually show that of the current user and not just site 1
  */
 function AuditGraphs() {
-  
-  const [picuID, setPicuID]  = useState<string|null>('0');
-  const [idOptions, setIdOptions] = useState<RoleAutoComplete[]>([]);
-
-  //-----------------------------------------------------
-  //if admin{ function getAllCompData}
-  if(sessionStorage.getItem('ROLE') === 'picu'){
-    setPicuID(sessionStorage.getItem('USERNAME')!== null ? sessionStorage.getItem('USERNAME') : '0')
-    // Data Manipulation to get comp score and dates
-    //setChartData();
-  }else{
-    setPicuID('1');
-    // Data Manipulation to get comp score and dates
-    //setChartData();
-  }
+  const [picuID, setPicuID]  = useState<string|null>(sessionStorage.getItem('ROLE') === 'picu' ? sessionStorage.getItem('SITE')!== null ? sessionStorage.getItem('SITE') : '0' : '0');
+  const [idOptions, setIdOptions] = useState<AutoCompleteValues[]>([]);
 
   useEffect(() => {
     const configuration = {
@@ -101,6 +89,19 @@ function AuditGraphs() {
               <div className='col'>
                 <h5>Select the type of chart you would like: </h5>
               </div>
+
+              <div className='col'>
+              <Autocomplete
+                disablePortal
+                id="id"
+                autoComplete
+                autoHighlight
+                isOptionEqualToValue = {(option:AutoCompleteValues, value:AutoCompleteValues) => option.label === value.label}
+                options={idOptions}
+                renderInput={(params:any) => <TextField {...params} required margin="normal" name="id" label="id" />}
+              />
+              </div>
+
               <div className='col'>
                 <TypeDropDown text="Chart Type" primaryColour='#025858' secondaryColour='#013e3e' options={["Line Graph", "Pie Chart", "Bar Chart"]}/>
               </div>
@@ -109,11 +110,9 @@ function AuditGraphs() {
 
           <div className = 'row' id = 'ButtonContainer'>
             <div className="canvas">
-              <LineGraph id={picuID} /> 
+              <LineGraph id={picuID} />
             </div>
-          </div>
-
-          {/* <PButton text="Submit" onButtonClick = {() => {console.log("Hello World")}} primaryColour='#025858' secondaryColour='#013e3e'/> */}
+          </div> 
         </form>
       </div>
     </div>

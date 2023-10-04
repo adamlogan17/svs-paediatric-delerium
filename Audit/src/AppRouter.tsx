@@ -32,7 +32,7 @@ function AppRouter() {
         <Route path="/login2" element={<Login />}/>
         <Route path="/login" element={<SignIn /> }/>
 
-        <Route path="/sandbox" element={<Sandbox /> }/>          
+        <Route path="/sandbox" element={<Sandbox /> }/> 
 
         {picuAccess && (
           <>
@@ -45,8 +45,8 @@ function AppRouter() {
         {adminAccess && (
           <>
             <Route path="/admin" element={<Admin />} />
-            <Route path="/add-picu" element={<AddPicu />} />
             <Route path="/edit-picus" element={<EditPicus />} />
+            <Route path="/add-picu" element={<AddPicu />} />
           </>
         )}
 

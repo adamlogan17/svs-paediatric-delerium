@@ -23,6 +23,9 @@ export default function EditTable(props:{initialData:any[], uniqueIdName:string,
   const [rowsPerPage, setRowsPerPage] = useState(5);
   const [editOpen, setEditOpen] = useState(false);
 
+  console.log(data);
+  console.log(data.length);
+
   // Avoid a layout jump when reaching the last page with empty rows.
   const emptyRows = page > 0 ? Math.max(0, (1 + page) * rowsPerPage - data.length) : 0;
 
@@ -89,7 +92,8 @@ export default function EditTable(props:{initialData:any[], uniqueIdName:string,
 
 
   return (
-    <Paper sx={{margin:'auto'}}>
+    <>
+    <Paper sx={{mb: 2}}>
       <ConfirmDialog open={editOpen} handleClose={() => { setEditOpen(false)}} handleConfirm={saveEdit} title='Confrim Edit Record' description={<>Would you like to edit record {editId}?</>} />
 
       <EnhancedToolbar numSelected={selected.length} title='PICU' handleDelete={() => handleDelete(selected)} />
@@ -100,8 +104,8 @@ export default function EditTable(props:{initialData:any[], uniqueIdName:string,
               <TableCell padding='checkbox'>
               <Checkbox
                 color="primary"
-                indeterminate={selected.length > 0 && selected.length < data.length}
-                checked={data.length > 0 && selected.length === data.length}
+                indeterminate={selected.length > 0 && selected.length < (data.length - (props?.disableDelete ?? []).length)}
+                checked={data.length > 0 && selected.length === (data.length - (props?.disableDelete ?? []).length)}
                 onChange={handleSelectAllClick}
               />
               </TableCell>
@@ -226,14 +230,18 @@ export default function EditTable(props:{initialData:any[], uniqueIdName:string,
         </Table>
       </TableContainer>
       <TablePagination
-          rowsPerPageOptions={[5, 10, 25]}
-          component="div"
-          count={data.length}
-          rowsPerPage={rowsPerPage}
-          page={page}
-          onPageChange={handleChangePage}
-          onRowsPerPageChange={handleChangeRowsPerPage}
-        />
+        rowsPerPageOptions={[5, 10, 25, { label: 'All', value: data.length }]}
+        count={data.length}
+        rowsPerPage={rowsPerPage}
+        page={page}
+        onPageChange={handleChangePage}
+        onRowsPerPageChange={handleChangeRowsPerPage}
+        component='div'
+        showFirstButton={true}
+        showLastButton={true}
+      />
     </Paper>
+    
+  </>
   );
 }

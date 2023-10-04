@@ -3,15 +3,20 @@ import morgan from "morgan";
 import bp from 'body-parser';
 import https from 'https';
 import fs from 'fs';
+import { config } from 'dotenv';
+
 
 import swaggerJsdoc from 'swagger-jsdoc';
 import swaggerUi from 'swagger-ui-express';
 
 import { deleteData, getAll, insertData, updateData } from './crud';
-import { authenticate, authorise, updatePicuPassword } from './login';
+import { authenticate, authorise, updatePicuPassword, verifyCaptcha } from './login';
 import { allPicuCompliance, singlePicuCompliance } from './auditCharts';
-import { insertCompData } from './complianceScores';
 import { addPicu, deletePicus, editPicu, getAllIds, nextPicu } from './picuDbManagement';
+
+// initialise process.env
+config();
+
 
 // Express Initialize
 const app = express();
@@ -138,7 +143,7 @@ app.get("/test/:val", (req: Request,res: Response)=>{
  * /login:
  *   post:
  *     tags:
- *       - Authorization
+ *       - Authorisation
  *     summary: Allows users to log into the system
  *     description: Accepts a username and password and returns a token
  *     produces:
@@ -336,7 +341,7 @@ app.delete("/:database/deletedata/:table/:predicate", async (req: Request,res: R
  *     tags:
  *       - Testing
  *     summary: Tests authentication
- *     description: Endpoint that requires authorization.
+ *     description: Endpoint that requires authorisation.
  *     security:
  *       - Bearer: []
  *     produces:
@@ -367,7 +372,7 @@ app.get("/test-auth", (request: Request, response: Response, next:NextFunction) 
  *     tags:
  *       - Testing
  *     summary: Tests Admin authentication
- *     description: Endpoint that requires authorization.
+ *     description: Endpoint that requires authorisation.
  *     security:
  *       - Bearer: []
  *     produces:
@@ -389,7 +394,7 @@ app.get("/test-auth/admin", (request: Request, response: Response, next:NextFunc
  *     tags:
  *       - Testing
  *     summary: Tests field engineer authentication
- *     description: Endpoint that requires authorization.
+ *     description: Endpoint that requires authorisation.
  *     security:
  *       - Bearer: []
  *     produces:
@@ -504,7 +509,7 @@ app.get("/getPicuIds", (request: Request, response: Response, next:NextFunction)
  * /updatePicuPassword:
  *   put:
  *     tags:
- *       - Authorization
+ *       - Authorisation
  *     summary: Update the password for a given PICU ID.
  *     security:
  *       - Bearer: []
@@ -607,16 +612,53 @@ app.put("/updatePicu", (request: Request, response: Response, next:NextFunction)
   res.status(status).send(result);
 });
 
+/**
+ * @swagger
+ * /verify-captcha:
+ *   post:
+ *     tags:
+ *       - Authorisation
+ *     summary: Verify the provided CAPTCHA token.
+ *     parameters:
+ *       - in: body
+ *         name: body
+ *         description: CAPTCHA token to verify.
+ *         schema:
+ *           type: object
+ *           required:
+ *             - token
+ *           properties:
+ *             token:
+ *               type: string
+ *               description: The CAPTCHA token to verify.
+ *     produces:
+ *       - application/json
+ *     responses:
+ *       200:
+ *         description: CAPTCHA token verification result.
+ *         schema:
+ *           type: object
+ *           properties:
+ *             success:
+ *               type: boolean
+ *               description: Result of the CAPTCHA token verification.
+ *       400:
+ *         description: An error occurred.
+ */
+app.post("/verify-captcha", async (request: Request, response: Response,) => {
+  response.send({success: await verifyCaptcha(request.body.token)});
+});
+
 // Used to activate the endpoints through HTTP
-// app.listen(port,()=> {
-//   console.log(`listen port ${port}`);
-//   console.log(`Go to http://localhost:${port}/`);
-// });
+app.listen(port,()=> {
+  console.log(`listen port ${port}`);
+  console.log(`Go to http://localhost:${port}/swagger-docs for documentation`);
+});
 
 // Used to activate the endpoints through HTTPS
-https.createServer(options, app)
-.listen(port, () => {
-  console.log(`listen port ${port}`);
-  console.log(`Go to https://localhost:${port}/swagger-docs for documentation`);
-});
+// https.createServer(options, app)
+// .listen(port, () => {
+//   console.log(`listen port ${port}`);
+//   console.log(`Go to https://localhost:${port}/swagger-docs for documentation`);
+// });
 

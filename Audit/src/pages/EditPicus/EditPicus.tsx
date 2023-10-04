@@ -3,6 +3,7 @@ import EditTable from '../../components/EditTable/EditTable';
 import axios from 'axios';
 import { enqueueSnackbar } from 'notistack';
 import { Typography } from '@mui/material';
+import EnhancedTable from '../../components/EditTable/FullTable';
 
 
 const customInputFields:any[] = [
@@ -112,6 +113,9 @@ export default function EditPicus() {
           disableDelete={[Number(sessionStorage.getItem('USERNAME'))]}
         />}
       </div>
+
+      
+      <EnhancedTable />
     </>
   );
 }

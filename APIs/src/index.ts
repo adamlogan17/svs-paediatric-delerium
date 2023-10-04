@@ -110,6 +110,7 @@ app.use((req:Request, res:Response, next) =>{
 
   // Add the API call detail to the array
   apiCallDetails.push(apiCallDetail);
+  insertData("audit", "api_log", [apiCallDetail],[],"postgres", "postgrespw");
 
   // Continue with the request handling
   next();

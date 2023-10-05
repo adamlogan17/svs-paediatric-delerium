@@ -1,11 +1,23 @@
 #form .content {
-    background: #009999;
+    background: #02558a;
     color: #ffffff;
     box-shadow: 0 50px 50px rgba(0, 0, 0, .2);
     padding: 2em;
     margin-top: 2em;
     border-radius: 2em;
 }
+
+
+
+.radio-group {
+    display: flex;  /* Display radio buttons in a row */
+    flex-direction: row; /* Arrange them horizontally */
+    align-items: center; /* Vertically center-align the labels and buttons */
+  }
+
+  .radio-label {
+    margin-right: 20px; /* Adjust the margin as per your preference */
+  }
 
 .data-input {
     text-align: left;
@@ -22,6 +34,7 @@
     padding: 0.5em 0.1em;
     transition: all 0.5s ease;
 }
+
 
 .entry:focus {
     outline: none;

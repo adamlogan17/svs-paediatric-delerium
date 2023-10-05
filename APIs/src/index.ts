@@ -12,16 +12,32 @@ import { authenticate, authorise, updatePicuPassword } from './login';
 import { allPicuCompliance, singlePicuCompliance } from './auditCharts';
 import { insertCompData } from './complianceScores';
 import { addPicu, getAllIds, nextPicu } from './picuDbManagement';
+import { SimpleConsoleLogger } from 'typeorm';
 
 // Express Initialize
 const app = express();
 const port: number = 8000;
+
+interface APICallDetail {
+  date: string;
+  time: string;
+  method: string;
+  url: string;
+  status: number;
+  userIP: string;
+  userAgent: string;
+  userRole: string;
+  username: string;
+}
+
 
 // apps certs for https
 const options = {
   key: fs.readFileSync("server.key"),
   cert: fs.readFileSync("server.cert"),
 };
+
+const apiCallDetails: APICallDetail[] = [];
 
 // swagger configuration
 const specs = swaggerJsdoc(
@@ -78,6 +94,28 @@ app.use((req:Request, res:Response, next) => {
     next();
 });
 
+app.use((req:Request, res:Response, next) =>{
+  const now = new Date();
+  const apiCallDetail: APICallDetail = {
+    date: now.toISOString().split('T')[0], // Separate date
+    time: now.toISOString().split('T')[1].split('.')[0], // Separate time
+    method: req.method,
+    url: req.originalUrl,
+    status: res.statusCode,
+    userIP: req.ip,
+    userAgent: req.headers['user-agent'] || '',
+    username: req.params.username,
+    userRole: req.params.role,
+  };
+
+  // Add the API call detail to the array
+  apiCallDetails.push(apiCallDetail);
+  insertData("audit", "api_log", apiCallDetail);
+
+  // Continue with the request handling
+  next();
+});
+
 // Routes
 /**
  * @swagger
@@ -103,6 +141,7 @@ app.get("/test/:val", (req: Request,res: Response)=>{
         val: req.params.val
     });
 });
+
 
 /**
  * @swagger
@@ -530,6 +569,33 @@ app.put("/updatePicuPassword", (request: Request, response: Response, next:NextF
   let status:number = result.toString().includes("Error") ? 400 : 201;
   res.status(status).send(result);
 });
+
+/* function saveApiCallDetailsToDatabase() {
+  console.log('Saved API Call Details:');
+  apiCallDetails.forEach((apiCallDetail, index) => {
+    console.log(`#${index + 1}:`);
+    console.log(`Date: ${apiCallDetail.date}`);
+    console.log(`Time: ${apiCallDetail.time}`);
+    console.log(`Method: ${apiCallDetail.method}`);
+    console.log(`URL: ${apiCallDetail.url}`);
+    console.log(`Status: ${apiCallDetail.status}`);
+    console.log(`UserIP: ${apiCallDetail.userIP}`);
+    console.log(`UserAgent: ${apiCallDetail.userAgent}`);
+    console.log(`UserRole: ${apiCallDetail.userRole}`);
+    console.log(`Username: ${apiCallDetail.username}`);
+    console.log('-------------------');
+  });
+
+  // In a real application, you would save this data to the database here
+  // Your database saving logic goes here
+
+  // Clear the apiCallDetails array after printing
+  apiCallDetails.length = 0;
+}
+
+setInterval(() => {
+  saveApiCallDetailsToDatabase();
+}, 5000); */
 
 // Used to activate the endpoints through HTTP
 // app.listen(port,()=> {

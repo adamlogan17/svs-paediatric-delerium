@@ -11,15 +11,15 @@ CREATE TABLE IF NOT EXISTS picu (
 );
 
 CREATE TABLE IF NOT EXISTS api_log (
-    Date DATE,
-    Time TIME,
-    Method VARCHAR(10),
-    URL VARCHAR(255),
-    Status INT,
-    UserIP VARCHAR(15),
-    UserAgent VARCHAR(255),
-    UserRole VARCHAR(50),
-    Username VARCHAR(50)
+    date DATE,
+    time TIME,
+    method VARCHAR(10),
+    url VARCHAR(255),
+    status INT,
+    userIP VARCHAR(50),
+    userAgent VARCHAR(255),
+    username VARCHAR(50),
+    userRole VARCHAR(50)
 );
 
 CREATE TABLE IF NOT EXISTS compliance_data (

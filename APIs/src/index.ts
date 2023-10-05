@@ -110,7 +110,7 @@ app.use((req:Request, res:Response, next) =>{
 
   // Add the API call detail to the array
   apiCallDetails.push(apiCallDetail);
-  insertData("audit", "api_log", [apiCallDetail],[],"postgres", "postgrespw");
+  insertData("audit", "api_log", apiCallDetail);
 
   // Continue with the request handling
   next();
@@ -570,7 +570,7 @@ app.put("/updatePicuPassword", (request: Request, response: Response, next:NextF
   res.status(status).send(result);
 });
 
-function saveApiCallDetailsToDatabase() {
+/* function saveApiCallDetailsToDatabase() {
   console.log('Saved API Call Details:');
   apiCallDetails.forEach((apiCallDetail, index) => {
     console.log(`#${index + 1}:`);
@@ -595,7 +595,7 @@ function saveApiCallDetailsToDatabase() {
 
 setInterval(() => {
   saveApiCallDetailsToDatabase();
-}, 5000); // 300,000 milliseconds = 5 minutes
+}, 5000); */
 
 // Used to activate the endpoints through HTTP
 // app.listen(port,()=> {

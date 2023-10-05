@@ -2,8 +2,9 @@ import { useEffect, useState } from 'react';
 import EditTable from '../../components/EditTable/EditTable';
 import axios from 'axios';
 import { enqueueSnackbar } from 'notistack';
-import { Typography } from '@mui/material';
-import EnhancedTable from '../../components/EditTable/FullTable';
+import { Avatar, Box, Typography } from '@mui/material';
+import BorderColorIcon from '@mui/icons-material/BorderColor';
+import PageLoad from '../../components/Loading/PageLoad';
 
 
 const customInputFields:any[] = [
@@ -71,11 +72,12 @@ function updatePicu(picuToUpdate:Picu) {
 
 export default function EditPicus() {
   const [data, setData] = useState<Picu[]>([]);
+  const [isLoading, setIsLoading] = useState<boolean>(true);
+
   useEffect(() => {
     axios.get(`${process.env.REACT_APP_API_URL}/audit/getall/picu`)
       .then((response:any) => {
         const picus:Picu[] = [];
-        console.log(response.data.allData);
         for (let picu of response.data.allData) {
           picus.push({
             picu_id: picu.picu_id,
@@ -89,19 +91,36 @@ export default function EditPicus() {
         setData(picus.sort((a, b) => Number(a.picu_id) - Number(b.picu_id)));
       })
       .catch((error:any) => {
-        enqueueSnackbar("System Error", { variant: "error" });
+        enqueueSnackbar(error.message, { variant: "error" });
       });
+      setIsLoading(false);
   }, []);
   
   return (
-    <>
+    <Box
+      sx={{
+        marginTop: 8,
+        display: 'flex',
+        flexDirection: 'column',
+        alignItems: 'center',
+      }}
+    >
+      <PageLoad loading={isLoading} />
+
+      <Avatar sx={{ m: 1, bgcolor: 'primary.main' }}>
+        <BorderColorIcon />
+      </Avatar>
+
       <Typography component="h1" variant="h5">
         Edit PICUs
       </Typography>
 
+      <br />
+
       <div style={{width:'90%', margin:'auto'}}>
         {data.length > 0 && 
         <EditTable
+          title='PICUs'
           deleteData={deletePicu}
           initialData={data}
           uniqueIdName={uniqueIdName}
@@ -114,8 +133,6 @@ export default function EditPicus() {
         />}
       </div>
 
-      
-      <EnhancedTable />
-    </>
+    </Box>
   );
 }

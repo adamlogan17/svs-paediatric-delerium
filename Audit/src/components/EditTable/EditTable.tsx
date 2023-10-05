@@ -11,9 +11,10 @@ import ConfirmDialog from '../ConfirmDialog/ConfirmDialog';
 /**
  * 
  * @todo Add other option for textfield, to be a checkbox for boolean values
- * @todo Cannot deselect all after implementing the disableDelete prop
+ * @todo Maybe add validation for the props?
+ * @todo Need to make the TablePagination text vertically centered (think this has something to do with stylings of the document)
  */
-export default function EditTable(props:{initialData:any[], uniqueIdName:string, columnNameMap:any, customInputFields:any[], noEditFields:string[], validateData:(data:any) => string[], deleteData:(ids:number[]) => void, updateData:(data:any) => void, disableDelete?:any[]}) {
+export default function EditTable(props:{initialData:any[], title:string, uniqueIdName:string, columnNameMap:any, customInputFields:any[], noEditFields:string[], validateData:(data:any) => string[], deleteData:(ids:number[]) => void, updateData:(data:any) => void, disableDelete?:any[]}) {
   const [data, setData] = useState<any[]>(props.initialData);
   const [editId, setEditId] = useState<number | null>(null);
   const [tempData, setTempData] = useState<any | null>(null);
@@ -22,9 +23,6 @@ export default function EditTable(props:{initialData:any[], uniqueIdName:string,
   const [page, setPage] = useState(0);
   const [rowsPerPage, setRowsPerPage] = useState(5);
   const [editOpen, setEditOpen] = useState(false);
-
-  console.log(data);
-  console.log(data.length);
 
   // Avoid a layout jump when reaching the last page with empty rows.
   const emptyRows = page > 0 ? Math.max(0, (1 + page) * rowsPerPage - data.length) : 0;
@@ -38,7 +36,7 @@ export default function EditTable(props:{initialData:any[], uniqueIdName:string,
     [page, rowsPerPage, data],
   );
 
-  function startEdit(id: number, row: Picu) {
+  function startEdit(id: number, row: any) {
     setEditId(id);
     setTempData({ ...row });
     setError(null);
@@ -96,7 +94,7 @@ export default function EditTable(props:{initialData:any[], uniqueIdName:string,
     <Paper sx={{mb: 2}}>
       <ConfirmDialog open={editOpen} handleClose={() => { setEditOpen(false)}} handleConfirm={saveEdit} title='Confrim Edit Record' description={<>Would you like to edit record {editId}?</>} />
 
-      <EnhancedToolbar numSelected={selected.length} title='PICU' handleDelete={() => handleDelete(selected)} />
+      <EnhancedToolbar numSelected={selected.length} title={props.title} handleDelete={() => handleDelete(selected)} />
       <TableContainer>
         <Table>
           <TableHead>
@@ -229,7 +227,15 @@ export default function EditTable(props:{initialData:any[], uniqueIdName:string,
           </TableBody>
         </Table>
       </TableContainer>
+      
       <TablePagination
+        // the style below is due to bootstrap causing alignment issue with the pagination text @see {@link https://github.com/mui/mui-x/issues/4076} for more
+        sx={{
+          '.MuiTablePagination-displayedRows, .MuiTablePagination-selectLabel': {
+            'margin-top': '1em',
+            'margin-bottom': '1em'
+          }
+        }}
         rowsPerPageOptions={[5, 10, 25, { label: 'All', value: data.length }]}
         count={data.length}
         rowsPerPage={rowsPerPage}

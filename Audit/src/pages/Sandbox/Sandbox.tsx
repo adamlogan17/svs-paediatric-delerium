@@ -1,7 +1,6 @@
 import Button from '@mui/material/Button';
 import { VariantType, useSnackbar } from 'notistack';
 import EditTable from '../../components/EditTable/EditTable';
-import EnhancedTable from '../../components/EditTable/FullTable';
 
 const initialData: Picu[] = [
   {
@@ -124,7 +123,6 @@ export default function Sandbox(props:any) {
 
       <br />
       <br />
-      <EnhancedTable />
     </div>
   );
 }

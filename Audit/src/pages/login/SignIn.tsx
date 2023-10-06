@@ -1,4 +1,4 @@
-import React from 'react';
+import { useRef } from 'react';
 import Avatar from '@mui/material/Avatar';
 import Button from '@mui/material/Button';
 import TextField from '@mui/material/TextField';
@@ -8,13 +8,12 @@ import Box from '@mui/material/Box';
 import LockOutlinedIcon from '@mui/icons-material/LockOutlined';
 import Typography from '@mui/material/Typography';
 import Container from '@mui/material/Container';
-
-import { useNavigate } from "react-router-dom";
 import { useState } from "react";
 import axios from 'axios';
 import PageLoad from '../../components/Loading/PageLoad';
 import { enqueueSnackbar } from 'notistack';
 import PasswordTextField from '../../components/PasswordTextField/PasswordTextField';
+import ReCAPTCHA from "react-google-recaptcha";
 
 
 /**
@@ -26,30 +25,59 @@ import PasswordTextField from '../../components/PasswordTextField/PasswordTextFi
  * 
  * @returns {JSX.Element} - Rendered component.
  * 
- * TODO Add a media query to the Box component to make the TextFields the same size, no matter how many is in them.
+ * @todo Add a media query to the Box component to make the TextFields the same size, no matter how many is in them.
+ * @todo Change the email, to reset the password
  */
 export default function SignIn() {
-  const navigate = useNavigate();
   const [incorrectDetails, setIncorrectDetails] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
+  const captchaRef = useRef<any>(null); // need to debug issue with type
 
   /**
    * Handles form submission.
    * Sends a POST request with user credentials for authentication.
-   * Navigates to the MFA login page if authenticated, otherwise displays an error alert.
    */
-  const handleSubmit = (event: React.FormEvent<HTMLFormElement>) => {
+  const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
-    // setIsLoading(true);
-    const data = new FormData(event.currentTarget);
-    const username = data.get('username');
-    const password = data.get('password');
+    setIsLoading(true);
 
-    console.log("password", password);
-    console.log("username", username);
+    const data:FormData = new FormData(event.currentTarget);
+    const username:FormDataEntryValue|null  = data.get('username');
+    const password:FormDataEntryValue|null  = data.get('password');
 
+    if(captchaRef === null || captchaRef.current === undefined) {
+      enqueueSnackbar("no login in!", { variant: "error" });
+      setIsLoading(false);
+      return;
+    }
 
-    const configuration = {
+    const token = captchaRef.current.getValue();
+    captchaRef.current.reset();
+
+    const capcthaConfig = {
+      method: "post",
+      url: `${process.env.REACT_APP_API_URL}/verify-captcha`, 
+      data: {
+        token: token
+      }
+    }
+
+    // using the await keyword, ensures this is called before the next request
+    try {
+      const captchaResult = await axios(capcthaConfig);
+      if(!captchaResult.data.success) {
+        enqueueSnackbar("Please complete the captcha", { variant: "error" });
+        setIsLoading(false);
+        return;
+      }
+    } catch (error) {
+      // the type cannot be set within 'catch' and therefore is cast here
+      enqueueSnackbar((error as Error).message, { variant: "error" })
+      return;
+    }
+    
+
+    const loginConfig = {
       method: "post",
       url: `${process.env.REACT_APP_API_URL}/login`, 
       data: {
@@ -57,37 +85,34 @@ export default function SignIn() {
         password: password
       }
     };
-    
-    axios(configuration)
-      .then((result) => {
-        // sets the cookies
-        sessionStorage.setItem("TOKEN", result.data.token);
-        sessionStorage.setItem("ROLE", result.data.role);
-        sessionStorage.setItem("SITE", result.data.username);
 
-        if(result.data.token === undefined) {
-          setIncorrectDetails(true);
-        } else {
-          // redirects the user depending on role
-          if(result.data.role === "admin") {
-            navigate("/admin");
-            navigate(0);
-          } else if (result.data.role === "field_engineer") {
-            navigate("/fieldengineer");
-            navigate(0);
-          }
-          else if (result.data.role === "picu") {
-            navigate("/");
-            navigate(0);
-          }
+    try {
+      const loginResult = await axios(loginConfig);
+      // sets the cookies
+      sessionStorage.setItem("TOKEN", loginResult.data.token);
+      sessionStorage.setItem("ROLE", loginResult.data.role);
+      sessionStorage.setItem("USERNAME", loginResult.data.username);
+      if(loginResult.data.token === undefined) {
+        setIncorrectDetails(true);
+      } else {
+        // redirects the user depending on role
+        if(loginResult.data.role === "admin") {
+          window.location.href = "/admin";
+        } else if (loginResult.data.role === "field_engineer") {
+          window.location.href = "/fieldengineer";
         }
-        setIsLoading(false);
-      })
-      .catch((error) => enqueueSnackbar(error.message, { variant: "error" }));
+        else if (loginResult.data.role === "picu") {
+          window.location.href = "/";
+        }
+      }
+      setIsLoading(false);
+    } catch (error) {
+      enqueueSnackbar((error as Error).message, { variant: "error" })
+    }
   }
 
   return (
-    <Container component="main" maxWidth="xl" sx={{backgroundColor:'aqua'}}>
+    <Container component="main" maxWidth="xl">
       <PageLoad loading={isLoading} />
       <Box
         sx={{
@@ -95,7 +120,6 @@ export default function SignIn() {
           display: 'flex',
           flexDirection: 'column',
           alignItems: 'center',
-          backgroundColor:'brown'
         }}
       >
 
@@ -118,6 +142,12 @@ export default function SignIn() {
           />
 
           <PasswordTextField id="password" error={incorrectDetails} helperText={incorrectDetails ? "Incorrect Username or Password" : "" } label="Password" />
+
+          <ReCAPTCHA
+            sitekey={process.env.REACT_APP_CAPTCHA_SITE_KEY ? process.env.REACT_APP_CAPTCHA_SITE_KEY : ""}
+            ref={captchaRef}
+            // onChange={(value) => {console.log("val", value)} }  // this can also be used, instead of using ref, although a state, will need to be added as well as the disadvantage of not being able to reset the captcha
+          />
           
           <Button
             type="submit"
@@ -129,13 +159,13 @@ export default function SignIn() {
           </Button>
           <Grid container>
             <Grid item xs>
-              <Link href="#" variant="body2">
-                Forgot password?
+              <Link href="mailto:alogan20@qub.ac.uk" variant="body2">
+                Forgot password? Ask for a reset
               </Link>
             </Grid>
             <Grid item>
-              <Link href="/test-sign-up" variant="body2">
-                {"Don't have an account? Sign Up"}
+              <Link href="mailto:alogan20@qub.ac.uk" variant="body2">
+                Email us, to sign up
               </Link>
             </Grid>
           </Grid>

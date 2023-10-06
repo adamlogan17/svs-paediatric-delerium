@@ -3,16 +3,20 @@ import morgan from "morgan";
 import bp from 'body-parser';
 import https from 'https';
 import fs from 'fs';
+import { config } from 'dotenv';
+
 
 import swaggerJsdoc from 'swagger-jsdoc';
 import swaggerUi from 'swagger-ui-express';
 
 import { deleteData, getAll, insertData, updateData } from './crud';
-import { authenticate, authorise, updatePicuPassword } from './login';
+import { authenticate, authorise, updatePicuPassword, verifyCaptcha } from './login';
 import { allPicuCompliance, singlePicuCompliance } from './auditCharts';
-import { insertCompData } from './complianceScores';
-import { addPicu, getAllIds, nextPicu } from './picuDbManagement';
-import { SimpleConsoleLogger } from 'typeorm';
+import { addPicu, deletePicus, editPicu, getAllIds, nextPicu } from './picuDbManagement';
+
+// initialise process.env
+config();
+
 
 // Express Initialize
 const app = express();
@@ -116,6 +120,57 @@ app.use((req:Request, res:Response, next) =>{
   next();
 });
 
+app.use((req:Request, res:Response, next) =>{
+  const now = new Date();
+  const apiCallDetail: APICallDetail = {
+    date: now.toISOString().split('T')[0], // Separate date
+    time: now.toISOString().split('T')[1].split('.')[0], // Separate time
+    method: req.method,
+    url: req.originalUrl,
+    status: res.statusCode,
+    userIP: req.ip,
+    userAgent: req.headers['user-agent'] || '',
+    username: req.params.username,
+    userRole: req.params.role,
+  };
+
+  // Add the API call detail to the array
+  apiCallDetails.push(apiCallDetail);
+  insertData("audit", "api_log", apiCallDetail);
+
+  // Continue with the request handling
+  next();
+});
+
+/**
+ * @swagger
+ * definitions:
+ *   Picu:
+ *     properties:
+ *       picu_id:
+ *         type: string
+ *       hospital_name:
+ *         type: string
+ *       auditor:
+ *         type: string
+ *       picu_role:
+ *         type: string
+ *         enum:
+ *           - picu
+ *           - admin
+ *           - field_engineer
+ *       password:
+ *         type: string
+ *       ward_name:
+ *         type: string
+ *   Login:
+ *     properties:
+ *       username:
+ *         type: string
+ *       password:
+ *         type: string
+ */
+
 // Routes
 /**
  * @swagger
@@ -148,7 +203,7 @@ app.get("/test/:val", (req: Request,res: Response)=>{
  * /login:
  *   post:
  *     tags:
- *       - Authorization
+ *       - Authorisation
  *     summary: Allows users to log into the system
  *     description: Accepts a username and password and returns a token
  *     produces:
@@ -177,14 +232,7 @@ app.get("/test/:val", (req: Request,res: Response)=>{
  *             username:
  *               type: string
  *       401:
- *         description: Unauthorized - Invalid username or password
- * definitions:
- *   Login:
- *     properties:
- *      username:
- *        type: string
- *      password:
- *        type: string
+ *         description: Unauthorized - Invalid username or password   
  */
 app.post("/login", authenticate);
 
@@ -353,7 +401,7 @@ app.delete("/:database/deletedata/:table/:predicate", async (req: Request,res: R
  *     tags:
  *       - Testing
  *     summary: Tests authentication
- *     description: Endpoint that requires authorization.
+ *     description: Endpoint that requires authorisation.
  *     security:
  *       - Bearer: []
  *     produces:
@@ -384,7 +432,7 @@ app.get("/test-auth", (request: Request, response: Response, next:NextFunction) 
  *     tags:
  *       - Testing
  *     summary: Tests Admin authentication
- *     description: Endpoint that requires authorization.
+ *     description: Endpoint that requires authorisation.
  *     security:
  *       - Bearer: []
  *     produces:
@@ -406,7 +454,7 @@ app.get("/test-auth/admin", (request: Request, response: Response, next:NextFunc
  *     tags:
  *       - Testing
  *     summary: Tests field engineer authentication
- *     description: Endpoint that requires authorization.
+ *     description: Endpoint that requires authorisation.
  *     security:
  *       - Bearer: []
  *     produces:
@@ -468,23 +516,6 @@ app.get("/chartData/allSites", allPicuCompliance);
  *         description: Picu successfully added.
  *       '400':
  *         description: Error occurred.
- * definitions:
- *   Picu:
- *     properties:
- *       hospital_name:
- *         type: string
- *       auditor:
- *         type: string
- *       picu_role:
- *         type: string
- *         enum:
- *           - picu
- *           - admin
- *           - field_engineer
- *       password:
- *         type: string
- *       ward_name:
- *         type: string
  */
 app.post("/addPicu", (request: Request, response: Response, next:NextFunction) => authorise(request, response, next, 'admin'), async (req: Request, res: Response) => {
   let result = await addPicu(req.body, req.params.role);
@@ -538,7 +569,7 @@ app.get("/getPicuIds", (request: Request, response: Response, next:NextFunction)
  * /updatePicuPassword:
  *   put:
  *     tags:
- *       - Authorization
+ *       - Authorisation
  *     summary: Update the password for a given PICU ID.
  *     security:
  *       - Bearer: []
@@ -570,6 +601,114 @@ app.put("/updatePicuPassword", (request: Request, response: Response, next:NextF
   res.status(status).send(result);
 });
 
+/**
+ * @swagger
+ * /deletePicu:
+ *   delete:
+ *     tags:
+ *       - Picu
+ *     summary: Delete multiple PICUs based on provided PICU IDs.
+ *     security:
+ *       - Bearer: []
+ *     parameters:
+ *       - in: body
+ *         name: body
+ *         description: Array of PICU IDs to delete.
+ *         schema:
+ *           type: object
+ *           required:
+ *             - picu_ids
+ *           properties:
+ *             picu_ids:
+ *               type: array
+ *               description: The IDs of the PICUs to delete.
+ *               items:
+ *                 type: number
+ *     responses:
+ *       200:
+ *         description: PICUs deleted successfully.
+ *       400:
+ *         description: An error occurred.
+ */
+app.delete("/deletePicu", (request: Request, response: Response, next:NextFunction) => authorise(request, response, next, 'admin'), async (req: Request, res: Response) => {
+  let result = await deletePicus(req.body.picu_ids, req.params.role);
+  let status:number = result.toString().includes("Error") ? 400 : 201;
+  res.status(status).send(result);
+});
+
+/**
+ * @swagger
+ * /updatePicu:
+ *   put:
+ *     tags:
+ *       - Picu
+ *     summary: Update a PICU's details based on the provided data.
+ *     security:
+ *       - Bearer: []
+ *     parameters:
+ *       - in: body
+ *         name: body
+ *         description: The data to update for the PICU.
+ *         schema:
+ *           type: object
+ *           required:
+ *            - hospital_name
+ *            - auditor
+ *            - picu_role
+ *            - picu_id
+ *            - ward_name
+ *           properties:
+ *             data:
+ *               $ref: '#/definitions/Picu'
+ *     responses:
+ *       201:
+ *         description: PICU updated successfully.
+ *       400:
+ *         description: An error occurred.
+ */
+app.put("/updatePicu", (request: Request, response: Response, next:NextFunction) => authorise(request, response, next, 'admin'), async (req: Request, res: Response) => {
+  let result = await editPicu(req.body, req.params.role);
+  let status:number = result.toString().includes("Error") ? 400 : 201;
+  res.status(status).send(result);
+});
+
+/**
+ * @swagger
+ * /verify-captcha:
+ *   post:
+ *     tags:
+ *       - Authorisation
+ *     summary: Verify the provided CAPTCHA token.
+ *     parameters:
+ *       - in: body
+ *         name: body
+ *         description: CAPTCHA token to verify.
+ *         schema:
+ *           type: object
+ *           required:
+ *             - token
+ *           properties:
+ *             token:
+ *               type: string
+ *               description: The CAPTCHA token to verify.
+ *     produces:
+ *       - application/json
+ *     responses:
+ *       200:
+ *         description: CAPTCHA token verification result.
+ *         schema:
+ *           type: object
+ *           properties:
+ *             success:
+ *               type: boolean
+ *               description: Result of the CAPTCHA token verification.
+ *       400:
+ *         description: An error occurred.
+ */
+app.post("/verify-captcha", async (request: Request, response: Response,) => {
+  response.send({success: await verifyCaptcha(request.body.token)});
+});
+
 /* function saveApiCallDetailsToDatabase() {
   console.log('Saved API Call Details:');
   apiCallDetails.forEach((apiCallDetail, index) => {
@@ -598,14 +737,15 @@ setInterval(() => {
 }, 5000); */
 
 // Used to activate the endpoints through HTTP
-// app.listen(port,()=> {
-//   console.log(`listen port ${port}`);
-//   console.log(`Go to http://localhost:${port}/`);
-// });
+app.listen(port,()=> {
+  console.log(`listen port ${port}`);
+  console.log(`Go to http://localhost:${port}/swagger-docs for documentation`);
+});
 
 // Used to activate the endpoints through HTTPS
-https.createServer(options, app)
-.listen(port, () => {
-  console.log(`listen port ${port}`);
-  console.log(`Go to https://localhost:${port}/swagger-docs for documentation`);
-});
+// https.createServer(options, app)
+// .listen(port, () => {
+//   console.log(`listen port ${port}`);
+//   console.log(`Go to https://localhost:${port}/swagger-docs for documentation`);
+// });
+

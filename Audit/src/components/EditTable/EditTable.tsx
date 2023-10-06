@@ -8,13 +8,34 @@ import CancelIcon from '@mui/icons-material/Cancel';
 import EnhancedToolbar from './EnhancedToolbar';
 import ConfirmDialog from '../ConfirmDialog/ConfirmDialog';
 
+type CustomFields = {
+    key:string,
+    type:"autocomplete"|"boolean"
+    options?:{
+      label:string,
+      value:string
+    }[]
+}
+
+type EditTableProps = {
+  initialData: any[],
+  title: string,
+  uniqueIdName: string,
+  columnNameMap?: any,
+  customInputFields?: CustomFields[],
+  noEditFields?: string[],
+  validateData?: (data: any) => string[],
+  deleteData: (ids: number[]) => void,
+  updateData: (data: any) => void,
+  disableDelete?: any[]
+}
+
 /**
  * 
  * @todo Add other option for textfield, to be a checkbox for boolean values
  * @todo Maybe add validation for the props?
- * @todo Need to make the TablePagination text vertically centered (think this has something to do with stylings of the document)
  */
-export default function EditTable(props:{initialData:any[], title:string, uniqueIdName:string, columnNameMap:any, customInputFields:any[], noEditFields:string[], validateData:(data:any) => string[], deleteData:(ids:number[]) => void, updateData:(data:any) => void, disableDelete?:any[]}) {
+export default function EditTable(props: EditTableProps) {
   const [data, setData] = useState<any[]>(props.initialData);
   const [editId, setEditId] = useState<number | null>(null);
   const [tempData, setTempData] = useState<any | null>(null);
@@ -43,14 +64,15 @@ export default function EditTable(props:{initialData:any[], title:string, unique
   };
 
   function saveEdit() {
-    if (tempData && (props.validateData(tempData).length === 0)) {
+    if (tempData && ((props.validateData?.(tempData) ?? []).length === 0)) {
       props.updateData(tempData);
 
       setData(prev => prev.map(row => (row[props.uniqueIdName] === editId ? tempData : row)));
       setEditId(null);
       setTempData(null);
+      setError(null);
     } else {
-      setError(props.validateData(tempData));
+      setError(props.validateData?.(tempData) ?? null);
     }
   };
 
@@ -90,7 +112,6 @@ export default function EditTable(props:{initialData:any[], title:string, unique
 
 
   return (
-    <>
     <Paper sx={{mb: 2}}>
       <ConfirmDialog open={editOpen} handleClose={() => { setEditOpen(false)}} handleConfirm={saveEdit} title='Confrim Edit Record' description={<>Would you like to edit record {editId}?</>} />
 
@@ -102,14 +123,18 @@ export default function EditTable(props:{initialData:any[], title:string, unique
               <TableCell padding='checkbox'>
               <Checkbox
                 color="primary"
+                // The '??' provides a default value if the array is undefined or null
                 indeterminate={selected.length > 0 && selected.length < (data.length - (props?.disableDelete ?? []).length)}
                 checked={data.length > 0 && selected.length === (data.length - (props?.disableDelete ?? []).length)}
                 onChange={handleSelectAllClick}
               />
               </TableCell>
-              {Object.keys(data[0]).map((key:string, index:number) => (
-                <TableCell sx={cellStyle} key={index}>{props.columnNameMap[key]}</TableCell>
+
+              {/* If the user provides a columnNameMap, use that, otherwise use the keys from the first object in the data array */}
+              {Object.keys(props.columnNameMap ?? data[0]).map((key:string, index:number) => (
+                <TableCell sx={cellStyle} key={index}>{props.columnNameMap?.[key] ?? key}</TableCell>
               ))}
+
               <TableCell sx={cellStyle}>Edit</TableCell>
             </TableRow>
           </TableHead>
@@ -138,29 +163,29 @@ export default function EditTable(props:{initialData:any[], title:string, unique
                 {editId === row[props.uniqueIdName] ? (
                   <>
                     {Object.keys(row).map((key:string, index:number) => (
-                      props.noEditFields.includes(key) ? 
+                      props.noEditFields?.includes(key) ? 
                         (
                           <TableCell key={index}>{row[key]}</TableCell>
                         ) : (
                           <>
-                            {props.customInputFields.some((obj:any) => obj.key === key && obj.type === "autocomplete") && 
+                            {props.customInputFields?.some((obj:any) => obj.key === key && obj.type === "autocomplete") && 
                             (
                               <TableCell key={index}>
                                 <Autocomplete
-                                  options={props.customInputFields.filter(obj => obj.key === key)[0].options} 
+                                  options={props.customInputFields.filter(obj => obj.key === key)[0].options ?? []} 
                                   onChange={(e, newValue:any) => {
                                     if(newValue === null) {
                                       newValue = { value: ""}
                                     }
                                     setTempData((prev:any) => ({ ...prev!, [key]: newValue.value }));
                                   }}
-                                  value={props.customInputFields.filter(obj => obj.key === key)[0].options.find((option:any) => option.value === tempData?.[key])}
+                                  value={(props.customInputFields.filter(obj => obj.key === key)[0].options ?? []).find((option:any) => option.value === tempData?.[key])}
                                   renderInput={(params) => <TextField {...params} error={error?.includes(key)} />}
                                 />
                               </TableCell>
                             )}
 
-                            {props.customInputFields.some((obj:any) => obj.key !== key) && (
+                            {(props.customInputFields === undefined || props.customInputFields?.some((obj:any) => obj.key !== key)) && (
                               <TableCell key={index}>
                                 <TextField
                                   value={tempData?.[key]}
@@ -186,18 +211,20 @@ export default function EditTable(props:{initialData:any[], title:string, unique
                       </IconButton>
                     </TableCell>
                   </>
-                ) : (
+                ) : 
+                // below occurs when the data is NOT being edited
+                (
                   <>
                     {Object.keys(row).map((key, index) => (
                       <>
-                        {props.customInputFields.some((obj:any) => obj.key === key && obj.type === "autocomplete") && 
+                        {props.customInputFields?.some((obj:any) => obj.key === key && obj.type === "autocomplete") && 
                         (
                           <TableCell>
-                            {props.customInputFields.filter(obj => obj.key === key)[0].options.find((option:any) => option.value === row[key]).label}
+                            {(props.customInputFields.filter(obj => obj.key === key)[0].options ?? []).find((option:any) => option.value === row[key])?.label}
                           </TableCell>
                         )}
 
-                        {props.customInputFields.some((obj:any) => obj.key !== key) && (
+                        {(props.customInputFields === undefined || props.customInputFields?.some((obj:any) => obj.key !== key)) && (
                           <TableCell>
                             {row[key]}
                           </TableCell>
@@ -232,8 +259,8 @@ export default function EditTable(props:{initialData:any[], title:string, unique
         // the style below is due to bootstrap causing alignment issue with the pagination text @see {@link https://github.com/mui/mui-x/issues/4076} for more
         sx={{
           '.MuiTablePagination-displayedRows, .MuiTablePagination-selectLabel': {
-            'margin-top': '1em',
-            'margin-bottom': '1em'
+            marginTop: '1em',
+            marginBottom: '1em'
           }
         }}
         rowsPerPageOptions={[5, 10, 25, { label: 'All', value: data.length }]}
@@ -247,7 +274,5 @@ export default function EditTable(props:{initialData:any[], title:string, unique
         showLastButton={true}
       />
     </Paper>
-    
-  </>
   );
 }

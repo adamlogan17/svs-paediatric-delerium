@@ -69,6 +69,8 @@ export function authenticate(request: Request, response: Response): void {
  * @param { Response } response
  * @param { NextFunction } next
  * @returns { void }
+ * 
+ * @todo check the role from the db is correct for the one embedded in the token
  */
 export function authorise(request: Request, response: Response, next:NextFunction, level:string = 'picu'):void {
   try {

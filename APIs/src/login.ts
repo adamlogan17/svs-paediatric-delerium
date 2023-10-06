@@ -2,6 +2,10 @@ import { NextFunction, Request, Response } from "express";
 import jwt, { JwtPayload } from 'jsonwebtoken';
 import {createPool, createSelect, updateData} from './crud';
 import bcrypt from 'bcrypt';
+import axios from 'axios';
+import { config } from 'dotenv';
+
+config();
 
 /**
  * Initial login function that creates a JWT token based on the userId and their role
@@ -48,7 +52,7 @@ export function authenticate(request: Request, response: Response): void {
             });
 
           } else {
-            response.status(401).send("Invalid User");
+            response.send("Invalid User");
           }
         })
         .catch(err => response.send(err))
@@ -65,6 +69,8 @@ export function authenticate(request: Request, response: Response): void {
  * @param { Response } response
  * @param { NextFunction } next
  * @returns { void }
+ * 
+ * @todo check the role from the db is correct for the one embedded in the token
  */
 export function authorise(request: Request, response: Response, next:NextFunction, level:string = 'picu'):void {
   try {
@@ -111,7 +117,7 @@ export function authorise(request: Request, response: Response, next:NextFunctio
  * @param {string} password - The plaintext password to be hashed.
  * @returns {Promise<string>} - The hashed password or an error message if the input password is not valid.
  */
-export async function hashPassword(password:string) {
+export async function hashPassword(password:string):Promise<string> {
   const SALTROUNDS = 10;
 
   // Checks the password is valid
@@ -137,8 +143,10 @@ export async function hashPassword(password:string) {
  * @param {string} newPassword - The new plaintext password to be set.
  * @param {string} role - The role of the user.
  * @returns {Promise<string>} - A message indicating the result of the update operation.
+ * 
+ * @todo Incorporate the role parameter into the function.
  */
-export async function updatePicuPassword(id:string, newPassword:string, role:string) {
+export async function updatePicuPassword(id:string, newPassword:string, role:string):Promise<string> {
   const hashedPassword = await hashPassword(newPassword);
 
   if(hashedPassword.length !== 60 || hashedPassword.includes("Error")) {
@@ -148,4 +156,28 @@ export async function updatePicuPassword(id:string, newPassword:string, role:str
   const result = updateData("audit", "picu", {password: hashedPassword}, `picu_id=${id}`);
 
   return result;
+}
+
+/**
+ * Verifies the provided CAPTCHA token with Google's reCAPTCHA service.
+ * 
+ * This must be done server side, as the domain must be registered [here]{@link [https://www.google.com/recaptcha/admin/site/678042304]}.
+ * When registering, ensure 'Challenge (v2) and "I'm not a robot" Checkbox' is selected.
+ * The secret key is then generated and stored in the .env file.
+ * The site key is then used in the client side code.
+ * 
+ * @function verifyCaptcha
+ * 
+ * @param {string} token - The CAPTCHA token generated client-side after a user completes a CAPTCHA challenge.
+ * @returns {Promise<boolean>} - A promise that resolves to true if the CAPTCHA token is valid and false otherwise.
+ * 
+ */
+export async function verifyCaptcha(token:string):Promise<boolean> {
+  const secretKey = process.env.CAPTCHA_SECRET_KEY;
+  const url = `https://www.google.com/recaptcha/api/siteverify?secret=${secretKey}&response=${token}`;
+
+  const verifyResponse = await axios.post(url);
+  const captchaValidation = verifyResponse.data;
+
+  return captchaValidation.success;
 }

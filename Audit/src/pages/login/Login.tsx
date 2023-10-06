@@ -2,7 +2,7 @@ import PButton from '../../components/PButton/PButton';
 import axios from 'axios';
 
 import '../../shared/layout.css';
-import './login.css';
+import './Login.css';
 import { useRef } from 'react';
 
 /**

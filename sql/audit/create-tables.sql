@@ -10,6 +10,18 @@ CREATE TABLE IF NOT EXISTS picu (
   overall_compliance DECIMAL
 );
 
+CREATE TABLE IF NOT EXISTS api_log (
+    date DATE,
+    time TIME,
+    method VARCHAR(10),
+    url VARCHAR(255),
+    status INT,
+    userIP VARCHAR(50),
+    userAgent VARCHAR(255),
+    username VARCHAR(50),
+    userRole VARCHAR(50)
+);
+
 CREATE TABLE IF NOT EXISTS compliance_data (
   comp_id SERIAL PRIMARY KEY,
   entry_date DATE NOT NULL,

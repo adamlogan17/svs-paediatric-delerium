@@ -18,6 +18,7 @@
     - [Shuffle Array](#shuffle-array)
     - [Potential 404 pages](#potential-404-pages)
     - [JSDOC in react](#jsdoc-in-react)
+    - [Captcha Implementation](#captcha-implementation)
     - [Markdown Formatting](#markdown-formatting)
   - [Useful vscode extension ids](#useful-vscode-extension-ids)
 
@@ -126,6 +127,11 @@
 
 - <https://www.inkoop.io/blog/a-guide-to-js-docs-for-react-js/>
 - <https://gist.github.com/DeruiDENG/074b15de1ebc23ee8d307c14198c1231>
+
+### Captcha Implementation
+
+- <https://blog.logrocket.com/implement-recaptcha-react-application>
+- <https://www.google.com/recaptcha/about/>
 
 ### Markdown Formatting
 

@@ -12,6 +12,7 @@ import SignIn from "./pages/LogIn/SignIn";
 import Sandbox from "./pages/Sandbox/Sandbox";
 import AddPicu from "./pages/Admin/AddPicu";
 import ForgottenPassword from "./pages/ForgottenPassword/ForgottenPassword";
+import EditPicus from "./pages/EditPicus/EditPicus";
 
 const token:string|null = sessionStorage.getItem("TOKEN");
 const role:string|null = sessionStorage.getItem("ROLE");
@@ -31,7 +32,7 @@ function AppRouter() {
         <Route path="/login2" element={<Login />}/>
         <Route path="/login" element={<SignIn /> }/>
 
-        <Route path="/sandbox" element={<Sandbox /> }/>          
+        <Route path="/sandbox" element={<Sandbox /> }/> 
 
         {picuAccess && (
           <>
@@ -44,6 +45,7 @@ function AppRouter() {
         {adminAccess && (
           <>
             <Route path="/admin" element={<Admin />} />
+            <Route path="/edit-picus" element={<EditPicus />} />
             <Route path="/add-picu" element={<AddPicu />} />
           </>
         )}

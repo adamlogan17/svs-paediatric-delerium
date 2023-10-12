@@ -4,8 +4,18 @@ import DeleteIcon from '@mui/icons-material/Delete';
 import FileDownloadIcon from '@mui/icons-material/FileDownload';
 import ConfirmDialog from "../ConfirmDialog/ConfirmDialog";
 import { useState } from "react";
+import { CSVLink } from "react-csv";
+import { Data, Headers } from "react-csv/lib/core";
 
-export default function EnhancedToolbar(props: {numSelected:number, title:string, handleDelete:() => void}) {
+type EnhancedToolbarProps = {
+  numSelected:number,
+  data:Data,
+  header:Headers,
+  title:string,
+  handleDelete:() => void
+}
+
+export default function EnhancedToolbar(props: EnhancedToolbarProps) {
   const [isOpen, setIsOpen] = useState(false);
 
   return (
@@ -46,7 +56,9 @@ export default function EnhancedToolbar(props: {numSelected:number, title:string
       ) : (
         <Tooltip title="Download">
           <IconButton>
-            <FileDownloadIcon />
+            <CSVLink data={props.data} headers={props.header} filename={props.title} style={{  color:'inherit' }}>
+              <FileDownloadIcon />
+            </CSVLink>
           </IconButton>
         </Tooltip>
       )}

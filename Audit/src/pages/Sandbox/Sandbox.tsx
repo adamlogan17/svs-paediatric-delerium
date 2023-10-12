@@ -2,6 +2,11 @@ import Button from '@mui/material/Button';
 import { VariantType, useSnackbar } from 'notistack';
 import EditTable from '../../components/EditTable/EditTable';
 
+import { CSVLink, CSVDownload } from "react-csv";
+import { Toolbar, Tooltip, IconButton, Typography } from "@mui/material";
+import FileDownloadIcon from '@mui/icons-material/FileDownload';
+
+
 const initialData: Picu[] = [
   {
     picu_id: 3,
@@ -102,6 +107,22 @@ function validateData(data:any) {
   return Object.entries(data).filter(([key, value]) => value === "").map(([key]) => key);
 }
 
+const csvData = [
+  ["firstname", "lastname", "email"],
+  ["Ahmed", "Tomi", "ah@smthing.co.com"],
+  ["Raed", "Labes", "rl@smthing.co.com"],
+  ["Yezzi", "Min l3b", "ymin@cocococo.com"]
+];
+
+const headers = [
+  { label: 'PICU ID', key: 'picu_id' },
+  { label: 'Ward Name', key: 'ward_name' },
+  { label: 'Hospital Name', key: 'hospital_name' },
+  { label: 'Auditor', key: 'auditor' },
+  { label: 'PICU Role', key: 'picu_role' },
+  { label: 'Overall Compliance', key: 'overall_compliance' },
+];
+
 export default function Sandbox(props:any) {
   const { enqueueSnackbar } = useSnackbar();
 
@@ -120,7 +141,15 @@ export default function Sandbox(props:any) {
       {/* <Button onClick={handleClick}>Show snackbar</Button>
       <Button onClick={handleClickVariant('success')}>Show success snackbar</Button>
       <Button onClick={handleClickVariant('error')}>Show success default</Button> */}
+      {/* <CSVDownload data={csvData} target="_blank" /> */}
 
+      <Tooltip title="Download">
+        <IconButton>
+          <CSVLink data={initialData} headers={headers} filename={'Audit'} style={{  color:'inherit' }}>
+            <FileDownloadIcon />
+          </CSVLink>
+        </IconButton>
+      </Tooltip>
       <br />
       <br />
     </div>

@@ -115,7 +115,13 @@ export default function EditTable(props: EditTableProps) {
     <Paper sx={{mb: 2}}>
       <ConfirmDialog open={editOpen} handleClose={() => { setEditOpen(false)}} handleConfirm={saveEdit} title='Confrim Edit Record' description={<>Would you like to edit record {editId}?</>} />
 
-      <EnhancedToolbar numSelected={selected.length} title={props.title} handleDelete={() => handleDelete(selected)} />
+      <EnhancedToolbar 
+        numSelected={selected.length} 
+        title={props.title} 
+        handleDelete={() => handleDelete(selected)}
+        data={data}
+        header={Object.keys(props.columnNameMap ?? data[0]).map((key:string) => ({label: props.columnNameMap?.[key] ?? key, key: key}))}
+      />
       <TableContainer>
         <Table>
           <TableHead>

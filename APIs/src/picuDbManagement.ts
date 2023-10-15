@@ -1,6 +1,5 @@
-import { createInsert, createPool, createSelect, deleteData, insertData, updateData } from './crud';
+import { createPool, createSelect, deleteData, insertData, updateData } from './crud';
 import { hashPassword } from './login';
-import errorCodeMessage from './errorCodeMessage';
 
 const db:string = process.env.DATABASE || "No database found";
 const dbPassword:string = process.env.DBPASSWORD || "No password found";

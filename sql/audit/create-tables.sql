@@ -26,7 +26,7 @@ CREATE TABLE IF NOT EXISTS api_log (
 CREATE TABLE IF NOT EXISTS compliance_data (
   comp_id SERIAL PRIMARY KEY,
   entry_date DATE NOT NULL,
-  method VARCHAR(5) 
+  method VARCHAR(5) NOT NULL
     CHECK(method IN ('SOSPD', 'CAPD')),
   bed_number INTEGER NOT NULL,
   correct_details BOOLEAN NOT NULL,

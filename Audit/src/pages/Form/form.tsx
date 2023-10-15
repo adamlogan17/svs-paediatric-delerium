@@ -16,12 +16,9 @@ import axios from 'axios';
 function insertData(data: any[]): void {
   const configuration = {
     method: "post",
-    url: `${process.env.REACT_APP_API_URL}/compData`,
+    url: `${process.env.REACT_APP_API_URL}/add-compliance`,
     headers: { 'Authorization': "bearer " + sessionStorage.getItem('TOKEN') },
-    data: {
-      table: "compliance_data",
-      data: data
-    }
+    data: data
   };
 
   // make the API call

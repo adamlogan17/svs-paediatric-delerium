@@ -13,7 +13,7 @@ import { deleteData, getAll, insertData, updateData } from './crud';
 import { authenticate, authorise, updatePicuPassword, verifyCaptcha } from './login';
 import { allPicuCompliance, singlePicuCompliance } from './auditCharts';
 import { addPicu, deletePicus, editPicu, getAllIds, nextPicu } from './picuDbManagement';
-import { deleteCompRecords, editCompliance } from './complianceScores';
+import { deleteCompRecords, editCompliance, insertCompData } from './complianceScores';
 
 // initialise process.env
 config();
@@ -511,11 +511,36 @@ app.get("/chartData/singleSite/:siteId", (request: Request, response: Response, 
 app.get("/chartData/allSites", allPicuCompliance);
 
 /**
- * Inserts compliance data
- * TODO Create another endpoint to allow an admin (and possible a field engineer) to insert data for any picu
- * @author Adam Logan
+ * @swagger
+ * /add-compliance:
+ *   post:
+ *     tags:
+ *       - Compliance
+ *     summary: Adds a new compliance score to the database
+ *     security:
+ *       - Bearer: []
+ *     consumes:
+ *       - application/json
+ *     parameters:
+ *       - name: picu
+ *         in: body
+ *         schema:
+ *           $ref: '#/definitions/ComplianceData'
+ *     responses:
+ *       '200':
+ *         description: Picu successfully added.
+ *       '400':
+ *         description: Error occurred.
  */
-// app.post("/compData", , insertCompData);
+app.post("/add-compliance", (request: Request, response: Response, next:NextFunction) => authorise(request, response, next), async (req: Request, res: Response) => {
+  if(req.params.role === "picu" && req.body.picu_id !== Number(req.params.username)) {
+    res.status(401).send("ERROR: Permission Denied");
+  } else {
+    let result = await insertCompData(req.body, req.params.role);
+    let status:number = result.toString().includes("Error") ? 400 : 201;
+    res.status(status).send(result);
+  }
+});
 
 /**
  * @swagger
@@ -523,7 +548,6 @@ app.get("/chartData/allSites", allPicuCompliance);
  *   post:
  *     tags:
  *       - Picu
- *     name: Add Picu
  *     summary: Adds a new Picu to the database
  *     security:
  *       - Bearer: []
@@ -558,7 +582,6 @@ app.post("/addPicu", (request: Request, response: Response, next:NextFunction) =
  *   get:
  *     tags:
  *       - Picu
- *     name: Add Picu
  *     summary: Gets the next PICU ID, used when adding a new PICU to the database
  *     security:
  *       - Bearer: []

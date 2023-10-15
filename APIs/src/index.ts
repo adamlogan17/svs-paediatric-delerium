@@ -13,7 +13,7 @@ import { deleteData, getAll, insertData, updateData } from './crud';
 import { authenticate, authorise, updatePicuPassword, verifyCaptcha } from './login';
 import { allPicuCompliance, singlePicuCompliance } from './auditCharts';
 import { addPicu, deletePicus, editPicu, getAllIds, nextPicu } from './picuDbManagement';
-import { editCompliance } from './complianceScores';
+import { deleteCompRecords, editCompliance } from './complianceScores';
 
 // initialise process.env
 config();
@@ -762,6 +762,41 @@ app.put("/update-compliance", (request: Request, response: Response, next:NextFu
   let result:string = await editCompliance(req.body, req.params.role);
   let status:number = result.toString().includes("Error") ? 400 : 201;
 
+  res.status(status).send(result);
+});
+
+/**
+ * @swagger
+ * /delete-compliance:
+ *   delete:
+ *     tags:
+ *       - Compliance
+ *     summary: Delete multiple compliance records based on provided IDs.
+ *     security:
+ *       - Bearer: []
+ *     parameters:
+ *       - in: body
+ *         name: body
+ *         description: Array of compliance record IDs to delete.
+ *         schema:
+ *           type: object
+ *           required:
+ *             - comp_ids
+ *           properties:
+ *             comp_ids:
+ *               type: array
+ *               description: The IDs of the compliance records to delete.
+ *               items:
+ *                 type: number
+ *     responses:
+ *       200:
+ *         description: Compliance records deleted successfully.
+ *       400:
+ *         description: An error occurred.
+ */
+app.delete("/delete-compliance", (request: Request, response: Response, next:NextFunction) => authorise(request, response, next, 'admin'), async (req: Request, res: Response) => {
+  let result = await deleteCompRecords(req.body.comp_ids, req.params.role);
+  let status:number = result.toString().includes("Error") ? 400 : 201;
   res.status(status).send(result);
 });
 

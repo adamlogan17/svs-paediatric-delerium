@@ -1,11 +1,12 @@
 import { Request, Response } from "express";
-import { createInsert, createPool, updateData } from "./crud";
+import { createInsert, createPool, deleteData, updateData } from "./crud";
 import { config } from 'dotenv';
 
 config();
 
 const db:string = process.env.DATABASE || "No database found";
 const dbPassword:string = process.env.DBPASSWORD || "No password found";
+const tableName = "compliance_data";
 
 /**
  * @typedef ComplianceData
@@ -96,5 +97,18 @@ export async function editCompliance(dataToEdit:ComplianceData, role:string): Pr
 
   console.log(process.env.DATABASE);
 
-  return await updateData(db, 'compliance_data', dataToEdit, `comp_id = ${Number(id)}`, role, dbPassword);
+  return await updateData(db, tableName, dataToEdit, `comp_id = ${Number(id)}`, role, dbPassword);
+}
+
+/**
+ * Deletes a selection of compliance records from the database.
+ * 
+ * @function deleteCompRecords
+ * @author Adam Logan
+ * @param {number[]} ids - The IDs of the PICUs to be deleted.
+ * @param {string} role - The role for which the database pool will be created. 
+ * @returns {Promise<string>} A message indicating the success or failure of the deletion.
+ */
+export async function deleteCompRecords(ids:number[], role:string): Promise<string> {
+  return await deleteData(db, tableName, `comp_id IN (${ids.join()})`, role, dbPassword);
 }

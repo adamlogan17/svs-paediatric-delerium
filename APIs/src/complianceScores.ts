@@ -1,6 +1,27 @@
 import { Request, Response } from "express";
-import { createInsert, createPool } from "./crud";
+import { createInsert, createPool, updateData } from "./crud";
+import { config } from 'dotenv';
 
+config();
+
+const db:string = process.env.DATABASE || "No database found";
+const dbPassword:string = process.env.DBPASSWORD || "No password found";
+
+type ComplianceData = {
+  comp_id?: number,
+  entry_date: Date,
+  method: 'SOSPD' | 'CAPD',
+  bed_number: number,
+  correct_details: boolean,
+  comfort_recorded: boolean,
+  comfort_above: boolean,
+  all_params_scored: boolean,
+  totalled_correctly: boolean,
+  in_score_range: boolean,
+  observer_name: boolean,
+  score?: number,
+  picu_id: number,
+};
 
 /**
  * Inserts compliance data into the database
@@ -36,4 +57,14 @@ export function insertCompData(request: Request, response: Response): void {
       response.send(error);
     }
   });
+}
+
+export async function editCompliance(dataToEdit:ComplianceData, role:string): Promise<string> {
+  const id = dataToEdit.comp_id;
+  delete dataToEdit.comp_id;
+  delete dataToEdit.score;
+
+  console.log(process.env.DATABASE);
+
+  return await updateData(db, 'compliance_data', dataToEdit, `comp_id = ${Number(id)}`, role, dbPassword);
 }

@@ -10,6 +10,7 @@ CREATE TABLE IF NOT EXISTS picu (
   overall_compliance DECIMAL
 );
 
+-- TODO: Add a primary key to this table
 CREATE TABLE IF NOT EXISTS api_log (
     date DATE,
     time TIME,

@@ -13,6 +13,7 @@ import { deleteData, getAll, insertData, updateData } from './crud';
 import { authenticate, authorise, updatePicuPassword, verifyCaptcha } from './login';
 import { allPicuCompliance, singlePicuCompliance } from './auditCharts';
 import { addPicu, deletePicus, editPicu, getAllIds, nextPicu } from './picuDbManagement';
+import { editCompliance } from './complianceScores';
 
 // initialise process.env
 config();
@@ -705,8 +706,34 @@ app.put("/updatePicu", (request: Request, response: Response, next:NextFunction)
  *       400:
  *         description: An error occurred.
  */
-app.post("/verify-captcha", async (request: Request, response: Response,) => {
+app.post("/verify-captcha", async (request: Request, response: Response) => {
   response.send({success: await verifyCaptcha(request.body.token)});
+});
+
+/**
+ * @swagger
+ * /update-compliance:
+ *   put:
+ *     tags:
+ *       - Compliance
+ *     summary: Update compliance data.
+ *     security:
+ *       - Bearer: []
+ *     parameters:
+ *       - in: body
+ *         name: body
+ *         description: The data to update for the PICU.
+ *     responses:
+ *       201:
+ *         description: Compliance data updated successfully.
+ *       400:
+ *         description: An error occurred.
+ */
+app.put("/update-compliance", (request: Request, response: Response, next:NextFunction) => authorise(request, response, next, 'admin'), async (req: Request, res: Response) => {
+  let result:string = await editCompliance(req.body, req.params.role);
+  let status:number = result.toString().includes("Error") ? 400 : 201;
+
+  res.status(status).send(result);
 });
 
 /* function saveApiCallDetailsToDatabase() {

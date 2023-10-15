@@ -170,6 +170,34 @@ app.use((req:Request, res:Response, next) =>{
  *         type: string
  *       password:
  *         type: string
+ *   ComplianceData:
+ *     properties:
+ *       comp_id:
+ *         type: number
+ *       entry_date:
+ *         type: string
+ *         format: date
+ *       method:
+ *         type: string
+ *         enum: ['SOSPD', 'CAPD']
+ *       bed_number:
+ *         type: number
+ *       correct_details:
+ *         type: boolean
+ *       comfort_recorded:
+ *         type: boolean
+ *       comfort_above:
+ *         type: boolean
+ *       all_params_scored:
+ *         type: boolean
+ *       totalled_correctly:
+ *         type: boolean
+ *       in_score_range:
+ *         type: boolean
+ *       observer_name:
+ *         type: boolean
+ *       picu_id:
+ *         type: number
  */
 
 // Routes
@@ -652,15 +680,13 @@ app.delete("/deletePicu", (request: Request, response: Response, next:NextFuncti
  *         description: The data to update for the PICU.
  *         schema:
  *           type: object
+ *           $ref: '#/definitions/Picu'
  *           required:
  *            - hospital_name
  *            - auditor
  *            - picu_role
  *            - picu_id
  *            - ward_name
- *           properties:
- *             data:
- *               $ref: '#/definitions/Picu'
  *     responses:
  *       201:
  *         description: PICU updated successfully.
@@ -716,16 +742,19 @@ app.post("/verify-captcha", async (request: Request, response: Response) => {
  *   put:
  *     tags:
  *       - Compliance
- *     summary: Update compliance data.
+ *     summary: Update a compliance entry based on the provided data.
  *     security:
  *       - Bearer: []
  *     parameters:
  *       - in: body
- *         name: body
- *         description: The data to update for the PICU.
+ *         name: complianceData
+ *         description: The data to update for the compliance entry.
+ *         schema:
+ *           type: object
+ *           $ref: '#/definitions/ComplianceData'
  *     responses:
  *       201:
- *         description: Compliance data updated successfully.
+ *         description: Compliance entry updated successfully.
  *       400:
  *         description: An error occurred.
  */

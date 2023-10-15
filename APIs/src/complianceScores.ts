@@ -7,6 +7,26 @@ config();
 const db:string = process.env.DATABASE || "No database found";
 const dbPassword:string = process.env.DBPASSWORD || "No password found";
 
+/**
+ * @typedef ComplianceData
+ * 
+ * Represents a compliance record within the system, which is used to store
+ * data related to certain standards or metrics of care.
+ * 
+ * @property {number} [comp_id] - Optional unique identifier for the compliance record.
+ * @property {Date} entry_date - The date the record was entered into the system.
+ * @property {'SOSPD' | 'CAPD'} method - The method used, either SOSPD or CAPD.
+ * @property {number} bed_number - Identifier for the bed associated with the record.
+ * @property {boolean} correct_details - Whether the correct details were provided.
+ * @property {boolean} comfort_recorded - Whether comfort was recorded for the patient.
+ * @property {boolean} comfort_above - Whether the comfort recorded was above a certain threshold.
+ * @property {boolean} all_params_scored - Whether all parameters were scored.
+ * @property {boolean} totalled_correctly - Whether scores were totalled correctly.
+ * @property {boolean} in_score_range - Whether the score was in the acceptable range.
+ * @property {boolean} observer_name - Whether the observer's name was provided.
+ * @property {number} [score] - Optional score, if applicable.
+ * @property {number} picu_id - Identifier for the PICU associated with the record.
+ */
 type ComplianceData = {
   comp_id?: number,
   entry_date: Date,
@@ -59,6 +79,16 @@ export function insertCompData(request: Request, response: Response): void {
   });
 }
 
+/**
+ * Edits an existing compliance record in the database.
+ * 
+ * @function editCompliance
+ * 
+ * @param {ComplianceData} dataToEdit - Data fields to be updated for the compliance record, along with the ID of the record to be updated.
+ * @param {string} role - User role performing the edit.
+ * 
+ * @returns {Promise<string>} - A promise that indicates if the data has been successfully updated, or if there was an error
+ */
 export async function editCompliance(dataToEdit:ComplianceData, role:string): Promise<string> {
   const id = dataToEdit.comp_id;
   delete dataToEdit.comp_id;

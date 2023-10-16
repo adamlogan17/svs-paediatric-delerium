@@ -31,7 +31,7 @@ function insertData(data: any[]): void {
       window.location.href = "/auditGraphs"
     })
     .catch((error) => error = new Error());
-}
+} //
 
 function Form() {
   // all the inputs in the form are instantiated here

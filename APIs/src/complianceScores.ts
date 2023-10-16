@@ -15,7 +15,7 @@ const tableName = "compliance_data";
  * data related to certain standards or metrics of care.
  * 
  * @property {number} [comp_id] - Optional unique identifier for the compliance record.
- * @property {Date} entry_date - The date the record was entered into the system.
+ * @property {Date} [entry_date] - The date the record was entered into the system.
  * @property {'SOSPD' | 'CAPD'} method - The method used, either SOSPD or CAPD.
  * @property {number} bed_number - Identifier for the bed associated with the record.
  * @property {boolean} correct_details - Whether the correct details were provided.
@@ -30,7 +30,7 @@ const tableName = "compliance_data";
  */
 type ComplianceData = {
   comp_id?: number,
-  entry_date: Date,
+  entry_date?: Date,
   method: 'SOSPD' | 'CAPD',
   bed_number: number,
   correct_details: boolean,
@@ -67,8 +67,10 @@ export async function insertCompData(dataToAdd:ComplianceData, role:string): Pro
  */
 export async function editCompliance(dataToEdit:ComplianceData, role:string): Promise<string> {
   const id = dataToEdit.comp_id;
-  delete dataToEdit.comp_id;
-  delete dataToEdit.score;
+
+  delete dataToEdit.comp_id; // the id should not change
+  delete dataToEdit.score; // the score is updated based on the trigger
+  delete dataToEdit.entry_date; // the entry date should not change
 
   return await updateData(db, tableName, dataToEdit, `comp_id = ${Number(id)}`, role, dbPassword);
 }

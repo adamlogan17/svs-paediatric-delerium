@@ -23,7 +23,8 @@ type Picu = {
   picu_role:'picu'|'admin'|'field_engineer',
   password?:string
   ward_name:string,
-  picu_id?:string
+  picu_id?:string,
+  overall_compliance?:number,
 }
 
 /**
@@ -49,6 +50,7 @@ export async function editPicu(dataToEdit:Picu, role:string): Promise<string> {
   // Extract picu_id and remove it from the data to be edited
   const id = dataToEdit.picu_id;
   delete dataToEdit.picu_id;
+  delete dataToEdit.overall_compliance;
 
   return await updateData(db, 'picu', dataToEdit, `picu_id = ${Number(id)}`, role, dbPassword);
 }

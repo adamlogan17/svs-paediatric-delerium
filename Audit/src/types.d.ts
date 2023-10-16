@@ -28,7 +28,7 @@ type RoleAutoComplete = {
  * @property {number|null} [overall_compliance] - Optional overall compliance score for the PICU, which is calculated within the database.
  */
 type Picu = {
-  [key: string]: string|number|null|undefined; // allows the Picu['key'] syntax to work
+  [key: string]: string|number|null|undefined, // allows the Picu['key'] syntax to work
   hospital_name:string, 
   ward_name:string, 
   picu_role:string, 
@@ -37,6 +37,43 @@ type Picu = {
   picu_id?:string|number,
   overall_compliance?:number|null,
 }
+
+/**
+ * @typedef ComplianceData
+ * 
+ * Represents a compliance record within the system, which is used to store
+ * data related to certain standards or metrics of care.
+ * 
+ * @property {number} [comp_id] - Optional unique identifier for the compliance record.
+ * @property {Date} entry_date - The date the record was entered into the system.
+ * @property {'SOSPD' | 'CAPD'} method - The method used, either SOSPD or CAPD.
+ * @property {number} bed_number - Identifier for the bed associated with the record.
+ * @property {boolean} correct_details - Whether the correct details were provided.
+ * @property {boolean} comfort_recorded - Whether comfort was recorded for the patient.
+ * @property {boolean} comfort_above - Whether the comfort recorded was above a certain threshold.
+ * @property {boolean} all_params_scored - Whether all parameters were scored.
+ * @property {boolean} totalled_correctly - Whether scores were totalled correctly.
+ * @property {boolean} in_score_range - Whether the score was in the acceptable range.
+ * @property {boolean} observer_name - Whether the observer's name was provided.
+ * @property {number} [score] - Optional score, if applicable.
+ * @property {number} picu_id - Identifier for the PICU associated with the record.
+ */
+type ComplianceData = {
+  [key: string]: string|number|null|undefined|boolean|Date,
+  comp_id?: number,
+  entry_date: Date,
+  method: 'SOSPD' | 'CAPD',
+  bed_number: number,
+  correct_details: boolean,
+  comfort_recorded: boolean,
+  comfort_above: boolean,
+  all_params_scored: boolean,
+  totalled_correctly: boolean,
+  in_score_range: boolean,
+  observer_name: boolean,
+  score?: number,
+  picu_id: number,
+};
 
 /**
  * Defines the various levels of severity.for the 'Alert' MUI component.

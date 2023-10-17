@@ -11,6 +11,7 @@ import SignIn from "./pages/Login/SignIn";
 import Sandbox from "./pages/Sandbox/Sandbox";
 import AddPicu from "./pages/Admin/AddPicu";
 import ForgottenPassword from "./pages/ForgottenPassword/ForgottenPassword";
+import Auditlog from "./pages/Admin/AuditLog";
 import EditPicus from "./pages/EditPicus/EditPicus";
 
 const token:string|null = sessionStorage.getItem("TOKEN");
@@ -45,6 +46,7 @@ function AppRouter() {
             <Route path="/admin" element={<Admin />} />
             <Route path="/edit-picus" element={<EditPicus />} />
             <Route path="/add-picu" element={<AddPicu />} />
+            <Route path="/audit-log" element={<Auditlog />} />
           </>
         )}
 

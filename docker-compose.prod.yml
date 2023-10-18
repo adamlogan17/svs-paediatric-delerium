@@ -1,0 +1,22 @@
+version: "3"
+
+volumes:
+  data: 
+
+services:
+  apis:
+    container_name: prod_svs_apis
+    build: 
+      dockerfile: prod.Dockerfile
+    ports:
+      # The ports cannot be the same as the fist docker-compose file
+      - "5000:8000" 
+  audit:
+    container_name: prod_svs_audit
+    build: 
+      dockerfile: prod.Dockerfile
+    ports:
+      # The ports cannot be the same as the fist docker-compose file
+      - "4000:80" 
+  postgres:
+    container_name: prod_svs_postgres

@@ -8,22 +8,22 @@ interface AuditLogData {
     method: string;
     url: string;
     status: number;
-    userIP: string;
-    userAgent: string;
+    userip: string; // Updated to match the response property name
+    useragent: string; // Updated to match the response property name
     username: string;
-    userRole: string;
+    userrole: string; // Updated to match the response property name
 }
 
 function getAPIData() {
     return axios.get(`${process.env.REACT_APP_API_URL}/audit/getall/api_log`, {
         headers: { 'Authorization': "bearer " + sessionStorage.getItem('TOKEN') } 
     })
-        .then((response) => {
-            return response.data;
-        })
-        .catch((error) => {
-            return [];
-        });
+    .then((response) => {
+        return response.data.allData; // Access 'allData' array from the response
+    })
+    .catch((error) => {
+        return [];
+    });
 }
 
 function AuditLog() {
@@ -32,46 +32,45 @@ function AuditLog() {
     useEffect(() => {
         const fetchAuditLogData = async () => {
             const data = await getAPIData();
+            console.log(JSON.stringify(data)); // Add this line to log the data as a string
             setAuditLogData(data);
         };
         fetchAuditLogData();
     }, []);
 
     return (
-        <div>
-            <TableContainer component={Paper}>
-                <Table>
-                    <TableHead>
-                        <TableRow>
-                            <TableCell>Date</TableCell>
-                            <TableCell>Time</TableCell>
-                            <TableCell>Method</TableCell>
-                            <TableCell>URL</TableCell>
-                            <TableCell>Status</TableCell>
-                            <TableCell>User IP</TableCell>
-                            <TableCell>User Agent</TableCell>
-                            <TableCell>Username</TableCell>
-                            <TableCell>User Role</TableCell>
+        <TableContainer component={Paper}>
+            <Table>
+                <TableHead>
+                    <TableRow>
+                        <TableCell>Date</TableCell>
+                        <TableCell>Time</TableCell>
+                        <TableCell>Method</TableCell>
+                        <TableCell>URL</TableCell>
+                        <TableCell>Status</TableCell>
+                        <TableCell>User IP</TableCell>
+                        <TableCell>User Agent</TableCell>
+                        <TableCell>Username</TableCell>
+                        <TableCell>User Role</TableCell>
+                    </TableRow>
+                </TableHead>
+                <TableBody>
+                    {auditLogData.map((row, index) => (
+                        <TableRow key={index}>
+                            <TableCell>{row.date}</TableCell>
+                            <TableCell>{row.time}</TableCell>
+                            <TableCell>{row.method}</TableCell>
+                            <TableCell>{row.url}</TableCell>
+                            <TableCell>{row.status}</TableCell>
+                            <TableCell>{row.userip}</TableCell>
+                            <TableCell>{row.useragent}</TableCell>
+                            <TableCell>{row.username}</TableCell>
+                            <TableCell>{row.userrole}</TableCell>
                         </TableRow>
-                    </TableHead>
-                    <TableBody>
-                        {auditLogData.map((row) => (
-                            <TableRow key={`${row.date}-${row.time}-${row.method}-${row.url}`}>
-                                <TableCell>{row.date}</TableCell>
-                                <TableCell>{row.time}</TableCell>
-                                <TableCell>{row.method}</TableCell>
-                                <TableCell>{row.url}</TableCell>
-                                <TableCell>{row.status}</TableCell>
-                                <TableCell>{row.userIP}</TableCell>
-                                <TableCell>{row.userAgent}</TableCell>
-                                <TableCell>{row.username}</TableCell>
-                                <TableCell>{row.userRole}</TableCell>
-                            </TableRow>
-                        ))}
-                    </TableBody>
-                </Table>
-            </TableContainer>
-        </div>
+                    ))}
+                </TableBody>
+            </Table>
+        </TableContainer>
     );
 }
 

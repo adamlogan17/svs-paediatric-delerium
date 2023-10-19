@@ -10,6 +10,9 @@ RUN npm ci
 
 COPY . .
 
+ARG BASE_IP=localhost
+ENV BASE_IP $BASE_IP
+
 # Install 'serve' globally
 RUN npm install -g serve
 

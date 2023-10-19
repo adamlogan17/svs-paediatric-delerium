@@ -5,6 +5,9 @@ services:
     container_name: prod_svs_apis
     build: 
       dockerfile: prod.Dockerfile
+      args:
+        # This is the IP address of the server, which the docker container will be running on
+        - BASE_IP=143.117.69.4
     ports:
       - "48800:8000"
   audit:
@@ -13,7 +16,7 @@ services:
       dockerfile: prod.Dockerfile
       # overwrites the environment variable within teh '.env', if adding more the Dockerfile needs to be updated
       args:
-        - REACT_APP_API_URL=http://localhost:48800
+        - REACT_APP_API_URL=http://143.117.69.4:48800
     ports:
       # The ports cannot be the same as the fist docker-compose file
       - "48300:80"    

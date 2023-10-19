@@ -22,6 +22,7 @@ config();
 // Express Initialize
 const app = express();
 const port: number = 8000;
+const baseIP:string = process.env.BASE_IP || "localhost";
 
 interface APICallDetail {
   date: string;
@@ -64,7 +65,7 @@ const specs = swaggerJsdoc(
         },
       servers: [
         {
-          url: `https://localhost:${port}`
+          url: `https://${baseIP}:${port}`
         }
       ]
     },
@@ -853,13 +854,13 @@ setInterval(() => {
 // Used to activate the endpoints through HTTP
 app.listen(port,()=> {
   console.log(`listen port ${port}`);
-  console.log(`Go to http://localhost:${port}/swagger-docs for documentation`);
+  console.log(`Go to http://${baseIP}:${port}/swagger-docs for documentation`);
 });
 
 // Used to activate the endpoints through HTTPS
 // https.createServer(options, app)
 // .listen(port, () => {
 //   console.log(`listen port ${port}`);
-//   console.log(`Go to https://localhost:${port}/swagger-docs for documentation`);
+//   console.log(`Go to https://${baseIP}:${port}/swagger-docs for documentation`);
 // });
 

@@ -16,8 +16,7 @@ services:
       dockerfile: Dockerfile
   postgres:
     container_name: svs_postgres
-    # latest version is 16, need to change this to 16
-    image: postgres:latest
+    image: postgres:16
     environment:
       - POSTGRES_USER=postgres
       - POSTGRES_PASSWORD=postgrespw

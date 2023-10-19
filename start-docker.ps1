@@ -6,12 +6,14 @@ param(
     [switch]$c = $False,
 
     [Parameter(HelpMessage="Deletes all project images (will delete an image named 'postgres' even if it is not related to the project)")]
-    [switch]$n = $False
+    [switch]$n = $False,
+
+    [Parameter(HelpMessage="Runs the project in production mode")]
+    [switch]$p = $False
 )
 
 docker-compose down
 
-# TODO delete all the containers just for the project, and the same with the volumes, will need to name the volumes
 if($c -or $n) {
     # removes all containers
     docker rm -f $(docker ps -a -q)
@@ -33,6 +35,11 @@ if($n) {
 if($b) {
     # starts all containers in the background
     docker-compose -f docker-compose.yml -f docker-compose.dev.yml up -d
+} elseif ($p) {
+    docker rmi $(docker images -a svs-paediatric-delerium-audit -q)
+    docker rmi $(docker images -a svs-paediatric-delerium-apis -q)
+
+    docker-compose -f docker-compose.yml -f docker-compose.prod.yml up
 } else {
     docker-compose -f docker-compose.yml -f docker-compose.dev.yml up
 }

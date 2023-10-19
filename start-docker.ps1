@@ -32,7 +32,7 @@ if($n) {
 
 if($b) {
     # starts all containers in the background
-    docker-compose up -d
+    docker-compose -f docker-compose.yml -f docker-compose.dev.yml up -d
 } else {
-    docker-compose up
+    docker-compose -f docker-compose.yml -f docker-compose.dev.yml up
 }

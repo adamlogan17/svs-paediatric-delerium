@@ -5,15 +5,21 @@ services:
     container_name: dev_svs_apis
     volumes:
       - ./APIs/src:/app/src
+    ports:
+      - "8000:8000"
   audit:
     container_name: dev_svs_audit
     volumes:
       - ./Audit/src:/app/src
+    ports:
+      - "3000:3000"
   postgres:
     container_name: dev_svs_postgres
     # Below to save the database in the current directory
     volumes:
       - ./data:/var/lib/postgresql/data
+    ports:
+      - "5432:5432"
   pgadmin:
     container_name: pgadmin4_container
     image: dpage/pgadmin4

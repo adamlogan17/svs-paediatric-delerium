@@ -98,7 +98,7 @@ app.use((req:Request, res:Response, next) => {
     next();
 });
 
-app.use((req:Request, res:Response, next) =>{
+app.use((req:Request, res:Response, next) => {
   const now = new Date();
   const apiCallDetail: APICallDetail = {
     date: now.toISOString().split('T')[0], // Separate date
@@ -120,27 +120,6 @@ app.use((req:Request, res:Response, next) =>{
   next();
 });
 
-app.use((req:Request, res:Response, next) =>{
-  const now = new Date();
-  const apiCallDetail: APICallDetail = {
-    date: now.toISOString().split('T')[0], // Separate date
-    time: now.toISOString().split('T')[1].split('.')[0], // Separate time
-    method: req.method,
-    url: req.originalUrl,
-    status: res.statusCode,
-    userIP: req.ip,
-    userAgent: req.headers['user-agent'] || '',
-    username: req.params.username,
-    userRole: req.params.role,
-  };
-
-  // Add the API call detail to the array
-  apiCallDetails.push(apiCallDetail);
-  insertData("audit", "api_log", apiCallDetail);
-
-  // Continue with the request handling
-  next();
-});
 
 /**
  * @swagger
@@ -709,7 +688,7 @@ app.post("/verify-captcha", async (request: Request, response: Response,) => {
   response.send({success: await verifyCaptcha(request.body.token)});
 });
 
-/* function saveApiCallDetailsToDatabase() {
+ function saveApiCallDetailsToDatabase() {
   console.log('Saved API Call Details:');
   apiCallDetails.forEach((apiCallDetail, index) => {
     console.log(`#${index + 1}:`);
@@ -734,7 +713,7 @@ app.post("/verify-captcha", async (request: Request, response: Response,) => {
 
 setInterval(() => {
   saveApiCallDetailsToDatabase();
-}, 5000); */
+}, 5000); 
 
 // Used to activate the endpoints through HTTP
 app.listen(port,()=> {

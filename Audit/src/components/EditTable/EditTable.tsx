@@ -115,7 +115,13 @@ export default function EditTable(props: EditTableProps) {
     <Paper sx={{mb: 2}}>
       <ConfirmDialog open={editOpen} handleClose={() => { setEditOpen(false)}} handleConfirm={saveEdit} title='Confrim Edit Record' description={<>Would you like to edit record {editId}?</>} />
 
-      <EnhancedToolbar numSelected={selected.length} title={props.title} handleDelete={() => handleDelete(selected)} />
+      <EnhancedToolbar 
+        numSelected={selected.length} 
+        title={props.title} 
+        handleDelete={() => handleDelete(selected)}
+        data={data}
+        header={Object.keys(props.columnNameMap ?? data[0]).map((key:string) => ({label: props.columnNameMap?.[key] ?? key, key: key}))}
+      />
       <TableContainer>
         <Table>
           <TableHead>
@@ -138,6 +144,7 @@ export default function EditTable(props: EditTableProps) {
               <TableCell sx={cellStyle}>Edit</TableCell>
             </TableRow>
           </TableHead>
+          
           <TableBody>
             {visibleRows.map((row, index) => (
               <TableRow key={index} sx={
@@ -185,7 +192,7 @@ export default function EditTable(props: EditTableProps) {
                               </TableCell>
                             )}
 
-                            {(props.customInputFields === undefined || props.customInputFields?.some((obj:any) => obj.key !== key)) && (
+                            {(props.customInputFields === undefined || !props.customInputFields?.some((obj:any) => obj.key === key)) && (
                               <TableCell key={index}>
                                 <TextField
                                   value={tempData?.[key]}
@@ -224,15 +231,15 @@ export default function EditTable(props: EditTableProps) {
                           </TableCell>
                         )}
 
-                        {(props.customInputFields === undefined || props.customInputFields?.some((obj:any) => obj.key !== key)) && (
+                        {(props.customInputFields === undefined || !props.customInputFields?.some((obj:any) => obj.key === key)) && (
                           <TableCell>
-                            {row[key]}
+                            {row[key].toString()}
                           </TableCell>
                         )}
                       </>
                     ))}
                     <TableCell>
-                      <IconButton onClick={() => startEdit(row.picu_id !== undefined ? Number(row.picu_id) : 0, row)}>
+                      <IconButton onClick={() => startEdit(row[props.uniqueIdName] !== undefined ? Number(row[props.uniqueIdName]) : 0, row)}>
                         <EditIcon />
                       </IconButton>
                     </TableCell>

@@ -13,6 +13,7 @@ import AddPicu from "./pages/Admin/AddPicu";
 import ForgottenPassword from "./pages/ForgottenPassword/ForgottenPassword";
 import Auditlog from "./pages/Admin/AuditLog";
 import EditPicus from "./pages/EditPicus/EditPicus";
+import EditCompliance from "./pages/EditCompliance/EditCompliance";
 
 const token:string|null = sessionStorage.getItem("TOKEN");
 const role:string|null = sessionStorage.getItem("ROLE");
@@ -47,6 +48,7 @@ function AppRouter() {
             <Route path="/edit-picus" element={<EditPicus />} />
             <Route path="/add-picu" element={<AddPicu />} />
             <Route path="/audit-log" element={<Auditlog />} />
+            <Route path="/edit-compliance" element={<EditCompliance />} />
           </>
         )}
 

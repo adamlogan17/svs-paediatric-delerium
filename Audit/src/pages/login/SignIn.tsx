@@ -31,6 +31,7 @@ import ReCAPTCHA from "react-google-recaptcha";
 export default function SignIn() {
   const [incorrectDetails, setIncorrectDetails] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
+
   const captchaRef = useRef<any>(null); // need to debug issue with type
 
   /**
@@ -143,6 +144,7 @@ export default function SignIn() {
 
           <PasswordTextField id="password" error={incorrectDetails} helperText={incorrectDetails ? "Incorrect Username or Password" : "" } label="Password" />
 
+          {/* @see {@link https://stackoverflow.com/questions/57639200/google-recaptcha-component-with-dynamic-theme-value-next-js} on how to change the theme without refreshing the page */}
           <ReCAPTCHA
             sitekey={process.env.REACT_APP_CAPTCHA_SITE_KEY ? process.env.REACT_APP_CAPTCHA_SITE_KEY : ""}
             ref={captchaRef}

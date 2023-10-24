@@ -93,6 +93,7 @@ function LineGraph(props:{ id:string|null }) {
               display: false
             }
           }
+
         }}
       />
     </div>

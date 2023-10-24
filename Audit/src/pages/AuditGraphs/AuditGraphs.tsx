@@ -78,12 +78,12 @@ function AuditGraphs() {
   }, []);
 
   return (
-    <div id='form' className='wrapper'>
-      <div className = 'content'>
+    <div id='form' className='wrapper' style={{width: '100%', backgroundColor: 'aqua'}}>
+      <div className = 'content' style={{width: '100%', backgroundColor: 'brown'}}>
         <h1>Delirium Compliance - Audit Form</h1>
         <br />
 
-        <form action="" method="get">
+        <form action="" method="get" style={{width: '100%', backgroundColor: 'purple'}}>
           <div className="data-input">
             <div className = 'row' id = 'UpperTextContainer'>
               <div className='col'>
@@ -103,12 +103,12 @@ function AuditGraphs() {
               </div>
 
               <div className='col'>
-                <TypeDropDown text="Chart Type" primaryColour='#025858' secondaryColour='#013e3e' options={["Line Graph", "Pie Chart", "Bar Chart"]}/>
+                {/* <TypeDropDown text="Chart Type" primaryColour='#025858' secondaryColour='#013e3e' options={["Line Graph", "Pie Chart", "Bar Chart"]}/> */}
               </div>
             </div>
           </div>
 
-          <div className = 'row' id = 'ButtonContainer'>
+          <div className = 'row' id = 'ButtonContainer' style={{width: '100%', backgroundColor: 'green'}}>
             <div className="canvas">
               <LineGraph id={picuID} />
             </div>

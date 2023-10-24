@@ -36,7 +36,7 @@ function Admin() {
         <PButton text='Add a PICU' primaryColour='#025858' secondaryColour='#013e3e' width='100%' onButtonClick={() => navigate("/add-picu")}/>
           <PButton text='Reset a PICU account password' primaryColour='#025858' secondaryColour='#013e3e' width='100%' onButtonClick={() => navigate("/forgot-password")}/>
           <PButton text='View / Edit Compliance Data' primaryColour='#025858' secondaryColour='#013e3e' width='100%' onButtonClick={() => adminAuth()}/>
-          <PButton text='Admin Audit Log' primaryColour='#025858' secondaryColour='#013e3e'  width='100%' onButtonClick={() => adminAuth()} />
+          <PButton text='Admin Audit Log' primaryColour='#025858' secondaryColour='#013e3e'  width='100%' onButtonClick={() => navigate("/audit-log")}/>
         </div>
         <Link to='/'>
           <PButton text='Home' primaryColour='#025858' secondaryColour='#013e3e' width='100%' onButtonClick={() => window.location.href = "/"}/>

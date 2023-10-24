@@ -867,32 +867,6 @@ app.delete("/delete-compliance", (request: Request, response: Response, next:Nex
   res.status(status).send(result);
 });
 
-//  function saveApiCallDetailsToDatabase() {
-//   console.log('Saved API Call Details:');
-//   apiCallDetails.forEach((apiCallDetail, index) => {
-//     console.log(`#${index + 1}:`);
-//     console.log(`Date: ${apiCallDetail.date}`);
-//     console.log(`Time: ${apiCallDetail.time}`);
-//     console.log(`Method: ${apiCallDetail.method}`);
-//     console.log(`URL: ${apiCallDetail.url}`);
-//     console.log(`Status: ${apiCallDetail.status}`);
-//     console.log(`UserIP: ${apiCallDetail.userIP}`);
-//     console.log(`UserAgent: ${apiCallDetail.userAgent}`);
-//     console.log(`UserRole: ${apiCallDetail.userRole}`);
-//     console.log(`Username: ${apiCallDetail.username}`);
-//     console.log('-------------------');
-//   });
-
-  // In a real application, you would save this data to the database here
-  // Your database saving logic goes here
-
-  // Clear the apiCallDetails array after printing
-  apiCallDetails.length = 0;
-}
-
-setInterval(() => {
-  saveApiCallDetailsToDatabase();
-}, 5000); 
 
 // Used to activate the endpoints through HTTP
 app.listen(port,()=> {

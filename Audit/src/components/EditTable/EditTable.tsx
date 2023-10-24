@@ -26,7 +26,7 @@ type EditTableProps = {
   noEditFields?: string[],
   validateData?: (data: any) => string[],
   deleteData: (ids: number[]) => void,
-  updateData: (data: any) => void,
+  updateData: (data: any) => void|any[]|Promise<any[]>,
   disableDelete?: any[]
 }
 
@@ -38,6 +38,7 @@ type EditTableProps = {
 export default function EditTable(props: EditTableProps) {
   const [data, setData] = useState<any[]>(props.initialData);
   const [editId, setEditId] = useState<number | null>(null);
+  // stores the data that is being edited
   const [tempData, setTempData] = useState<any | null>(null);
   const [error, setError] = useState<string[] | null>(null);
   const [selected, setSelected] = useState<number[]>([]);
@@ -63,11 +64,12 @@ export default function EditTable(props: EditTableProps) {
     setError(null);
   };
 
-  function saveEdit() {
+  async function saveEdit() {
     if (tempData && ((props.validateData?.(tempData) ?? []).length === 0)) {
-      props.updateData(tempData);
+      const updatedData = await props.updateData(tempData);
 
-      setData(prev => prev.map(row => (row[props.uniqueIdName] === editId ? tempData : row)));
+      // If the updateData function returns an array, use that as the new data, otherwise just update the row that was edited
+      setData((prev) => updatedData ?? prev.map(row => (row[props.uniqueIdName] === editId ? tempData : row)));
       setEditId(null);
       setTempData(null);
       setError(null);
@@ -113,7 +115,13 @@ export default function EditTable(props: EditTableProps) {
 
   return (
     <Paper sx={{mb: 2}}>
-      <ConfirmDialog open={editOpen} handleClose={() => { setEditOpen(false)}} handleConfirm={saveEdit} title='Confrim Edit Record' description={<>Would you like to edit record {editId}?</>} />
+      <ConfirmDialog 
+        open={editOpen} 
+        handleClose={() => { setEditOpen(false)}} 
+        handleConfirm={saveEdit} 
+        title='Confirm Edit Record' 
+        description={<>Would you like to edit record {editId}?</>} 
+      />
 
       <EnhancedToolbar 
         numSelected={selected.length} 

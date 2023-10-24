@@ -4,6 +4,9 @@
 # Node module dependencies
 node_modules/
 
+# build output
+/build
+
 # Development environment files
 .npm/
 .npmrc

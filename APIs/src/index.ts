@@ -13,6 +13,7 @@ import { copyTable, deleteData, getAll, insertData, updateData } from './crud';
 import { authenticate, authorise, updatePicuPassword, verifyCaptcha } from './login';
 import { allPicuCompliance, singlePicuCompliance } from './auditCharts';
 import { addPicu, deletePicus, editPicu, getAllIds, nextPicu } from './picuDbManagement';
+import { deleteCompRecords, editCompliance, insertCompData } from './complianceScores';
 
 // initialise process.env
 config();
@@ -21,6 +22,7 @@ config();
 // Express Initialize
 const app = express();
 const port: number = 8000;
+const baseIP:string = process.env.BASE_IP || "localhost";
 
 interface APICallDetail {
   date: string;
@@ -63,7 +65,7 @@ const specs = swaggerJsdoc(
         },
       servers: [
         {
-          url: `https://localhost:${port}`
+          url: `https://${baseIP}:${port}`
         }
       ]
     },
@@ -149,6 +151,34 @@ app.use((req:Request, res:Response, next) => {
  *         type: string
  *       password:
  *         type: string
+ *   ComplianceData:
+ *     properties:
+ *       comp_id:
+ *         type: number
+ *       entry_date:
+ *         type: string
+ *         format: date
+ *       method:
+ *         type: string
+ *         enum: ['SOSPD', 'CAPD']
+ *       bed_number:
+ *         type: number
+ *       correct_details:
+ *         type: boolean
+ *       comfort_recorded:
+ *         type: boolean
+ *       comfort_above:
+ *         type: boolean
+ *       all_params_scored:
+ *         type: boolean
+ *       totalled_correctly:
+ *         type: boolean
+ *       in_score_range:
+ *         type: boolean
+ *       observer_name:
+ *         type: boolean
+ *       picu_id:
+ *         type: number
  */
 
 // Routes
@@ -490,11 +520,36 @@ app.get("/chartData/singleSite/:siteId", (request: Request, response: Response, 
 app.get("/chartData/allSites", allPicuCompliance);
 
 /**
- * Inserts compliance data
- * TODO Create another endpoint to allow an admin (and possible a field engineer) to insert data for any picu
- * @author Adam Logan
+ * @swagger
+ * /add-compliance:
+ *   post:
+ *     tags:
+ *       - Compliance
+ *     summary: Adds a new compliance score to the database
+ *     security:
+ *       - Bearer: []
+ *     consumes:
+ *       - application/json
+ *     parameters:
+ *       - name: picu
+ *         in: body
+ *         schema:
+ *           $ref: '#/definitions/ComplianceData'
+ *     responses:
+ *       '200':
+ *         description: Picu successfully added.
+ *       '400':
+ *         description: Error occurred.
  */
-// app.post("/compData", , insertCompData);
+app.post("/add-compliance", (request: Request, response: Response, next:NextFunction) => authorise(request, response, next), async (req: Request, res: Response) => {
+  if(req.params.role === "picu" && req.body.picu_id !== Number(req.params.username)) {
+    res.status(401).send("ERROR: Permission Denied");
+  } else {
+    let result = await insertCompData(req.body, req.params.role);
+    let status:number = result.toString().includes("Error") ? 400 : 201;
+    res.status(status).send(result);
+  }
+});
 
 /**
  * @swagger
@@ -502,7 +557,6 @@ app.get("/chartData/allSites", allPicuCompliance);
  *   post:
  *     tags:
  *       - Picu
- *     name: Add Picu
  *     summary: Adds a new Picu to the database
  *     security:
  *       - Bearer: []
@@ -537,7 +591,6 @@ app.post("/addPicu", (request: Request, response: Response, next:NextFunction) =
  *   get:
  *     tags:
  *       - Picu
- *     name: Add Picu
  *     summary: Gets the next PICU ID, used when adding a new PICU to the database
  *     security:
  *       - Bearer: []
@@ -659,15 +712,13 @@ app.delete("/deletePicu", (request: Request, response: Response, next:NextFuncti
  *         description: The data to update for the PICU.
  *         schema:
  *           type: object
+ *           $ref: '#/definitions/Picu'
  *           required:
  *            - hospital_name
  *            - auditor
  *            - picu_role
  *            - picu_id
  *            - ward_name
- *           properties:
- *             data:
- *               $ref: '#/definitions/Picu'
  *     responses:
  *       201:
  *         description: PICU updated successfully.
@@ -713,47 +764,149 @@ app.put("/updatePicu", (request: Request, response: Response, next:NextFunction)
  *       400:
  *         description: An error occurred.
  */
-app.post("/verify-captcha", async (request: Request, response: Response,) => {
+app.post("/verify-captcha", async (request: Request, response: Response) => {
   response.send({success: await verifyCaptcha(request.body.token)});
 });
 
- function saveApiCallDetailsToDatabase() {
-  console.log('Saved API Call Details:');
-  apiCallDetails.forEach((apiCallDetail, index) => {
-    console.log(`#${index + 1}:`);
-    console.log(`Date: ${apiCallDetail.date}`);
-    console.log(`Time: ${apiCallDetail.time}`);
-    console.log(`Method: ${apiCallDetail.method}`);
-    console.log(`URL: ${apiCallDetail.url}`);
-    console.log(`Status: ${apiCallDetail.status}`);
-    console.log(`UserIP: ${apiCallDetail.userIP}`);
-    console.log(`UserAgent: ${apiCallDetail.userAgent}`);
-    console.log(`UserRole: ${apiCallDetail.userRole}`);
-    console.log(`Username: ${apiCallDetail.username}`);
-    console.log('-------------------');
-  });
+/**
+ * @swagger
+ * /update-compliance:
+ *   put:
+ *     tags:
+ *       - Compliance
+ *     summary: Update a compliance entry based on the provided data.
+ *     security:
+ *       - Bearer: []
+ *     parameters:
+ *       - in: body
+ *         name: complianceData
+ *         description: The data to update for the compliance entry.
+ *         schema:
+ *           type: object
+ *           $ref: '#/definitions/ComplianceData'
+ *     responses:
+ *       201:
+ *         description: Compliance entry updated successfully.
+ *       400:
+ *         description: An error occurred.
+ */
+app.put("/update-compliance", (request: Request, response: Response, next:NextFunction) => authorise(request, response, next, 'admin'), async (req: Request, res: Response) => {
+  let result:string = await editCompliance(req.body, req.params.role);
+  let status:number = result.toString().includes("Error") ? 400 : 201;
 
-  // In a real application, you would save this data to the database here
-  // Your database saving logic goes here
+  res.status(status).send(result);
+});
 
-  // Clear the apiCallDetails array after printing
-  apiCallDetails.length = 0;
-}
+/**
+ * @swagger
+ * /delete-compliance:
+ *   delete:
+ *     tags:
+ *       - Compliance
+ *     summary: Delete multiple compliance records based on provided IDs.
+ *     security:
+ *       - Bearer: []
+ *     parameters:
+ *       - in: body
+ *         name: body
+ *         description: Array of compliance record IDs to delete.
+ *         schema:
+ *           type: object
+ *           required:
+ *             - comp_ids
+ *           properties:
+ *             comp_ids:
+ *               type: array
+ *               description: The IDs of the compliance records to delete.
+ *               items:
+ *                 type: number
+ *     responses:
+ *       200:
+ *         description: Compliance records deleted successfully.
+ *       400:
+ *         description: An error occurred.
+ */
+app.delete("/delete-compliance", (request: Request, response: Response, next:NextFunction) => authorise(request, response, next, 'admin'), async (req: Request, res: Response) => {
+  let result = await deleteCompRecords(req.body.comp_ids, req.params.role);
+  let status:number = result.toString().includes("Error") ? 400 : 201;
+  res.status(status).send(result);
+});
 
-setInterval(() => {
-  saveApiCallDetailsToDatabase();
-}, 5000); 
+/**
+ * @swagger
+ * /update-compliance:
+ *   put:
+ *     tags:
+ *       - Compliance
+ *     summary: Update a compliance entry based on the provided data.
+ *     security:
+ *       - Bearer: []
+ *     parameters:
+ *       - in: body
+ *         name: complianceData
+ *         description: The data to update for the compliance entry.
+ *         schema:
+ *           type: object
+ *           $ref: '#/definitions/ComplianceData'
+ *     responses:
+ *       201:
+ *         description: Compliance entry updated successfully.
+ *       400:
+ *         description: An error occurred.
+ */
+app.put("/update-compliance", (request: Request, response: Response, next:NextFunction) => authorise(request, response, next, 'admin'), async (req: Request, res: Response) => {
+  let result:string = await editCompliance(req.body, req.params.role);
+  let status:number = result.toString().includes("Error") ? 400 : 201;
+
+  res.status(status).send(result);
+});
+
+/**
+ * @swagger
+ * /delete-compliance:
+ *   delete:
+ *     tags:
+ *       - Compliance
+ *     summary: Delete multiple compliance records based on provided IDs.
+ *     security:
+ *       - Bearer: []
+ *     parameters:
+ *       - in: body
+ *         name: body
+ *         description: Array of compliance record IDs to delete.
+ *         schema:
+ *           type: object
+ *           required:
+ *             - comp_ids
+ *           properties:
+ *             comp_ids:
+ *               type: array
+ *               description: The IDs of the compliance records to delete.
+ *               items:
+ *                 type: number
+ *     responses:
+ *       200:
+ *         description: Compliance records deleted successfully.
+ *       400:
+ *         description: An error occurred.
+ */
+app.delete("/delete-compliance", (request: Request, response: Response, next:NextFunction) => authorise(request, response, next, 'admin'), async (req: Request, res: Response) => {
+  let result = await deleteCompRecords(req.body.comp_ids, req.params.role);
+  let status:number = result.toString().includes("Error") ? 400 : 201;
+  res.status(status).send(result);
+});
+
 
 // Used to activate the endpoints through HTTP
 app.listen(port,()=> {
   console.log(`listen port ${port}`);
-  console.log(`Go to http://localhost:${port}/swagger-docs for documentation`);
+  console.log(`Go to http://${baseIP}:${port}/swagger-docs for documentation`);
 });
 
 // Used to activate the endpoints through HTTPS
 // https.createServer(options, app)
 // .listen(port, () => {
 //   console.log(`listen port ${port}`);
-//   console.log(`Go to https://localhost:${port}/swagger-docs for documentation`);
+//   console.log(`Go to https://${baseIP}:${port}/swagger-docs for documentation`);
 // });
 

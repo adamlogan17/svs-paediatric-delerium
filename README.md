@@ -6,6 +6,8 @@
         - [*Powershell set up*](#powershell-set-up)
       - [**Linux**](#linux)
     - [Using Docker](#using-docker)
+      - [**Dev Mode**](#dev-mode)
+      - [**Prod Mode**](#prod-mode)
     - [Running Without Docker](#running-without-docker)
   - [Initialising DB](#initialising-db)
   - [Access Database Server](#access-database-server)
@@ -35,7 +37,6 @@ The following arguments can be supplied to each script
 - ```-n```
   - Deletes all project images (will delete an image named 'postgres' even if it is not related to the project)
 
-
 #### **Windows**
 
 ```powershell
@@ -58,8 +59,16 @@ Set-ExecutionPolicy RemoteSigned
 
 ### Using Docker
 
+#### **Dev Mode**
+
 ```console
-docker-compose up
+docker-compose -f docker-compose.yml -f docker-compose.dev.yml up
+```
+
+#### **Prod Mode**
+
+```console
+docker-compose -f docker-compose.yml -f docker-compose.prod.yml up
 ```
 
 ### Running Without Docker
@@ -99,7 +108,7 @@ The instructions below must be repeated every time the project is launched.
 1. Go to <http://localhost:5050/>, the page may take a while to load
 2. Enter in the following details
 
-    - username = admin@admin.com
+    - username = <admin@admin.com>
     - password = root
 
 3. Select 'Add New Server'

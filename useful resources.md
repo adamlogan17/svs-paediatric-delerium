@@ -55,6 +55,8 @@
 - <https://wkrzywiec.medium.com/how-to-run-database-backend-and-frontend-in-a-single-click-with-docker-compose-4bcda66f6de>
 - <https://saasbase.dev/blog/dockerfile-for-react-and-typescript>
 - <https://rsbh.dev/blogs/rest-api-express-typescript-docker>
+- [Docker compose override](https://learn.microsoft.com/en-us/dotnet/architecture/microservices/multi-container-microservice-net-applications/multi-container-applications-docker-compose)
+- [Prod docker](https://medium.com/@antonio.maccarini/dockerize-a-react-application-with-node-js-postgres-and-nginx-124c204029d4)
   
 ### D3.js
 

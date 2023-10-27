@@ -6,7 +6,7 @@ import { Avatar, Box, Typography } from '@mui/material';
 import BorderColorIcon from '@mui/icons-material/BorderColor';
 import PageLoad from '../../components/Loading/PageLoad';
 
-const booleanValues = [{label:'Yes', value:true}, {label:'No', value:false}];
+const booleanValues:{label:string, value:boolean}[] = [{label:'Yes', value:true}, {label:'No', value:false}];
 
 const customInputFields:any[] = [
   {
@@ -51,7 +51,7 @@ const customInputFields:any[] = [
   }
 ]
 
-const noEditFields:string[] = ["comp_id", "score", "picu_id"];
+const noEditFields:string[] = ["comp_id", "score", "picu_id", "entry_date"];
 
 const uniqueIdName:string = "comp_id";
 
@@ -71,65 +71,111 @@ const columnNameMap:any = {
   picu_id: "PICU ID"
 }
 
-function validateData(data:any) {
+/**
+ * Validates the provided compliance data object and returns an array of keys
+ * for fields that have empty values.
+ * 
+ * @author Adam Logan
+ * @function validateData
+ * @param {ComplianceData} data - The compliance data to validate.
+ * @returns {string[]} - An array of field names that have empty values.
+ */
+function validateData(data:ComplianceData) {
   return Object.entries(data).filter(([key, value]) => value === "").map(([key]) => key);
 }
 
-function deleteCompliance(picuIds:number[]) {
-  // axios.delete(`${process.env.REACT_APP_API_URL}/deletePicu`, {
-  //   headers: { 'Authorization': `Bearer ${sessionStorage.getItem('TOKEN')}` },
-  //   data: {
-  //     picu_ids: picuIds
-  //   }
-  // })
-  //   .then((response:any) => {
-  //     enqueueSnackbar("The data has been deleted", { variant: "success" });
-  //   })
-  //   .catch((error:any) => {
-  //     enqueueSnackbar("System Error", { variant: "error" });
-  //   }
-  // );
+/**
+ * Sends a delete request to remove specified compliance records.
+ * 
+ * @author Adam Logan
+ * @function deleteCompliance
+ * @param {number[]} compIds - An array of compliance record IDs to delete.
+ */
+function deleteCompliance(compIds:number[]) {
+  console.log(compIds);
+  axios.delete(`${process.env.REACT_APP_API_URL}/delete-compliance`, {
+    headers: { 'Authorization': `Bearer ${sessionStorage.getItem('TOKEN')}` },
+    data: {
+      comp_ids: compIds
+    }
+  })
+    .then((response:any) => {
+      enqueueSnackbar("The data has been deleted", { variant: "success" });
+    })
+    .catch((error:any) => {
+      enqueueSnackbar("System Error", { variant: "error" });
+    }
+  );
 }
 
-function updateCompliance(picuToUpdate:Picu) {
-  // const modifiedPicu:Picu = {...picuToUpdate};
-  // // convert the picuToUpdate.picu_id to a string, it is currently a number
-  // if (modifiedPicu.picu_id !== undefined && modifiedPicu.picu_id !== null) {
-  //   modifiedPicu.picu_id = modifiedPicu.picu_id.toString();
-  // }
+/**
+ * Updates a specified compliance record.
+ * 
+ * @author Adam Logan
+ * @function updateCompliance
+ * @param {ComplianceData} compToUpdate - The compliance data to update.
+ * @returns {Promise<ComplianceData[]>} - A promise that resolves to the updated set of compliance data.
+ */
+async function updateCompliance(compToUpdate: ComplianceData): Promise<ComplianceData[]> {
+  try {
+    await axios.put(`${process.env.REACT_APP_API_URL}/update-compliance`, compToUpdate, {
+      headers: { Authorization: `Bearer ${sessionStorage.getItem("TOKEN")}` },
+    });
 
-  // delete modifiedPicu.overall_compliance;
+    enqueueSnackbar(`PICU ${compToUpdate.comp_id} has been updated.`, {
+      variant: "success",
+    });
 
-  // axios.put(`${process.env.REACT_APP_API_URL}/updatePicu`, picuToUpdate, {
-  //   headers: { 'Authorization': `Bearer ${sessionStorage.getItem('TOKEN')}` }
-  // })
-  //   .then((response:any) => {
-  //     enqueueSnackbar(`PICU ${picuToUpdate.picu_id} has been updated.`, { variant: "success" });
-  //   })
-  //   .catch((error:any) => {
-  //     console.log(error);
-  //     enqueueSnackbar("System Error", { variant: "error" });
-  //   }
-  // );
+    return await getCompData();
+
+  } catch (error) {
+    console.log(error);
+    enqueueSnackbar("System Error", { variant: "error" });
+    return [];
+  }
 }
 
+/**
+ * Fetches all compliance data records.
+ * 
+ * @author Adam Logan
+ * @function getCompData
+ * @returns {Promise<ComplianceData[]>} - A promise that resolves to an array of compliance data records.
+ */
+function getCompData():Promise<ComplianceData[]> {
+  return axios.get(`${process.env.REACT_APP_API_URL}/audit/getall/compliance_data`)
+    .then((response:any) => {
+      const compData:any[] = [];
+      for (let singleScore of response.data.allData) {
+        // rounds the score to 2 decimal places
+        singleScore.score = Math.round(singleScore.score * 100) / 100;
+        // removes the time from the date
+        singleScore.entry_date = singleScore.entry_date.split("T")[0];
+        compData.push(singleScore);
+      }
+      return compData.sort((a, b) => Number(a.comp_id) - Number(b.comp_id));
+    })
+    .catch((error:any) => {
+      enqueueSnackbar(error.message, { variant: "error" });
+      return [];
+    });
+}
+
+/**
+ * A component that allows users to edit compliance scores.
+ * 
+ * @component EditCompliance
+ * @author Adam Logan
+ */
 export default function EditCompliance() {
-  const [data, setData] = useState<Picu[]>([]);
+  const [data, setData] = useState<ComplianceData[]>([]);
   const [isLoading, setIsLoading] = useState<boolean>(true);
 
   useEffect(() => {
-    axios.get(`${process.env.REACT_APP_API_URL}/audit/getall/compliance_data`)
-      .then((response:any) => {
-        const compData:any[] = [];
-        for (let singleScore of response.data.allData) {
-          compData.push(singleScore);
-        }
-        setData(compData.sort((a, b) => Number(a.comp_id) - Number(b.comp_id)));
-      })
-      .catch((error:any) => {
-        enqueueSnackbar(error.message, { variant: "error" });
-      });
+    getCompData().then((compData:ComplianceData[]) => {
+      setData(compData);
       setIsLoading(false);
+    });
   }, []);
   
   return (
@@ -155,17 +201,18 @@ export default function EditCompliance() {
 
       <div style={{width:'90%', margin:'auto'}}>
         {data.length > 0 && 
-        <EditTable
-          title='Compliance Scores'
-          deleteData={deleteCompliance}
-          initialData={data}
-          uniqueIdName={uniqueIdName}
-          columnNameMap={columnNameMap}
-          customInputFields={customInputFields}
-          noEditFields={noEditFields}
-          validateData={validateData}
-          updateData={updateCompliance}
-        />}
+          <EditTable
+            title='Compliance Scores'
+            deleteData={deleteCompliance}
+            initialData={data}
+            uniqueIdName={uniqueIdName}
+            columnNameMap={columnNameMap}
+            customInputFields={customInputFields}
+            noEditFields={noEditFields}
+            validateData={validateData}
+            updateData={updateCompliance}
+          />
+        }
       </div>
 
     </Box>

@@ -5,6 +5,8 @@ eval set -- "$ARGS"
 background="false"
 clean="false"
 nuclear="false"
+production="false"
+
 
 while true; do
     case "$1" in
@@ -17,6 +19,9 @@ while true; do
     -n|--nuclear)
         nuclear="true"
         shift;;
+    -n|--production)
+        production="true"
+        shift;;
     --)
         break;;
         *)
@@ -27,27 +32,35 @@ done
 
 docker-compose down
 
-if [ $clean == true ] || [ $nuclear == true ]; then
+if [ "$c" ] || [ "$n" ]; then
     # removes all containers
-    docker rm -f $(docker ps -a -q)
+    docker rm -a -f -v $(docker ps -q -f name="svs")
+fi
 
-    # removes all volumes
-    docker volume rm $(docker volume ls -q)
-else 
+if [ -z "$p" ]; then
     # removes the postgres server volume
-    docker volume rm svs-paediatric-delerium_data
+    docker volume rm svs-paediatric-delerium_svs-data
 fi
 
-if [ $nuclear == true ]; then
+# Check if n flag is set
+if [ "$n" ]; then
     # removes all images related to the project
-    docker rmi $(docker images -a postgres -q)
-    docker rmi $(docker images -a svs-paediatric-delerium-frontend -q)
-    docker rmi $(docker images -a svs-paediatric-delerium-apis -q)
+    docker rmi $(docker images -a -f ancestor=postgres -q)
+    docker rmi $(docker images -a -f ancestor=svs-paediatric-delerium-audit -q)
+    docker rmi $(docker images -a -f ancestor=svs-paediatric-delerium-apis -q)
 fi
 
-if [ $background == true ]; then
+# Check if b flag is set
+if [ "$b" ]; then
     # starts all containers in the background
-    docker-compose up -d
-else 
-    docker-compose up
+    docker-compose -f docker-compose.yml -f docker-compose.dev.yml up -d
+elif [ "$p" ]; then
+    docker rm -a -v -f $(docker ps -q -f name="prod_svs")
+
+    docker rmi $(docker images -a -f ancestor=svs-paediatric-delerium-audit -q)
+    docker rmi $(docker images -a -f ancestor=svs-paediatric-delerium-apis -q)
+
+    docker-compose -f docker-compose.yml -f docker-compose.prod.yml up
+else
+    docker-compose -f docker-compose.yml -f docker-compose.dev.yml up
 fi

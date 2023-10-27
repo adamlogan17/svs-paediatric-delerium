@@ -1,5 +1,5 @@
 # Logs
-*.log\
+*.log/
 
 # Node module dependencies
 node_modules/

@@ -16,13 +16,10 @@ docker-compose down
 
 if($c -or $n) {
     # removes all containers
-    docker rm -f $(docker ps -a -q)
-
-    # removes all volumes
-    docker volume rm $(docker volume ls -q)
-} else {
+    docker rm -a -f -v $(docker ps -q -f name="svs")
+} elseif(!$p) {
     # removes the postgres server volume
-    docker volume rm svs-paediatric-delerium_data
+    docker volume rm svs-paediatric-delerium_svs-data
 }
 
 if($n) {
@@ -36,6 +33,8 @@ if($b) {
     # starts all containers in the background
     docker-compose -f docker-compose.yml -f docker-compose.dev.yml up -d
 } elseif ($p) {
+    docker rm -a -v -f $(docker ps -q -f name="prod_svs")
+
     docker rmi $(docker images -a svs-paediatric-delerium-audit -q)
     docker rmi $(docker images -a svs-paediatric-delerium-apis -q)
 

@@ -1,29 +1,62 @@
 import AppRouter from './AppRouter';
 
-import { createTheme, ThemeProvider } from '@mui/material/styles';
+import { createTheme, PaletteOptions, ThemeOptions, ThemeProvider } from '@mui/material/styles';
 import BasicNavBar from './components/NavBar/NavBar';
 import { CssBaseline, PaletteMode } from '@mui/material';
 import React, { createContext, useMemo, useState } from 'react';
 import { SnackbarProvider } from 'notistack';
 import BaseSnackBarElement from './components/SnackBarVarients/BaseSnackbarVarient';
 
-const getDesignTokens = (mode: PaletteMode) => ({
-  palette: {
-    mode,
-    ...(mode === 'light'
-      ? {
-          // palette values for light mode
-          primary: {
-            main:'#009999'
-          }
-        }
-      : {
-          primary: {
-            main: '#009999'
-          }
-        }),
+const lightTheme:PaletteOptions = {
+  mode: 'light',
+  primary: {
+    main: '#009999'
+  }
+}
+
+const darkTheme:PaletteOptions = {
+  mode: 'dark',
+  primary: {
+    main: '#009999'
+  }
+}
+
+const contrastTheme:PaletteOptions = {
+  mode: 'dark',
+  primary: {
+    main: '#368af6'
   },
-});
+  text: {
+    primary:'#ffffff',
+  },
+  background: {
+    default:'#1f2235',
+    paper: '#313552'
+  }
+}
+
+function getDesignTokens(mode: string):ThemeOptions {
+  let theme;
+  switch (mode) {
+    case "light":
+      theme = lightTheme;
+      break;
+    case "dark":
+      theme = darkTheme;
+      break;
+    case "contrast":
+      theme = contrastTheme;
+      break;
+    default:
+      theme = lightTheme;
+  }
+
+  return {
+    palette: {
+      ...theme
+    },
+  };
+}
 
 /**
  * Below is used to add a custom variant to the notistack snackbar, with 'varientName' being the name of the variant to queue
@@ -55,7 +88,6 @@ const customVarients = {
  */
 export default function App() {
   const [mode, setMode] = useState<'light' | 'dark'>(sessionStorage.getItem("MODE") !== 'light' ? 'dark' : 'light');
-  const ColorModeContext = createContext({ toggleColorMode: () => {} });
   const theme = useMemo(() => createTheme(getDesignTokens(mode)), [mode]);
 
   const colorMode = useMemo(
@@ -72,19 +104,17 @@ export default function App() {
   );
 
   return (
-    <ColorModeContext.Provider value={colorMode}>
-      <ThemeProvider theme={createTheme(theme)} >
-        <CssBaseline />
+    <ThemeProvider theme={createTheme(theme)} >
+      <CssBaseline />
 
-        <SnackbarProvider maxSnack={3} Components={customVarients}>
-          <BasicNavBar props={{toggleMode: colorMode.toggleColorMode, mode:mode}} />
-          
-          <br />
-          {/* Render the current page content using the AppRouter component */}
-          <AppRouter />
-        </SnackbarProvider>
+      <SnackbarProvider maxSnack={3} Components={customVarients}>
+        <BasicNavBar props={{toggleMode: colorMode.toggleColorMode, mode:mode}} />
+        
+        <br />
+        {/* Render the current page content using the AppRouter component */}
+        <AppRouter />
+      </SnackbarProvider>
 
-      </ThemeProvider>
-    </ColorModeContext.Provider>
+    </ThemeProvider>
   )
 }

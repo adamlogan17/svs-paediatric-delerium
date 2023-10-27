@@ -66,8 +66,7 @@ function getDesignTokens(mode: string):ThemeOptions {
 //   interface VariantOverrides {
 //     varientName: true;
 //   }
-// }
-
+// 
 const customVarients = {
   error: BaseSnackBarElement,
   info: BaseSnackBarElement,
@@ -87,14 +86,13 @@ const customVarients = {
  * @returns {JSX.Element} - Rendered component.
  */
 export default function App() {
-  const [mode, setMode] = useState<'light' | 'dark'>(sessionStorage.getItem("MODE") !== 'light' ? 'dark' : 'light');
+  const [mode, setMode] = useState<'light' | 'dark' | 'contrast'>(sessionStorage.getItem("MODE") !== 'light' ? 'dark' : 'light');
   const theme = useMemo(() => createTheme(getDesignTokens(mode)), [mode]);
 
   const colorMode = useMemo(
     () => ({
-      toggleColorMode: () => {
+      toggleColorMode: (newMode:'light' | 'dark' | 'contrast') => {
         setMode((prevMode) => {
-          const newMode = prevMode === 'light' ? 'dark' : 'light'
           sessionStorage.setItem("MODE", newMode);
           return newMode;
         });
@@ -108,7 +106,12 @@ export default function App() {
       <CssBaseline />
 
       <SnackbarProvider maxSnack={3} Components={customVarients}>
-        <BasicNavBar props={{toggleMode: colorMode.toggleColorMode, mode:mode}} />
+        <BasicNavBar 
+          toggleMode={colorMode.toggleColorMode} 
+          theme={mode} 
+          backgroundColor={theme.palette.background.paper} 
+          textColor={theme.palette.text.primary}
+        />
         
         <br />
         {/* Render the current page content using the AppRouter component */}

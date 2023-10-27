@@ -233,3 +233,34 @@ export async function deleteData(database:string ,table:string, predicate:string
   }
   return results;
 }
+
+/**
+ * Copies a table to an existing table with a different name
+ * @param {string} database The name of the database to copy the table from
+ * @param {string} sourceTable The name of the table to copy
+ * @param {string} destinationTable The name of the existing table to insert the data into
+ * @param {string} [user="postgres"] Username for the database
+ * @param {string} [password="postgrespw"] Password for the database
+ * @returns {Promise<string>} A Promise that resolves to a success message if the copy was successful, or an error message if it wasn't
+ */
+export async function copyTable(database: string, sourceTable: string, destinationTable: string, user = 'postgres', password = 'postgrespw'): Promise<string> {
+  const role = user === 'postgres' ? user : `${user}_role`;
+
+  const pool = createPool(database, role, password);
+
+  const sqlStatement = `INSERT INTO ${destinationTable} SELECT * FROM ${sourceTable}`;
+
+  let results: string;
+
+  try {
+    await pool.query(sqlStatement);
+    results = 'Table copied successfully';
+  } catch (error) {
+    console.error(error);
+    results = 'Error copying table';
+  } finally {
+    pool.end();
+  }
+
+  return results;
+}

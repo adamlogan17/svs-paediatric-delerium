@@ -3,49 +3,32 @@ import { Paper, Table, TableBody, TableCell, TableHead, TableRow, SxProps, Theme
 import { alpha } from '@mui/material/styles';
 import EnhancedToolbar from './EnhancedToolbar';
 
-type CustomFields = {
-    key:string,
-    type:"autocomplete"|"boolean"
-    options?:{
-      label:string,
-      value:string
-    }[]
-}
-
-type EditTableProps = {
+type BaseTableProps = {
   initialData: any[],
   title: string,
   uniqueIdName: string,
   columnNameMap?: any,
-  customInputFields?: CustomFields[],
-  noEditFields?: string[],
-  validateData?: (data: any) => string[],
-  deleteData: (ids: number[]) => void,
-  updateData: (data: any) => void|any[]|Promise<any[]>,
-  disableDelete?: any[]
 }
 
-/**
- * 
- * @todo Add other option for textfield, to be a checkbox for boolean values
- * @todo Maybe add validation for the props?
- */
-export default function BaseTable(props: EditTableProps) {
+export default function BaseTable(props: BaseTableProps) {
+  // required to keep a store of all of the data, not just that being displayed
   const [data, setData] = useState<any[]>(props.initialData);
-  const [selected, setSelected] = useState<number[]>([]);
+  // commented out incase of a merge with the EditTable component
+  // const [selected, setSelected] = useState<number[]>([]);
+  const [filteredData, setFilteredData] = useState<any[]>(props.initialData);
   const [page, setPage] = useState(0);
   const [rowsPerPage, setRowsPerPage] = useState(5);
 
   // Avoid a layout jump when reaching the last page with empty rows.
-  const emptyRows = page > 0 ? Math.max(0, (1 + page) * rowsPerPage - data.length) : 0;
+  const emptyRows = page > 0 ? Math.max(0, (1 + page) * rowsPerPage - filteredData.length) : 0;
 
   const visibleRows = useMemo(
     () =>
-      data.slice(
+      filteredData.slice(
         page * rowsPerPage,
         page * rowsPerPage + rowsPerPage,
       ),
-    [page, rowsPerPage, data],
+    [page, rowsPerPage, filteredData],
   );
 
 
@@ -66,9 +49,9 @@ export default function BaseTable(props: EditTableProps) {
     <Paper sx={{mb: 2}}>
       <EnhancedToolbar 
         numSelected={0} 
-        title={props.title} 
-        handleDelete={() => null}
+        title={props.title}
         data={data}
+        changeData={setFilteredData}
         header={Object.keys(props.columnNameMap ?? data[0]).map((key:string) => ({label: props.columnNameMap?.[key] ?? key, key: key}))}
       />
       <TableContainer>
@@ -85,12 +68,13 @@ export default function BaseTable(props: EditTableProps) {
           <TableBody>
             {visibleRows.map((row, index) => (
               <TableRow key={index} sx={
+                // this style is included incase this component is merged with the EditTable component
                 {
-                  height:'100px',
-                  ...(selected.includes(Number(row[props.uniqueIdName])) && {
-                    bgcolor: (theme) =>
-                      alpha(theme.palette.primary.main, theme.palette.action.activatedOpacity),
-                  }),
+                  // height:'100px',
+                  // ...(selected.includes(Number(row[props.uniqueIdName])) && {
+                  //   bgcolor: (theme) =>
+                  //     alpha(theme.palette.primary.main, theme.palette.action.activatedOpacity),
+                  // }),
                 }}>
                 
                 {Object.keys(row).map((key, index) => (
@@ -109,7 +93,7 @@ export default function BaseTable(props: EditTableProps) {
                   height: `${100 * emptyRows}px`,
                 }}
               >
-                <TableCell colSpan={Object.keys(data[0]).length + 2} />
+                <TableCell colSpan={Object.keys(filteredData[0]).length} />
               </TableRow>
             )}
 
@@ -125,8 +109,8 @@ export default function BaseTable(props: EditTableProps) {
             marginBottom: '1em'
           }
         }}
-        rowsPerPageOptions={[5, 10, 25, { label: 'All', value: data.length }]}
-        count={data.length}
+        rowsPerPageOptions={[5, 10, 25, { label: 'All', value: filteredData.length }]}
+        count={filteredData.length}
         rowsPerPage={rowsPerPage}
         page={page}
         onPageChange={handleChangePage}

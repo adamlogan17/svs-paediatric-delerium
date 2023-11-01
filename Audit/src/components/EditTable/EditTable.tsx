@@ -36,8 +36,11 @@ type EditTableProps = {
  * @todo Maybe add validation for the props?
  */
 export default function EditTable(props: EditTableProps) {
+  // required to keep a store of all of the data, not just that being displayed
   const [data, setData] = useState<any[]>(props.initialData);
   const [editId, setEditId] = useState<number | null>(null);
+  // it is important to update this state when the data is updated, otherwise the visible table will not update
+  const [filteredData, setFilteredData] = useState<any[]>(props.initialData);
   // stores the data that is being edited
   const [tempData, setTempData] = useState<any | null>(null);
   const [error, setError] = useState<string[] | null>(null);
@@ -47,15 +50,15 @@ export default function EditTable(props: EditTableProps) {
   const [editOpen, setEditOpen] = useState(false);
 
   // Avoid a layout jump when reaching the last page with empty rows.
-  const emptyRows = page > 0 ? Math.max(0, (1 + page) * rowsPerPage - data.length) : 0;
+  const emptyRows = page > 0 ? Math.max(0, (1 + page) * rowsPerPage - filteredData.length) : 0;
 
   const visibleRows = useMemo(
     () =>
-      data.slice(
+      filteredData.slice(
         page * rowsPerPage,
         page * rowsPerPage + rowsPerPage,
       ),
-    [page, rowsPerPage, data],
+    [page, rowsPerPage, filteredData],
   );
 
   function startEdit(id: number, row: any) {
@@ -70,6 +73,8 @@ export default function EditTable(props: EditTableProps) {
 
       // If the updateData function returns an array, use that as the new data, otherwise just update the row that was edited
       setData((prev) => updatedData ?? prev.map(row => (row[props.uniqueIdName] === editId ? tempData : row)));
+      setFilteredData((prev) => updatedData ?? prev.map(row => (row[props.uniqueIdName] === editId ? tempData : row)));
+
       setEditId(null);
       setTempData(null);
       setError(null);
@@ -84,6 +89,7 @@ export default function EditTable(props: EditTableProps) {
 
   const handleDelete = (ids: number[]) => {
     setData(prev => prev.filter(row => !ids.includes(Number(row[props.uniqueIdName]))));
+    setFilteredData(prev => prev.filter(row => !ids.includes(Number(row[props.uniqueIdName]))));
     ids.forEach(id => itemSelection(false, id));
     props.deleteData(ids);
   };
@@ -128,6 +134,7 @@ export default function EditTable(props: EditTableProps) {
         title={props.title} 
         handleDelete={() => handleDelete(selected)}
         data={data}
+        changeData={setFilteredData}
         header={Object.keys(props.columnNameMap ?? data[0]).map((key:string) => ({label: props.columnNameMap?.[key] ?? key, key: key}))}
       />
       <TableContainer>
@@ -174,7 +181,7 @@ export default function EditTable(props: EditTableProps) {
                     checked={selected.includes(Number(row[props.uniqueIdName])) && !props.disableDelete?.includes(row[props.uniqueIdName])}
                   />
                 </TableCell>
-                      
+                
                 {editId === row[props.uniqueIdName] ? (
                   <>
                     {Object.keys(row).map((key:string, index:number) => (
@@ -278,8 +285,8 @@ export default function EditTable(props: EditTableProps) {
             marginBottom: '1em'
           }
         }}
-        rowsPerPageOptions={[5, 10, 25, { label: 'All', value: data.length }]}
-        count={data.length}
+        rowsPerPageOptions={[5, 10, 25, { label: 'All', value: filteredData.length }]}
+        count={filteredData.length}
         rowsPerPage={rowsPerPage}
         page={page}
         onPageChange={handleChangePage}

@@ -135,13 +135,13 @@ export default function EditTable(props: EditTableProps) {
           <TableHead>
             <TableRow>
               <TableCell padding='checkbox'>
-              <Checkbox
-                color="primary"
-                // The '??' provides a default value if the array is undefined or null
-                indeterminate={selected.length > 0 && selected.length < (data.length - (props?.disableDelete ?? []).length)}
-                checked={data.length > 0 && selected.length === (data.length - (props?.disableDelete ?? []).length)}
-                onChange={handleSelectAllClick}
-              />
+                <Checkbox
+                  color="primary"
+                  // The '??' provides a default value if the array is undefined or null
+                  indeterminate={selected.length > 0 && selected.length < (data.length - (props?.disableDelete ?? []).length)}
+                  checked={data.length > 0 && selected.length === (data.length - (props?.disableDelete ?? []).length)}
+                  onChange={handleSelectAllClick}
+                />
               </TableCell>
 
               {/* If the user provides a columnNameMap, use that, otherwise use the keys from the first object in the data array */}

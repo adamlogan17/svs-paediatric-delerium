@@ -9,11 +9,12 @@ import { Data, Headers } from "react-csv/lib/core";
 
 type EnhancedToolbarProps = {
   numSelected:number,
-  data:Data,
+  dataToFilter?:Data,
+  downloadData:Data,
   header:Headers,
   title:string,
   handleDelete?:() => void,
-  changeData?:any
+  filterData?:any
 }
 
 export default function EnhancedToolbar(props: EnhancedToolbarProps) {
@@ -55,14 +56,11 @@ export default function EnhancedToolbar(props: EnhancedToolbarProps) {
           label="Search"
           variant="outlined"
           onChange={(e) => {
-            // console.log(e.target.value);
-            // console.log(props.data);
-            const filteredData = props.data.filter((row: { [key: string]: any }) => {
+            const filteredData = props.dataToFilter?.filter((row: { [key: string]: any }) => {
               const searchTerm = e.target.value.toLowerCase();
               return Object.values(row).some(value => value.toString().toLowerCase().includes(searchTerm));
             });
-            // console.log(filteredData);
-            props.changeData?.(filteredData);
+            props.filterData?.(filteredData);
           }}
         />
       </div>
@@ -76,7 +74,7 @@ export default function EnhancedToolbar(props: EnhancedToolbarProps) {
       ) : (
         <Tooltip title="Download">
           <IconButton>
-            <CSVLink data={props.data} headers={props.header} filename={props.title} style={{  color:'inherit' }}>
+            <CSVLink data={props.downloadData} headers={props.header} filename={props.title} style={{  color:'inherit' }}>
               <FileDownloadIcon />
             </CSVLink>
           </IconButton>

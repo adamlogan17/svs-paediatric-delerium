@@ -133,8 +133,9 @@ export default function EditTable(props: EditTableProps) {
         numSelected={selected.length} 
         title={props.title} 
         handleDelete={() => handleDelete(selected)}
-        data={data}
-        changeData={setFilteredData}
+        dataToFilter={data}
+        downloadData={filteredData}
+        filterData={setFilteredData}
         header={Object.keys(props.columnNameMap ?? data[0]).map((key:string) => ({label: props.columnNameMap?.[key] ?? key, key: key}))}
       />
       <TableContainer>

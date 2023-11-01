@@ -50,8 +50,9 @@ export default function BaseTable(props: BaseTableProps) {
       <EnhancedToolbar 
         numSelected={0} 
         title={props.title}
-        data={data}
-        changeData={setFilteredData}
+        dataToFilter={data}
+        downloadData={filteredData}
+        filterData={setFilteredData}
         header={Object.keys(props.columnNameMap ?? data[0]).map((key:string) => ({label: props.columnNameMap?.[key] ?? key, key: key}))}
       />
       <TableContainer>

@@ -3,6 +3,16 @@ import { Paper, Table, TableBody, TableCell, TableHead, TableRow, SxProps, Theme
 import { alpha } from '@mui/material/styles';
 import EnhancedToolbar from './EnhancedToolbar';
 
+/**
+ * @typedef BaseTableProps
+ * 
+ * Represents the props required for the BaseTable component.
+ * 
+ * @property {any[]} initialData - The initial data to be displayed in the table.
+ * @property {string} title - The title of the table.
+ * @property {string} uniqueIdName - The unique identifier for each row in the table.
+ * @property {any} [columnNameMap] - An optional mapping of column names for display.
+ */
 type BaseTableProps = {
   initialData: any[],
   title: string,
@@ -10,6 +20,16 @@ type BaseTableProps = {
   columnNameMap?: any,
 }
 
+/**
+ * @component
+ * @author Adam Logan
+ * 
+ * A base table component for displaying data.
+ * 
+ * @param {BaseTableProps} props - The props for the BaseTable component.
+ * 
+ * @todo maybe merge this with the EditTable component
+ */
 export default function BaseTable(props: BaseTableProps) {
   // required to keep a store of all of the data, not just that being displayed
   const [data, setData] = useState<any[]>(props.initialData);
@@ -22,6 +42,7 @@ export default function BaseTable(props: BaseTableProps) {
   // Avoid a layout jump when reaching the last page with empty rows.
   const emptyRows = page > 0 ? Math.max(0, (1 + page) * rowsPerPage - filteredData.length) : 0;
 
+  // Calculate the rows that should be visible in the current page
   const visibleRows = useMemo(
     () =>
       filteredData.slice(

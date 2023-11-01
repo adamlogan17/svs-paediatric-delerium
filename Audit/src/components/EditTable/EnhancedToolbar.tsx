@@ -7,6 +7,19 @@ import { useState } from "react";
 import { CSVLink } from "react-csv";
 import { Data, Headers } from "react-csv/lib/core";
 
+/**
+ * @typedef EnhancedToolbarProps
+ * 
+ * Represents the props required for the EnhancedToolbar component.
+ * 
+ * @property {number} numSelected - The number of selected items.
+ * @property {Data} [dataToFilter] - The data to apply filtering on (optional).
+ * @property {Data} downloadData - The data to download, within JSON format.
+ * @property {Headers} header - The headers for the data, being downloaded for the CSV.
+ * @property {string} title - The title of the toolbar.
+ * @property {() => void} [handleDelete] - An optional function to handle deletion.
+ * @property {any} [filterData] - An optional function to handle data filtering.
+ */
 type EnhancedToolbarProps = {
   numSelected:number,
   dataToFilter?:Data,
@@ -17,6 +30,15 @@ type EnhancedToolbarProps = {
   filterData?:any
 }
 
+/**
+ * @component
+ * @author Adam Logan
+ * 
+ * A toolbar component for tables, that allows the data to be downloaded as a CSV.
+ * Also allows an option for a search to be implemented, to display the number of data selected and to delete this data.
+ * 
+ * @param {EnhancedToolbarProps} props - The props for the EnhancedToolbar component.
+ */
 export default function EnhancedToolbar(props: EnhancedToolbarProps) {
   const [isOpen, setIsOpen] = useState(false);
 
@@ -31,10 +53,10 @@ export default function EnhancedToolbar(props: EnhancedToolbarProps) {
         }),
       }}
     >
+      {/* Groups the components to the left of the toolbar */}
       <div style={{ marginTop:'10px', flex: '1 1 100%' }}>
         {props.numSelected > 0 ? (
           <Typography
-            // sx={{ flex: '1 1 100%' }}
             color="inherit"
             variant="subtitle1"
             component="div"
@@ -43,7 +65,6 @@ export default function EnhancedToolbar(props: EnhancedToolbarProps) {
           </Typography>
         ) : (
           <Typography
-            // sx={{ flex: '1 1 100%' }}
             variant="h6"
             component="div"
           >

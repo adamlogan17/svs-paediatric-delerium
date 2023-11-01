@@ -8,6 +8,15 @@ import CancelIcon from '@mui/icons-material/Cancel';
 import EnhancedToolbar from './EnhancedToolbar';
 import ConfirmDialog from '../ConfirmDialog/ConfirmDialog';
 
+/**
+ * @typedef CustomFields
+ * 
+ * Represents custom input fields for the EditTable.
+ * 
+ * @property {string} key - The key of the custom field, which matches that of the object.
+ * @property {"autocomplete" | "boolean"} type - The type of the custom field.
+ * @property {{ label: string, value: string }[]} [options] - Options for the "autocomplete" type (optional).
+ */
 type CustomFields = {
     key:string,
     type:"autocomplete"|"boolean"
@@ -17,6 +26,22 @@ type CustomFields = {
     }[]
 }
 
+/**
+ * @typedef EditTableProps
+ * 
+ * Represents the props required for the EditTable component.
+ * 
+ * @property {any[]} initialData - The initial data to display in the table.
+ * @property {string} title - The title of the table.
+ * @property {string} uniqueIdName - The name of the unique identifier for each row.
+ * @property {any} [columnNameMap] - A map of column names (optional).
+ * @property {CustomFields[]} [customInputFields] - Custom input fields (optional).
+ * @property {string[]} [noEditFields] - Fields that cannot be edited (optional).
+ * @property {(data: any) => string[]} [validateData] - A function for data validation (optional).
+ * @property {(ids: number[]) => void} deleteData - A function to delete data.
+ * @property {(data: any) => void|any[]|Promise<any[]>} updateData - A function to update data.
+ * @property {any[]} [disableDelete] - An array of IDs to disable delete functionality (optional).
+ */
 type EditTableProps = {
   initialData: any[],
   title: string,
@@ -31,6 +56,12 @@ type EditTableProps = {
 }
 
 /**
+ * @component
+ * @author Adam Logan
+ * 
+ * A table component for editing and managing data.
+ * 
+ * @param {EditTableProps} props - The props for the EditTable component.
  * 
  * @todo Add other option for textfield, to be a checkbox for boolean values
  * @todo Maybe add validation for the props?

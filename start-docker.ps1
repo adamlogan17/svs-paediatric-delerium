@@ -24,7 +24,9 @@ if($c -or $n) {
     Write-Host ""
     Write-Host "Remove complete!" -ForegroundColor Cyan -BackgroundColor Black
     Write-Host ""
-} elseif(!$p) {
+} 
+
+if(!$p) {
     # removes the postgres server volume
     docker volume rm svs-paediatric-delerium_svs-data
 }

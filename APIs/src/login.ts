@@ -3,6 +3,7 @@ import jwt, { JwtPayload } from 'jsonwebtoken';
 import {createPool, createSelect, insertData, updateData} from './crud';
 import bcrypt from 'bcrypt';
 import axios from 'axios';
+import crypto from 'crypto';
 import { config } from 'dotenv';
 
 config();
@@ -25,9 +26,11 @@ export function authenticate(request: Request, response: Response): void {
 
     let condition:string = "picu_id=" + username;
 
+    console.log(crypto.randomBytes(32).toString('hex'));
+
     POOL.query(createSelect("picu", condition, ["picu_role", "password"]), async (error:any, results:any) => {
       if (error || results.rows.length === 0) {
-        response.send("Invalid User");
+        response.send("ERROR: Permission Denied");
       }
       else {
         // compares the hashed password with the plaintext one which is provided
@@ -52,7 +55,7 @@ export function authenticate(request: Request, response: Response): void {
             });
 
           } else {
-            response.send("Invalid User");
+            response.send("ERROR: Permission Denied");
           }
         })
         .catch(err => response.send(err))

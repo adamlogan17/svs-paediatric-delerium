@@ -27,11 +27,11 @@ const contrastTheme:PaletteOptions = {
     main: '#368af6'
   },
   text: {
-    primary:'#ffffff',
+    primary:'#FFFF00',
   },
   background: {
-    default:'#1f2235',
-    paper: '#313552'
+    default:'#000000',
+    paper: '#191919'
   }
 }
 

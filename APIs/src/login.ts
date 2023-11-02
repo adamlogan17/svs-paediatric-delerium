@@ -198,6 +198,9 @@ const apiCallDetails: APICallDetail[] = [];
 
 export async function logData (request: Request, response: Response) {
   const now = new Date();
+  console.log(request.params.username);
+  console.log(request.params.role);
+
   const apiCallDetail: APICallDetail = {
     date: now.toISOString().split('T')[0], // Separate date
     time: now.toISOString().split('T')[1].split('.')[0], // Separate time
@@ -213,6 +216,6 @@ export async function logData (request: Request, response: Response) {
   // Add the API call detail to the array
   apiCallDetails.push(apiCallDetail);
   insertData("audit", "api_log", apiCallDetail);
-
+  response.status(200).send(request.body);
   // Continue with the request handling
 }

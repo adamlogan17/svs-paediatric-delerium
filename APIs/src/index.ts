@@ -101,27 +101,27 @@ app.use((req:Request, res:Response, next) => {
 });
 
 
-app.use((req:Request, res:Response, next:NextFunction) => {
-  const now = new Date();
-  const apiCallDetail: APICallDetail = {
-    date: now.toISOString().split('T')[0], // Separate date
-    time: now.toISOString().split('T')[1].split('.')[0], // Separate time
-    method: req.method,
-    url: req.originalUrl,
-    status: res.statusCode,
-    userIP: req.ip,
-    userAgent: req.headers['user-agent'] || '',
-    username: req.params.username,
-    userRole: req.params.role,
-  };
+// app.use((req:Request, res:Response, next:NextFunction) => {
+//   const now = new Date();
+//   const apiCallDetail: APICallDetail = {
+//     date: now.toISOString().split('T')[0], // Separate date
+//     time: now.toISOString().split('T')[1].split('.')[0], // Separate time
+//     method: req.method,
+//     url: req.originalUrl,
+//     status: res.statusCode,
+//     userIP: req.ip,
+//     userAgent: req.headers['user-agent'] || '',
+//     username: req.params.username,
+//     userRole: req.params.role,
+//   };
 
-  // Add the API call detail to the array
-  apiCallDetails.push(apiCallDetail);
-  insertData("audit", "api_log", apiCallDetail);
+//   // Add the API call detail to the array
+//   apiCallDetails.push(apiCallDetail);
+//   insertData("audit", "api_log", apiCallDetail);
 
-  // Continue with the request handling
-  next();
-});
+//   // Continue with the request handling
+//   next();
+// });
 
 
 /**
@@ -200,12 +200,20 @@ app.use((req:Request, res:Response, next:NextFunction) => {
  *      '200':
  *          description: OK
  */
-app.get("/test/:val", (req: Request,res: Response)=> logData(req: Request, res: Response)=>{
-    res.status(200).send({
-        hello:"world",
-        val: req.params.val
-    });
-});
+app.get("/test/:val", (req: Request,res: Response, next:NextFunction)=> {
+  
+    // res.status(200).send({
+    //     hello:"world",
+    //     val: req.params.val
+    // });
+    req.body = {
+          hello:"world",
+          val: req.params.val
+      }
+    console.log("in", req.body);
+
+    next();
+}, (req: Request,res: Response) => logData(req, res));
 
 
 /**
@@ -459,9 +467,25 @@ app.delete("/:database/deletedata/:table/:predicate", async (req: Request,res: R
  *       401:
  *         description: Unauthorized access.
  */
-app.get("/test-auth", (request: Request, response: Response, next:NextFunction) => authorise(request, response, next), (request:any, response) => {
-  response.json({ message: "You are authorized to access me" , user: request.params.username, role: request.params.role});
-});
+app.get("/test-auth", (request: Request, response: Response, next:NextFunction) => authorise(request, response, next), (request:any, response:Response, next:NextFunction) => {
+  request.body = { message: "You are authorized to access me" , user: request.params.username, role: request.params.role};
+  next();
+}, (req: Request,res: Response) => logData(req, res));
+
+app.get("/test/:val", (req: Request,res: Response, next:NextFunction)=> {
+  
+  // res.status(200).send({
+  //     hello:"world",
+  //     val: req.params.val
+  // });
+  req.body = {
+        hello:"world",
+        val: req.params.val
+    }
+  console.log("in", req.body);
+  
+  next();
+}, (req: Request,res: Response) => logData(req, res));
 
 /**
  * @swagger

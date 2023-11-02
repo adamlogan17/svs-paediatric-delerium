@@ -5,8 +5,6 @@ import { enqueueSnackbar } from 'notistack';
 import { Avatar, Box, Typography } from '@mui/material';
 import BorderColorIcon from '@mui/icons-material/BorderColor';
 import PageLoad from '../../components/Loading/PageLoad';
-import BaseTable from '../../components/EditTable/BaseTable';
-
 
 const customInputFields:any[] = [
   {
@@ -133,17 +131,6 @@ export default function EditPicus() {
           disableDelete={[Number(sessionStorage.getItem('USERNAME'))]}
         />}
       </div>
-
-      <div style={{width:'90%', margin:'auto'}}>
-        {data.length > 0 && 
-        <BaseTable
-          title='PICUs'
-          initialData={data}
-          uniqueIdName={uniqueIdName}
-          columnNameMap={columnNameMap}
-        />}
-      </div>
-
     </Box>
   );
 }

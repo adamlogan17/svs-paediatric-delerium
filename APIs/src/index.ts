@@ -10,7 +10,7 @@ import swaggerJsdoc from 'swagger-jsdoc';
 import swaggerUi from 'swagger-ui-express';
 
 import { copyTable, deleteData, getAll, insertData, updateData } from './crud';
-import { authenticate, authorise, updatePicuPassword, verifyCaptcha } from './login';
+import { authenticate, authorise, logData, updatePicuPassword, verifyCaptcha } from './login';
 import { allPicuCompliance, singlePicuCompliance } from './auditCharts';
 import { addPicu, deletePicus, editPicu, getAllIds, nextPicu } from './picuDbManagement';
 import { deleteCompRecords, editCompliance, insertCompData } from './complianceScores';
@@ -101,27 +101,27 @@ app.use((req:Request, res:Response, next) => {
 });
 
 
-app.use((req:Request, res:Response, next) => {
-  const now = new Date();
-  const apiCallDetail: APICallDetail = {
-    date: now.toISOString().split('T')[0], // Separate date
-    time: now.toISOString().split('T')[1].split('.')[0], // Separate time
-    method: req.method,
-    url: req.originalUrl,
-    status: res.statusCode,
-    userIP: req.ip,
-    userAgent: req.headers['user-agent'] || '',
-    username: req.params.username,
-    userRole: req.params.role,
-  };
+// app.use((req:Request, res:Response, next:NextFunction) => {
+//   const now = new Date();
+//   const apiCallDetail: APICallDetail = {
+//     date: now.toISOString().split('T')[0], // Separate date
+//     time: now.toISOString().split('T')[1].split('.')[0], // Separate time
+//     method: req.method,
+//     url: req.originalUrl,
+//     status: res.statusCode,
+//     userIP: req.ip,
+//     userAgent: req.headers['user-agent'] || '',
+//     username: req.params.username,
+//     userRole: req.params.role,
+//   };
 
-  // Add the API call detail to the array
-  apiCallDetails.push(apiCallDetail);
-  insertData("audit", "api_log", apiCallDetail);
+//   // Add the API call detail to the array
+//   apiCallDetails.push(apiCallDetail);
+//   insertData("audit", "api_log", apiCallDetail);
 
-  // Continue with the request handling
-  next();
-});
+//   // Continue with the request handling
+//   next();
+// });
 
 
 /**
@@ -200,12 +200,20 @@ app.use((req:Request, res:Response, next) => {
  *      '200':
  *          description: OK
  */
-app.get("/test/:val", (req: Request,res: Response)=>{
-    res.status(200).send({
-        hello:"world",
-        val: req.params.val
-    });
-});
+app.get("/test/:val", (req: Request,res: Response, next:NextFunction)=> {
+  
+    // res.status(200).send({
+    //     hello:"world",
+    //     val: req.params.val
+    // });
+    req.body = {
+          hello:"world",
+          val: req.params.val
+      }
+    console.log("in", req.body);
+
+    next();
+}, (req: Request,res: Response) => logData(req, res));
 
 
 /**
@@ -531,9 +539,25 @@ app.delete("/:database/deletedata/:table/:predicate", async (req: Request,res: R
  *       401:
  *         description: Unauthorized access.
  */
-app.get("/test-auth", (request: Request, response: Response, next:NextFunction) => authorise(request, response, next), (request:any, response) => {
-  response.json({ message: "You are authorized to access me" , user: request.params.username, role: request.params.role});
-});
+app.get("/test-auth", (request: Request, response: Response, next:NextFunction) => authorise(request, response, next), (request:any, response:Response, next:NextFunction) => {
+  request.body = { message: "You are authorized to access me" , user: request.params.username, role: request.params.role};
+  next();
+}, (req: Request,res: Response) => logData(req, res));
+
+app.get("/test/:val", (req: Request,res: Response, next:NextFunction)=> {
+  
+  // res.status(200).send({
+  //     hello:"world",
+  //     val: req.params.val
+  // });
+  req.body = {
+        hello:"world",
+        val: req.params.val
+    }
+  console.log("in", req.body);
+  
+  next();
+}, (req: Request,res: Response) => logData(req, res));
 
 /**
  * @swagger
@@ -898,76 +922,13 @@ app.put("/update-compliance", (request: Request, response: Response, next:NextFu
  *       400:
  *         description: An error occurred.
  */
-app.delete("/delete-compliance", (request: Request, response: Response, next:NextFunction) => authorise(request, response, next, 'admin'), async (req: Request, res: Response) => {
-  let result = await deleteCompRecords(req.body.comp_ids, req.params.role);
+app.delete("/delete-compliance", (request: Request, response: Response, next:NextFunction) => authorise(request, response, next, 'admin'), async (req: Request, res: Response, next:NextFunction) => {
+   let result = await deleteCompRecords(req.body.comp_ids, req.params.role);
   let status:number = result.toString().includes("Error") ? 400 : 201;
-  res.status(status).send(result);
-});
-
-/**
- * @swagger
- * /update-compliance:
- *   put:
- *     tags:
- *       - Compliance
- *     summary: Update a compliance entry based on the provided data.
- *     security:
- *       - Bearer: []
- *     parameters:
- *       - in: body
- *         name: complianceData
- *         description: The data to update for the compliance entry.
- *         schema:
- *           type: object
- *           $ref: '#/definitions/ComplianceData'
- *     responses:
- *       201:
- *         description: Compliance entry updated successfully.
- *       400:
- *         description: An error occurred.
- */
-app.put("/update-compliance", (request: Request, response: Response, next:NextFunction) => authorise(request, response, next, 'admin'), async (req: Request, res: Response) => {
-  let result:string = await editCompliance(req.body, req.params.role);
-  let status:number = result.toString().includes("Error") ? 400 : 201;
-
-  res.status(status).send(result);
-});
-
-/**
- * @swagger
- * /delete-compliance:
- *   delete:
- *     tags:
- *       - Compliance
- *     summary: Delete multiple compliance records based on provided IDs.
- *     security:
- *       - Bearer: []
- *     parameters:
- *       - in: body
- *         name: body
- *         description: Array of compliance record IDs to delete.
- *         schema:
- *           type: object
- *           required:
- *             - comp_ids
- *           properties:
- *             comp_ids:
- *               type: array
- *               description: The IDs of the compliance records to delete.
- *               items:
- *                 type: number
- *     responses:
- *       200:
- *         description: Compliance records deleted successfully.
- *       400:
- *         description: An error occurred.
- */
-app.delete("/delete-compliance", (request: Request, response: Response, next:NextFunction) => authorise(request, response, next, 'admin'), async (req: Request, res: Response) => {
-  let result = await deleteCompRecords(req.body.comp_ids, req.params.role);
-  let status:number = result.toString().includes("Error") ? 400 : 201;
-  res.status(status).send(result);
-});
-
+  // next();
+   res.status(status).send(result);
+})
+//, (req: Request, res: Response) => log(req, res));
 
 // Used to activate the endpoints through HTTP
 app.listen(port,()=> {

@@ -111,9 +111,13 @@ The instructions below must be repeated every time the project is launched.
     - username = <admin@admin.com>
     - password = root
 
-3. Select 'Add New Server'
-4. Enter any name you would like for the server to be called
-5. Select the 'Connection' tab and enter the below details, the default values for the other fields mentioned below should be left
+3. Select the server named ```dev-svs-postgres-server``` and enter the password ```postgrespw```
+
+Alternatively to step 3, you can add the server manually following the steps below:
+
+1. Select 'Add New Server'
+2. Enter any name you would like for the server to be called
+3. Select the 'Connection' tab and enter the below details, the default values for the other fields mentioned below should be left
 
     - Host name/address = svs_postgres
     - Username = postgres

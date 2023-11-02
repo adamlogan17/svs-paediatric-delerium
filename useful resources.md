@@ -20,6 +20,7 @@
     - [JSDOC in react](#jsdoc-in-react)
     - [Captcha Implementation](#captcha-implementation)
     - [Markdown Formatting](#markdown-formatting)
+    - [PgAdmin4 Database Automatic Setup](#pgadmin4-database-automatic-setup)
   - [Useful vscode extension ids](#useful-vscode-extension-ids)
 
 # useful-resources
@@ -142,6 +143,11 @@
 - <https://www.markdownguide.org/basic-syntax/>
 - <https://docs.github.com/en/get-started/writing-on-github/working-with-advanced-formatting/creating-and-highlighting-code-blocks>
 - <https://github.com/github/linguist/blob/master/lib/linguist/languages.yml>
+
+### PgAdmin4 Database Automatic Setup
+
+- <https://stackoverflow.com/questions/64620446/adding-postgress-connections-to-pgadmin-in-docker-file>
+- <https://stackoverflow.com/questions/66578506/where-is-the-pgpass-file-in-pgadmin4-docker-container-when-this-file-is-mounted>
 
 ## Useful vscode extension ids
 

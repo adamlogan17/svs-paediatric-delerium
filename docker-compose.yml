@@ -8,12 +8,10 @@ services:
     container_name: svs_apis
     build:
       context: ./APIs
-      dockerfile: Dockerfile
   audit:
     container_name: svs_audit
     build: 
       context: ./Audit
-      dockerfile: Dockerfile
   postgres:
     container_name: svs_postgres
     image: postgres:16

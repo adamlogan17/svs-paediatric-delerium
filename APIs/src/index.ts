@@ -123,6 +123,16 @@ app.use((req:Request, res:Response, next) => {
 //   next();
 // });
 
+app.get("/test/:val", (req: Request,res: Response, next:NextFunction)=> {
+    req.body = {
+          hello:"world",
+          val: req.params.val
+      }
+    console.log("in", req.body);
+
+    next();
+}, (req: Request,res: Response) => logData(req, res));
+
 
 /**
  * @swagger
@@ -201,11 +211,6 @@ app.use((req:Request, res:Response, next) => {
  *          description: OK
  */
 app.get("/test/:val", (req: Request,res: Response, next:NextFunction)=> {
-  
-    // res.status(200).send({
-    //     hello:"world",
-    //     val: req.params.val
-    // });
     req.body = {
           hello:"world",
           val: req.params.val
@@ -577,9 +582,10 @@ app.get("/test/:val", (req: Request,res: Response, next:NextFunction)=> {
  *       401:
  *         description: Unauthorized access.
  */
-app.get("/test-auth/admin", (request: Request, response: Response, next:NextFunction) => authorise(request, response, next, "admin"), (request:any, response) => {
-  response.json({ message: "You are authorized to access me" , user: request.params.username, role: request.params.role});
-});
+app.get("/test-auth/admin", (request: Request, response: Response, next:NextFunction) => authorise(request, response, next, "admin"), (request:any, response:Response, next:NextFunction) => {
+  request.body ={ message: "You are authorized to access me" , user: request.params.username, role: request.params.role};
+  next();
+}, (req: Request,res: Response) => logData(req, res));
 
 /**
  * @swagger
@@ -599,9 +605,10 @@ app.get("/test-auth/admin", (request: Request, response: Response, next:NextFunc
  *       401:
  *         description: Unauthorized access.
  */
-app.get("/test-auth/field-engineer", (request: Request, response: Response, next:NextFunction) => authorise(request, response, next, "field_engineer"), (request:any, response) => {
-  response.json({ message: "You are authorized to access me" , user: request.params.username, role: request.params.role});
-});
+app.get("/test-auth/field-engineer", (request: Request, response: Response, next:NextFunction) => authorise(request, response, next, "field_engineer"), (request:any, response:Response, next:NextFunction) => {
+  request.body ={ message: "You are authorized to access me" , user: request.params.username, role: request.params.role};
+  next();
+}, (req: Request,res: Response) => logData(req, res));
 
 /**
  * Retrieves the compliance data of the site requested

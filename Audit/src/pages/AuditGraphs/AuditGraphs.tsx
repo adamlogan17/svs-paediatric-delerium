@@ -3,6 +3,7 @@ import Chart from "chart.js/auto";
 import { CategoryScale } from "chart.js";
 
 import '../../shared/layout.css';
+import './graphs.css';
 import LineGraph from '../../components/LineGraph/LineGraph';
 import axios from 'axios';
 import { useEffect, useState } from 'react';
@@ -60,37 +61,51 @@ function getPicuCompData(username:string|undefined, password:string|undefined):v
 function AuditGraphs() {
   const [picuID, setPicuID]  = useState<string|null>(sessionStorage.getItem('ROLE') === 'picu' ? sessionStorage.getItem('SITE')!== null ? sessionStorage.getItem('SITE') : '0' : '0');
   const [idOptions, setIdOptions] = useState<AutoCompleteValues[]>([]);
+  const [chartTypeOptions, setChartTypeOptions] = useState<AutoCompleteValues[]>([]);
 
-  useEffect(() => {
-    const configuration = {
-      method: "get",
-      url: `${process.env.REACT_APP_API_URL}/getPicuIds`,
-      headers: { 'Authorization': "Bearer " + sessionStorage.getItem('TOKEN') } 
-    };
+  // useEffect(() => {
+  //   const configuration = {
+  //     method: "get",
+  //     url: `${process.env.REACT_APP_API_URL}/getPicuIds`,
+  //     headers: { 'Authorization': "Bearer " + sessionStorage.getItem('TOKEN') } 
+  //   };
 
-    axios(configuration)
-      .then((result) => {
-        const allIds = result.data.map((element:{picu_id:string}) => (element.picu_id.toString()));
-        allIds.sort((a:string, b:string) => (parseInt(a) - parseInt(b)));
-        setIdOptions(allIds);
-      })
-      .catch((error) => enqueueSnackbar(error.message, { variant: 'error' }));
-  }, []);
+  //   axios(configuration)
+  //     .then((result) => {
+  //       const allIds = result.data.map((element:{picu_id:string}) => (element.picu_id.toString()));
+  //       allIds.sort((a:string, b:string) => (parseInt(a) - parseInt(b)));
+  //       setIdOptions(allIds);
+  //     })
+  //     .catch((error) => enqueueSnackbar(error.message, { variant: 'error' }));
+  // }, []);
+
+  // setChartTypeOptions({["Line Graph", "Pie Chart", "Bar Chart"]})
 
   return (
-    <div id='form' className='wrapper' style={{width: '100%', backgroundColor: 'aqua'}}>
-      <div className = 'content' style={{width: '100%', backgroundColor: 'brown'}}>
+    <div id='form' className='wrapper' style={{width: '100%'}}>
+      <div className = 'content' style={{width: '100%'}}>
         <h1>Delirium Compliance - Audit Form</h1>
         <br />
 
-        <form action="" method="get" style={{width: '100%', backgroundColor: 'purple'}}>
-          <div className="data-input">
-            <div className = 'row' id = 'UpperTextContainer'>
-              <div className='col'>
-                <h5>Select the type of chart you would like: </h5>
+        <form id = 'graphContainer' action="" method="get" >          
+          <div className = 'gRow' id = 'gInputContainer' style={{margin: 'auto', borderRadius: 25, backgroundColor: '#009379'}}>
+              <div className='gRow' style={{width: '100%', margin: 'auto', paddingLeft: '5%', paddingTop: '2%'}}>
+                <h3>Select the type of chart you would like: </h3>
               </div>
-
-              <div className='col'>
+             <div className = 'gRow' id = 'UpperTextContainer' style={{width: '95%', margin: 'auto', display: 'flex'}}> 
+               <div className='gCol' style={{width: '48%', padding: '2%'}}>
+                {/* {<TypeDropDown text="Chart Type" primaryColour='#025858' secondaryColour='#013e3e' options={["Line Graph", "Pie Chart", "Bar Chart"]}/>} */}
+                <Autocomplete
+                disablePortal
+                id="chartType"
+                autoComplete
+                autoHighlight
+                isOptionEqualToValue = {(option:AutoCompleteValues, value:AutoCompleteValues) => option.label === value.label}
+                options={idOptions}
+                renderInput={(params:any) => <TextField {...params} required margin="normal" name="chartType" label="Chart Type" />}
+              />
+              </div>
+              <div className='gCol' style={{width: '48%', padding: '2%'}}>
               <Autocomplete
                 disablePortal
                 id="id"
@@ -100,17 +115,13 @@ function AuditGraphs() {
                 options={idOptions}
                 renderInput={(params:any) => <TextField {...params} required margin="normal" name="id" label="id" />}
               />
-              </div>
-
-              <div className='col'>
-                {/* <TypeDropDown text="Chart Type" primaryColour='#025858' secondaryColour='#013e3e' options={["Line Graph", "Pie Chart", "Bar Chart"]}/> */}
-              </div>
             </div>
           </div>
+          </div>
 
-          <div className = 'row' id = 'ButtonContainer' style={{width: '100%', backgroundColor: 'green'}}>
+          <div className = 'gRow' id = 'graphContaine' style={{margin: 'auto', borderRadius: 25, backgroundColor: '#009999'}}>
             <div className="canvas">
-              <LineGraph id={picuID} />
+              <LineGraph id={'1'} />
             </div>
           </div> 
         </form>

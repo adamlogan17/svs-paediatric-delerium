@@ -19,7 +19,7 @@ function BasicNavBar(props:{theme:string, toggleMode:Function, backgroundColor:s
     { label: "Dark", value: "dark" },
     { label: "Light", value: "light" },
   ];
-  
+
   return (
     <Navbar expand="lg" style={{ backgroundColor:props.backgroundColor, color:props.textColor}}>
       <Container>

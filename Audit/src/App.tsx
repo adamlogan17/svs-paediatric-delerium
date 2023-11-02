@@ -24,7 +24,7 @@ const darkTheme:PaletteOptions = {
 const contrastTheme:PaletteOptions = {
   mode: 'dark',
   primary: {
-    main: '#368af6'
+    main: '#FFFF00'
   },
   text: {
     primary:'#FFFF00',

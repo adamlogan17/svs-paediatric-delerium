@@ -8,7 +8,7 @@ import Form from './pages/Form/form';
 import Admin from './pages/Admin/Admin';
 import AuditGraphs from './pages/AuditGraphs/AuditGraphs';
 import FieldEngineer from './pages/FieldEngineer/FieldEngineer';
-import SignIn from "./pages/LogIn/SignIn";
+import SignIn from "./pages/SignIn/SignIn";
 import Sandbox from "./pages/Sandbox/Sandbox";
 import AddPicu from "./pages/Admin/AddPicu";
 import ForgottenPassword from "./pages/ForgottenPassword/ForgottenPassword";

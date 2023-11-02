@@ -31,6 +31,9 @@ export default function errorCodeMessage(code:string):string {
     case '42501':
       result += "Permission Denied";
       break;
+    case '23503':
+      result += "Foreign Key Violation";
+      break;
     default:
       result += "Unknown Error";
   }

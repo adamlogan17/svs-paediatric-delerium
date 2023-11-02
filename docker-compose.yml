@@ -1,39 +1,25 @@
 version: "3"
 
 volumes:
-  data: 
+  svs-data: 
 
 services:
   apis:
     container_name: svs_apis
     build:
       context: ./APIs
-      dockerfile: Dockerfile
-    volumes:
-      - ./APIs/src:/app/src
-    ports:
-      - "8000:8000"
   audit:
     container_name: svs_audit
     build: 
       context: ./Audit
-      dockerfile: Dockerfile
-    volumes:
-      - ./Audit/src:/app/src
-    ports:
-      - "3000:3000"
   postgres:
     container_name: svs_postgres
-    image: postgres:latest
+    image: postgres:16
     environment:
       - POSTGRES_USER=postgres
       - POSTGRES_PASSWORD=postgrespw
-    ports:
-      - 5432:5432
     volumes:
-      # Comment "- data:/var/lib/postgresql" and uncomment below to save the database in the current directory
-      # - ./data:/var/lib/postgresql/data
-      - data:/var/lib/postgresql
+      - svs-data:/var/lib/postgresql
 
       # mounts the sql files to be used within the start up shell script
       - ./sql:/sql
@@ -41,11 +27,3 @@ services:
       # Runs *.sh or *.sql when first creating the database, if the database already exists, the files do not execute
       # read more [here](https://levelup.gitconnected.com/creating-and-filling-a-postgres-db-with-docker-compose-e1607f6f882f)
       - ./database-set-up.sh:/docker-entrypoint-initdb.d/database-set-up.sh # the shell script is required to create the tables within the correct database
-  pgadmin:
-    container_name: pgadmin4_container
-    image: dpage/pgadmin4
-    environment:
-      PGADMIN_DEFAULT_EMAIL: admin@admin.com
-      PGADMIN_DEFAULT_PASSWORD: root
-    ports:
-      - "5050:80"

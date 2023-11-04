@@ -18,6 +18,9 @@ const darkTheme:PaletteOptions = {
   mode: 'dark',
   primary: {
     main: '#009999'
+  },
+  background: {
+    paper: '252525'
   }
 }
 
@@ -32,6 +35,7 @@ const contrastTheme:PaletteOptions = {
   background: {
     default:'#000000',
     paper: '#303030'
+
   }
 }
 

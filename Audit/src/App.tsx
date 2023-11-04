@@ -31,7 +31,7 @@ const contrastTheme:PaletteOptions = {
   },
   background: {
     default:'#000000',
-    paper: '#191919'
+    paper: '#303030'
   }
 }
 

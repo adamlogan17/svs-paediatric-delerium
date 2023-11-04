@@ -56,7 +56,7 @@ export default function Navbar(props:{theme:string, toggleMode:Function, backgro
           </Select>
             </MDBNavbarBrand >
             
-            <MDBNavbarToggler style={{color:'inherit'}} 
+            <MDBNavbarToggler style={{borderColor:'blue'}} 
             onClick={() => setShowNav(!showNav)}>
               <MDBIcon icon='bars'  fas />
             </MDBNavbarToggler>

@@ -19,9 +19,9 @@ services:
       - "3000:3000"
   postgres:
     container_name: dev_svs_postgres
-    # Below to save the database in the current directory
-    volumes:
-      - ./data:/var/lib/postgresql/data
+    # Uncomment below to save the database in the current directory
+    # volumes:
+      # - ./data:/var/lib/postgresql/data
     ports:
       - "5432:5432"
   pgadmin:

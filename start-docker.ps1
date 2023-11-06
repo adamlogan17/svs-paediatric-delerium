@@ -28,7 +28,11 @@ if($c -or $n) {
 
 if(!$p) {
     # removes the postgres server volume
+    Write-Host "Removing the volume which contains the data for the DB..." -ForegroundColor Cyan -BackgroundColor Black
+    Write-Host ""
     docker volume rm svs-paediatric-delerium_svs-data
+    Write-Host "Removed the volume which contains the data for the DB..." -ForegroundColor Cyan -BackgroundColor Black
+    Write-Host ""
 }
 
 if($n) {

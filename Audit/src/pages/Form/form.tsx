@@ -12,12 +12,28 @@ import {
 import { useRef, useState } from 'react';
 import axios from 'axios';
 
+// {
+//   "entry_date": "2023-11-07",
+//   "method": "SOSPD",
+//   "bed_number": 0,
+//   "correct_details": true,
+//   "comfort_recorded": true,
+//   "comfort_above": true,
+//   "all_params_scored": true,
+//   "totalled_correctly": true,
+//   "in_score_range": true,
+//   "observer_name": true,
+//   "picu_id": sessionStorage('USERNAME')
+// }
+
 
 function insertData(data: any[]): void {
+  console.log("ewan", data);
+  console.log(sessionStorage.getItem('TOKEN'));
   const configuration = {
     method: "post",
     url: `${process.env.REACT_APP_API_URL}/add-compliance`,
-    headers: { 'Authorization': "bearer " + sessionStorage.getItem('TOKEN') },
+    headers: { 'Authorization': "Bearer " + sessionStorage.getItem('TOKEN') },
     data: data
   };
 
@@ -53,12 +69,26 @@ function Form() {
 
     let userData: string[] = [patientDetails, isComfortBRecorded, isComfortBScore12OrMore, isComfortBScore12OrMoreIn24Hrs, isCAPDTotalledCorrectly, isCAPDScore9OrMore, isChartInitialled];
 
-    let convertedData: any[] = userData.map((data: string) => data === "Yes" ? true : false);
+    const data:any = {
+        entry_date: Date.now,
+        method: "CAPD",
+        bed_number: bedNo,
+        correct_details: isCAPDTotalledCorrectly,
+        comfort_recorded: isComfortBRecorded,
+        comfort_above: isComfortBScore12OrMore,
+        all_params_scored: isComfortBScore12OrMoreIn24Hrs,
+        totalled_correctly: isCAPDTotalledCorrectly,
+        in_score_range: isCAPDScore9OrMore,
+        observer_name: isChartInitialled,
+        picu_id: sessionStorage.getItem('USERNAME')
+      }
 
-    convertedData.push(bedNo);
-    convertedData.push("CAPD");
+    // let convertedData: any[] = userData.map((data: string) => data === "Yes" ? true : false);
 
-    insertData(convertedData);
+    // convertedData.push(bedNo);
+    // convertedData.push("CAPD");
+
+    insertData(data);
   };
 
   return (
@@ -84,8 +114,8 @@ function Form() {
               onChange={(e) => setPatientDetails(e.target.value)}
             >
               <div className="radio-group">
-                <FormControlLabel className="radio-label" value="Yes" control={<Radio />} label="Yes" />
-                <FormControlLabel className="radio-label" value="No" control={<Radio />} label="No" />
+                <FormControlLabel className="radio-label" value="True" control={<Radio />} label="Yes" />
+                <FormControlLabel className="radio-label" value="False" control={<Radio />} label="No" />
               </div>
             </RadioGroup>
             <br />
@@ -98,8 +128,8 @@ function Form() {
               onChange={(e) => setIsComfortBRecorded(e.target.value)}
             >
               <div className="radio-group">
-                <FormControlLabel className="radio-label" value="Yes" control={<Radio />} label="Yes" />
-                <FormControlLabel className="radio-label" value="No" control={<Radio />} label="No" />
+                <FormControlLabel className="radio-label" value="True" control={<Radio />} label="Yes" />
+                <FormControlLabel className="radio-label" value="False" control={<Radio />} label="No" />
               </div>
             </RadioGroup>
             <br />
@@ -111,8 +141,8 @@ function Form() {
               value={isComfortBScore12OrMore}
               onChange={(e) => setIsComfortBScore12OrMore(e.target.value)}
             >              <div className="radio-group">
-                <FormControlLabel className="radio-label" value="Yes" control={<Radio />} label="Yes" />
-                <FormControlLabel className="radio-label" value="No" control={<Radio />} label="No" />
+                <FormControlLabel className="radio-label" value="True" control={<Radio />} label="Yes" />
+                <FormControlLabel className="radio-label" value="False" control={<Radio />} label="No" />
               </div>
             </RadioGroup>
             <br />
@@ -126,8 +156,8 @@ function Form() {
               value={isComfortBScore12OrMoreIn24Hrs}
               onChange={(e) => setIsComfortBScore12OrMoreIn24Hrs(e.target.value)}
             ><div className="radio-group">
-                <FormControlLabel className="radio-label" value="Yes" control={<Radio />} label="Yes" />
-                <FormControlLabel className="radio-label" value="No" control={<Radio />} label="No" />
+                <FormControlLabel className="radio-label" value="True" control={<Radio />} label="Yes" />
+                <FormControlLabel className="radio-label" value="False" control={<Radio />} label="No" />
               </div>
             </RadioGroup>
             <br />
@@ -139,8 +169,8 @@ function Form() {
               value={isCAPDTotalledCorrectly}
               onChange={(e) => setIsCAPDTotalledCorrectly(e.target.value)}
             > <div className="radio-group">
-                <FormControlLabel className="radio-label" value="Yes" control={<Radio />} label="Yes" />
-                <FormControlLabel className="radio-label" value="No" control={<Radio />} label="No" />
+                <FormControlLabel className="radio-label" value="True" control={<Radio />} label="Yes" />
+                <FormControlLabel className="radio-label" value="False" control={<Radio />} label="No" />
               </div>
             </RadioGroup>
             <br />
@@ -152,8 +182,8 @@ function Form() {
               value={isCAPDScore9OrMore}
               onChange={(e) => setIsCAPDScore9OrMore(e.target.value)}
             > <div className="radio-group">
-                <FormControlLabel className="radio-label" value="Yes" control={<Radio />} label="Yes" />
-                <FormControlLabel className="radio-label" value="No" control={<Radio />} label="No" />
+                <FormControlLabel className="radio-label" value="True" control={<Radio />} label="Yes" />
+                <FormControlLabel className="radio-label" value="False" control={<Radio />} label="No" />
               </div>
             </RadioGroup>
             <br />
@@ -165,8 +195,8 @@ function Form() {
               value={isChartInitialled}
               onChange={(e) => setIsChartInitialled(e.target.value)}
             > <div className="radio-group">
-                <FormControlLabel className="radio-label" value="Yes" control={<Radio />} label="Yes" />
-                <FormControlLabel className="radio-label" value="No" control={<Radio />} label="No" />
+                <FormControlLabel className="radio-label" value="True" control={<Radio />} label="Yes" />
+                <FormControlLabel className="radio-label" value="False" control={<Radio />} label="No" />
               </div>
             </RadioGroup>
             <br />

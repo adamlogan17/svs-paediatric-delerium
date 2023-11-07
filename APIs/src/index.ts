@@ -123,10 +123,10 @@ app.use((req:Request, res:Response, next:NextFunction) => {
   next();
 });
 
-app.get("/test-auth", (request: Request, response: Response, next:NextFunction) => authorise(request, response, next), (request:any, response:Response, next:NextFunction) => {
-  request.body = { message: "You are authorized to access me" , user: request.params.username, role: request.params.role};
-  next();
-}, (req: Request,res: Response) => logData(req, res));
+// app.get("/test-auth", (request: Request, response: Response, next:NextFunction) => authorise(request, response, next), (request:any, response:Response, next:NextFunction) => {
+//   request.body = { message: "You are authorized to access me" , user: request.params.username, role: request.params.role};
+//   next();
+// }, (req: Request,res: Response) => logData(req, res));
 
 
 /**

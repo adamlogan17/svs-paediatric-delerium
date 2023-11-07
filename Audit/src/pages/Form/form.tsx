@@ -11,40 +11,25 @@ import {
 
 import { useRef, useState } from 'react';
 import axios from 'axios';
-
-// {
-//   "entry_date": "2023-11-07",
-//   "method": "SOSPD",
-//   "bed_number": 0,
-//   "correct_details": true,
-//   "comfort_recorded": true,
-//   "comfort_above": true,
-//   "all_params_scored": true,
-//   "totalled_correctly": true,
-//   "in_score_range": true,
-//   "observer_name": true,
-//   "picu_id": sessionStorage('USERNAME')
-// }
-
+import { enqueueSnackbar } from 'notistack';
 
 function insertData(data: any[]): void {
   console.log("ewan", data);
   console.log(sessionStorage.getItem('TOKEN'));
-  const configuration = {
-    method: "post",
-    url: `${process.env.REACT_APP_API_URL}/add-compliance`,
-    headers: { 'Authorization': "Bearer " + sessionStorage.getItem('TOKEN') },
-    data: data
-  };
 
-  // make the API call
-  axios(configuration)
-    .then((result) => {
-      alert("Data inserted!");
-      window.location.href = "/auditGraphs"
-    })
-    .catch((error) => error = new Error());
-} //
+
+  try {
+    axios.post(`${process.env.REACT_APP_API_URL}/add-compliance`, data, {
+    headers: { Authorization: `Bearer ${sessionStorage.getItem("TOKEN")}` },
+  });
+  
+} catch (error) {
+  console.log(error);
+  console.log(error);
+  enqueueSnackbar("System Error", { variant: "error" });
+  return;
+}
+} 
 
 function Form() {
   // all the inputs in the form are instantiated here
@@ -67,26 +52,33 @@ function Form() {
     console.log('User ID:', userID);
     console.log('Bed number:', bedNo);
 
-    let userData: string[] = [patientDetails, isComfortBRecorded, isComfortBScore12OrMore, isComfortBScore12OrMoreIn24Hrs, isCAPDTotalledCorrectly, isCAPDScore9OrMore, isChartInitialled];
-
     const data:any = {
-        entry_date: Date.now,
-        method: "CAPD",
-        bed_number: bedNo,
-        correct_details: isCAPDTotalledCorrectly,
-        comfort_recorded: isComfortBRecorded,
-        comfort_above: isComfortBScore12OrMore,
-        all_params_scored: isComfortBScore12OrMoreIn24Hrs,
-        totalled_correctly: isCAPDTotalledCorrectly,
-        in_score_range: isCAPDScore9OrMore,
-        observer_name: isChartInitialled,
-        picu_id: sessionStorage.getItem('USERNAME')
-      }
+      comp_id: 902131,
+      entry_date: "2023-11-07",
+      method: "SOSPD",
+      bed_number: 0,
+      correct_details: true,
+      comfort_recorded: true,
+      comfort_above: true,
+      all_params_scored: true,
+      totalled_correctly: true,
+      in_score_range: true,
+      observer_name: true,
+      picu_id: 1
+    }
 
-    // let convertedData: any[] = userData.map((data: string) => data === "Yes" ? true : false);
-
-    // convertedData.push(bedNo);
-    // convertedData.push("CAPD");
+    // const data:any = {
+    //     method: "CAPD",
+    //     bed_number: bedNo,
+    //     correct_details: isCAPDTotalledCorrectly,
+    //     comfort_recorded: isComfortBRecorded,
+    //     comfort_above: isComfortBScore12OrMore,
+    //     all_params_scored: isComfortBScore12OrMoreIn24Hrs,
+    //     totalled_correctly: isCAPDTotalledCorrectly,
+    //     in_score_range: isCAPDScore9OrMore,
+    //     observer_name: isChartInitialled,
+    //     picu_id: sessionStorage.getItem('USERNAME')
+    //   };
 
     insertData(data);
   };

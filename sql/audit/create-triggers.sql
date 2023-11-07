@@ -37,6 +37,16 @@ BEGIN
 END;
 $calculate_overall_score$ LANGUAGE plpgsql SECURITY DEFINER;
 
+-- Calculates the total number of patients, in a PICU with delirium
+CREATE FUNCTION calculate_positive_delirium() 
+RETURNS trigger AS $calculate_positive_delirium$
+BEGIN
+    UPDATE picu SET delirium_positive_patients=(SELECT SUM(in_score_range::INTEGER) FROM compliance_data WHERE picu_id=NEW.picu_id)/(SELECT COUNT(*) FROM compliance_data WHERE picu_id=NEW.picu_id) WHERE picu_id=NEW.picu_id;
+    RETURN NEW;
+END;
+
+$calculate_positive_delirium$ LANGUAGE plpgsql SECURITY DEFINER;
+
 -- Calculates the 'overall_compliance' field, within the 'picu' table, when data is inserted into the 'compliance_data' table
 CREATE TRIGGER insert_overall_score
     AFTER INSERT
@@ -44,9 +54,21 @@ CREATE TRIGGER insert_overall_score
     FOR EACH ROW
     EXECUTE PROCEDURE calculate_overall_score();
 
+CREATE TRIGGER insert_positive_delirium
+    AFTER INSERT
+    ON compliance_data
+    FOR EACH ROW
+    EXECUTE PROCEDURE calculate_positive_delirium();
+
 -- Calculates the 'overall_compliance' field, within the 'picu' table, when the 'score' field is updated in the 'compliance_data' table
 CREATE TRIGGER update_overall_score
     AFTER UPDATE OF score
     ON compliance_data
     FOR EACH ROW
     EXECUTE PROCEDURE calculate_overall_score();
+
+CREATE TRIGGER update_positive_delirium
+    AFTER UPDATE OF score
+    ON compliance_data
+    FOR EACH ROW
+    EXECUTE PROCEDURE calculate_positive_delirium();

@@ -12,7 +12,7 @@ import {
 import { useRef, useState } from 'react';
 import axios from 'axios';
 import { enqueueSnackbar } from 'notistack';
-import { convert } from 'typedoc/dist/lib/utils/options/declaration';
+import { useLocation } from 'react-router-dom';
 
 function insertData(data: any[]): void {
   console.log("ewan", data);
@@ -21,18 +21,21 @@ function insertData(data: any[]): void {
 
   try {
     axios.post(`${process.env.REACT_APP_API_URL}/add-compliance`, data, {
-    headers: { Authorization: `Bearer ${sessionStorage.getItem("TOKEN")}` },
-  });
-  
-} catch (error) {
-  console.log(error);
-  console.log(error);
-  enqueueSnackbar("System Error", { variant: "error" });
-  return;
+      headers: { Authorization: `Bearer ${sessionStorage.getItem("TOKEN")}` },
+    });
+
+  } catch (error) {
+    console.log(error);
+    console.log(error);
+    enqueueSnackbar("System Error", { variant: "error" });
+    return;
+  }
 }
-} 
 
 function Form() {
+  const location = useLocation();
+  const method = location.state.method;
+
   // all the inputs in the form are instantiated here
   const sumvalueRef = useRef<HTMLInputElement>(null);  //these 3 may not need to be included
   const userIDRef = useRef<HTMLInputElement>(null);   // ^^
@@ -67,30 +70,30 @@ function Form() {
     //   observer_name: true,
     //   picu_id: 1
     // }
-      
-      let userData:string[] = [ patientDetails, isComfortBRecorded, isComfortBScore12OrMore, isComfortBScore12OrMoreIn24Hrs, isCAPDTotalledCorrectly, isCAPDScore9OrMore, isChartInitialled ];
-      let convertedData:any[] = userData.map((data:string) => data === "True" ? true:false);
 
-      let today = new Date();
-      let dd = String(today.getDate()).padStart(2, '0');
-      let mm = String(today.getMonth() + 1).padStart(2, '0'); //January is 0!
-      let yyyy = today.getFullYear();
+    let userData: string[] = [patientDetails, isComfortBRecorded, isComfortBScore12OrMore, isComfortBScore12OrMoreIn24Hrs, isCAPDTotalledCorrectly, isCAPDScore9OrMore, isChartInitialled];
+    let convertedData: any[] = userData.map((data: string) => data === "True" ? true : false);
 
-      let todayFormatted = yyyy + '-' + mm + '-' + dd;
+    let today = new Date();
+    let dd = String(today.getDate()).padStart(2, '0');
+    let mm = String(today.getMonth() + 1).padStart(2, '0'); //January is 0!
+    let yyyy = today.getFullYear();
 
-      const data:any = {
-        method: "CAPD",
-        entry_date: todayFormatted,
-        bed_number: bedNo,
-        correct_details: convertedData[0],
-        comfort_recorded: convertedData[1],
-        comfort_above: convertedData[2],
-        all_params_scored: convertedData[3],
-        totalled_correctly: convertedData[4],
-        in_score_range: convertedData[5],
-        observer_name: convertedData[6],
-        picu_id:  parseInt(sessionStorage.getItem('USERNAME') || '0')
-      };
+    let todayFormatted = yyyy + '-' + mm + '-' + dd;
+
+    const data: any = {
+      method: method,
+      entry_date: todayFormatted,
+      bed_number: bedNo,
+      correct_details: convertedData[0],
+      comfort_recorded: convertedData[1],
+      comfort_above: convertedData[2],
+      all_params_scored: convertedData[3],
+      totalled_correctly: convertedData[4],
+      in_score_range: convertedData[5],
+      observer_name: convertedData[6],
+      picu_id: parseInt(sessionStorage.getItem('USERNAME') || '0')
+    };
 
     insertData(data);
   };
@@ -98,7 +101,9 @@ function Form() {
   return (
     <Container id="form" className="wrapper">
       <div className="content">
-        <Typography variant="h4">Delirium Compliance - Audit Form</Typography>
+        <Typography variant="h4">
+        {method === 'SOSPD' ? 'Delirium Compliance - Audit Form (SOS-PD)' : 'Delirium Compliance - Audit Form (CAPD)'}
+        </Typography>
         <br />
         <form onSubmit={handleSubmit}>
           <div className="data-input" style={{ marginTop: '20px' }}>
@@ -152,11 +157,12 @@ function Form() {
             <br />
 
             <Typography variant="subtitle1">
-              Has the Comfort B is 12 or more in the last 24 hours and ALL CAPD parameters 1-8 scored:
+            {method === 'SOSPD' ? 'Is Comfort B 12 or more in the last 24 hours, have all SOS-PD parameters been scored?' : 'Is Comfort B 12 or more in the last 24 hours, are ALL CAPD parameters 1-8 scored :'}
+              
             </Typography>
             <RadioGroup
-              aria-label="comfort-b-score-12-or-more-24hrs"
-              name="comfort-b-score-12-or-more-24hrs"
+                          aria-label={method === 'SOSPD' ? 'sospd-comfort-b-score-12-or-more-24hrs' : 'capd-comfort-b-score-12-or-more-24hrs'}
+                          name={method === 'SOSPD' ? 'sospd-comfort-b-score-12-or-more-24hrs' : 'capd-comfort-b-score-12-or-more-24hrs'}
               value={isComfortBScore12OrMoreIn24Hrs}
               onChange={(e) => setIsComfortBScore12OrMoreIn24Hrs(e.target.value)}
             ><div className="radio-group">
@@ -166,10 +172,12 @@ function Form() {
             </RadioGroup>
             <br />
 
-            <Typography variant="subtitle1">Has CAPD been totalled correctly:</Typography>
+            <Typography variant="subtitle1">
+              {method === 'SOSPD' ? 'Has the SOSPD been totalled correctly:' : 'Has CAPD been totalled correctly:'}
+            </Typography>
             <RadioGroup
-              aria-label="capd-totalled-correctly"
-              name="capd-totalled-correctly"
+              aria-label={method === 'SOSPD' ? 'sospd-totalled-correctly' : 'capd-totalled-correctly'}
+              name={method === 'SOSPD' ? 'sospd-totalled-correctly' : 'capd-totalled-correctly'}
               value={isCAPDTotalledCorrectly}
               onChange={(e) => setIsCAPDTotalledCorrectly(e.target.value)}
             > <div className="radio-group">
@@ -179,10 +187,12 @@ function Form() {
             </RadioGroup>
             <br />
 
-            <Typography variant="subtitle1">Is CAPD score 9 or more:</Typography>
+            <Typography variant="subtitle1">
+              {method === 'SOSPD' ? 'Do parents NOT recognise their child’s behaviour AND/OR SOS-PD score is ≥ 4 OR symptom with * is positive?' : 'Is CAPD score 9 or more:'}
+            </Typography>
             <RadioGroup
-              aria-label="capd-score-9-or-more"
-              name="capd-score-9-or-more"
+              aria-label={method === 'SOSPD' ? 'sospd-score-9-or-more' : 'capd-score-9-or-more'}
+              name={method === 'SOSPD' ? 'sospd-score-9-or-more' : 'capd-score-9-or-more'}
               value={isCAPDScore9OrMore}
               onChange={(e) => setIsCAPDScore9OrMore(e.target.value)}
             > <div className="radio-group">

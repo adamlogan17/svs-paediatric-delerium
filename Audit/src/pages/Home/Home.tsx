@@ -2,6 +2,7 @@ import HeadingText from '../../components/HeadingText/HeadingText';
 import BodyText from '../../components/BodyText/BodyText';
 import PButton from '../../components/PButton/PButton';
 import ContactInfo from '../../components/ContactInfo/ContactInfo';
+import { useNavigate } from 'react-router-dom';
 
 import '../../shared/layout.css';
 
@@ -10,7 +11,9 @@ import '../../shared/layout.css';
  * @author Adam Logan
  * @date 2023-04-28
  */
+
 function Home() {
+  const navigate = useNavigate();
   return (
         <div id='home' className='wrapper'>
           <div className = 'content'>
@@ -23,19 +26,27 @@ function Home() {
 
             <div className = 'row' id = 'ButtonContainer'>
               <div className = 'half-column' id = 'SOSPD-ButtonColumn'>
-                <PButton text = 'SOSPD Audit Section' onButtonClick = {() => {window.location.href = "/form"}}/>
+              <PButton 
+             text='SOSPD Audit Section' 
+             onButtonClick={() => {
+              navigate('/form', { state: { method: 'SOSPD' }});
+              }}/>
+                </div>
+                <div className = 'half-column' id = 'CAPD-ButtonColumn'>
+                <PButton 
+             text='CAPD Audit Section' 
+             onButtonClick={() => {
+              navigate('/form', { state: { method: 'CAPD' }});
+              }}/>
+                </div>
               </div>
-              <div className = 'half-column' id = 'CAPD-ButtonColumn'>
-                <PButton text = 'CAPD Audit Section' onButtonClick = {() => {window.location.href = "/form"}}/>
-              </div>
-            </div>
 
-            <div className = 'row' id = 'ContactInfoContainer'>
-              <ContactInfo />
+              <div className = 'row' id = 'ContactInfoContainer'>
+                <ContactInfo />
+              </div>
             </div>
           </div>
-        </div>
-  );
-}
+    );
+  }
 
 export default Home;

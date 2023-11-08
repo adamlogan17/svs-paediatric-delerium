@@ -10,13 +10,13 @@ GRANT SELECT, INSERT, UPDATE ON progression TO learner_role;
 CREATE ROLE elearning_admin_role WITH LOGIN PASSWORD 'password';
 ALTER ROLE admin_role SUPERUSER;
 
-GRANT SELECT, INSERT, UPDATE, DELETE ON users TO admin_role;
-GRANT SELECT, INSERT, UPDATE, DELETE ON courses TO admin_role;
-GRANT SELECT, INSERT, UPDATE, DELETE ON chapters TO admin_role;
-GRANT SELECT, INSERT, UPDATE, DELETE ON enrollment TO admin_role;
-GRANT SELECT, INSERT, UPDATE, DELETE ON progression TO admin_role;
+GRANT SELECT, INSERT, UPDATE, DELETE ON users TO elearning_admin_role;
+GRANT SELECT, INSERT, UPDATE, DELETE ON courses TO elearning_admin_role;
+GRANT SELECT, INSERT, UPDATE, DELETE ON chapters TO elearning_admin_role;
+GRANT SELECT, INSERT, UPDATE, DELETE ON enrollment TO elearning_admin_role;
+GRANT SELECT, INSERT, UPDATE, DELETE ON progression TO elearning_admin_role;
 
 -- Creates the field engineer role
 CREATE ROLE elearning_field_engineer_role WITH LOGIN PASSWORD 'password';
 
-GRANT SELECT, UPDATE ON users TO field_engineer_role;
+GRANT SELECT, UPDATE ON users TO field_engineer;

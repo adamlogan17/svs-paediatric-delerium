@@ -15,6 +15,7 @@ import { allPicuCompliance, singlePicuCompliance } from './auditCharts';
 import { addPicu, deletePicus, editPicu, getAllIds, nextPicu } from './picuDbManagement';
 import { deleteCompRecords, editCompliance, insertCompData } from './complianceScores';
 
+
 // initialise process.env
 config();
 
@@ -101,7 +102,9 @@ app.use((req:Request, res:Response, next) => {
 });
 
 
+
 app.use((req:Request, res:Response, next:NextFunction) => {
+
   const now = new Date();
   const apiCallDetail: APICallDetail = {
     date: now.toISOString().split('T')[0], // Separate date

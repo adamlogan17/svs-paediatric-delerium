@@ -4,6 +4,7 @@ import {createPool, createSelect, insertData, updateData} from './crud';
 import bcrypt from 'bcrypt';
 import axios from 'axios';
 import { config } from 'dotenv';
+import { log } from "console";
 
 config();
 

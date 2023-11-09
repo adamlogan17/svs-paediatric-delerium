@@ -8,23 +8,30 @@ import { useLocation } from 'react-router-dom';
 
 
 
+
 const NoPage = () => {
     const location = useLocation();
-    const method = location.state.method;
+    let message = '404'; // Default message
+    let description = 'Ooops... Page not found';
+
+    // Check if location.state exists and if it has a method property
+    if (location.state && (location.state.method === 'SOSPD' || location.state.method === 'CAPD')) {
+        message = '401';
+        description = 'You are not authorised to view this page, login first';
+    }
 
     return (
-        
         <div className="no-page">
             <Typography variant="h1" component="h2">
-            {method === 'SOSPD' || 'CAPD' ? '401 Error' : '404 Error'}
-             </Typography>
+                {message}
+            </Typography>
 
-             <Typography variant="h3" component="h3">
-             {method === 'SOSPD' || 'CAPD' ? 'Remember to login first' : 'Ooops... Page not found'}
-             </Typography>
+            <Typography variant="h3" component="h3">
+                {description}
+            </Typography>
         </div>
-        
     );
 };
+
 
 export default NoPage;

@@ -111,7 +111,7 @@ export async function addPicu(dataToAdd:Picu, role:string): Promise<{picu_id:num
  * @returns {Promise<number>} - The next value in the sequence.
  */
 export async function nextPicu(role:string) {
-  const POOL = createPool(db, role + "_role", dbPassword);
+  const POOL = createPool(db, role, dbPassword);
 
   return (await POOL.query("SELECT nextval('picu_picu_id_seq');")).rows[0].nextval;
 }
@@ -128,7 +128,7 @@ export async function nextPicu(role:string) {
  * @returns {Promise<{picu_id:string,picu_role:string}[]>} - An array of relevant PICU IDs.
  */
 export async function getAllIds(role:string): Promise<{picu_id:string, picu_role:string}[]> {
-  const POOL = createPool(db, role + "_role", dbPassword);
+  const POOL = createPool(db, role, dbPassword);
 
   const sqlStatement = createSelect("picu", "", ["picu_id", "picu_role"]);
 

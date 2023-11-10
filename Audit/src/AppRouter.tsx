@@ -38,7 +38,7 @@ function AppRouter() {
           <>
             <Route path="/form" element={<Form />} />
             <Route path="/otherPage" element={<OtherPage />} />
-            <Route path="/auditGraphs" element={<AuditGraphs />} />
+            <Route path="/audit-graphs" element={<AuditGraphs />} />
           </>
         )}
 

@@ -21,7 +21,8 @@ const darkTheme:PaletteOptions = {
     main: '#009999'
   },
   background: {
-    paper: '#000000'
+    default:'#181818',
+    paper: '#181818'
   }
 }
 

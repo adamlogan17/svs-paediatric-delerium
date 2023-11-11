@@ -9,11 +9,12 @@ import { config } from 'dotenv';
 import swaggerJsdoc from 'swagger-jsdoc';
 import swaggerUi from 'swagger-ui-express';
 
-import { deleteData, getAll, insertData, updateData } from './crud';
-import { authenticate, authorise, updatePicuPassword, verifyCaptcha } from './login';
+import { copyTable, deleteData, getAll, insertData, updateData } from './crud';
+import { authenticate, authorise, logData, updatePicuPassword, verifyCaptcha } from './login';
 import { allPicuCompliance, singlePicuCompliance } from './auditCharts';
 import { addPicu, deletePicus, editPicu, getAllIds, nextPicu } from './picuDbManagement';
 import { deleteCompRecords, editCompliance, insertCompData } from './complianceScores';
+
 
 // initialise process.env
 config();
@@ -100,7 +101,10 @@ app.use((req:Request, res:Response, next) => {
     next();
 });
 
-app.use((req:Request, res:Response, next) => {
+
+
+app.use((req:Request, res:Response, next:NextFunction) => {
+
   const now = new Date();
   const apiCallDetail: APICallDetail = {
     date: now.toISOString().split('T')[0], // Separate date
@@ -121,6 +125,11 @@ app.use((req:Request, res:Response, next) => {
   // Continue with the request handling
   next();
 });
+
+// app.get("/test-auth", (request: Request, response: Response, next:NextFunction) => authorise(request, response, next), (request:any, response:Response, next:NextFunction) => {
+//   request.body = { message: "You are authorized to access me" , user: request.params.username, role: request.params.role};
+//   next();
+// }, (req: Request,res: Response) => logData(req, res));
 
 
 /**
@@ -199,13 +208,15 @@ app.use((req:Request, res:Response, next) => {
  *      '200':
  *          description: OK
  */
-app.get("/test/:val", (req: Request,res: Response)=>{
-    res.status(200).send({
-        hello:"world",
-        val: req.params.val
-    });
-});
+app.get("/test/:val", (request: Request, respond: Response, next:NextFunction) => {
+    request.body = {
+          hello:"world",
+          val: request.params.val
+      }
+    console.log("in", request.body);
 
+    next();
+}, (req: Request,res: Response) => logData(req, res));
 
 /**
  * @swagger
@@ -276,6 +287,106 @@ app.get("/:database/getall/:table", async (req: Request,res: Response) => {
   let status:number = typeof result === 'string' ? 400 : 200;
   res.status(status).send(result);
 });
+
+/**
+ * @swagger
+ * /backupAllData:
+ *   post:
+ *     summary: Copy data from the api_log table to api_log_backup.
+ *     tags:
+ *       - Backup
+ *     responses:
+ *       200:
+ *         description: Data successfully copied.
+ *       400:
+ *         description: There was an error copying the data.
+ */
+app.post("/backupAllData", async (req, res) => {
+  try {
+
+    copyTable("audit", "api_log", "api_log_backup");
+    copyTable("audit", "compliance_data", "compliance_data_backup");
+    copyTable("audit", "picu", "picu_backup");
+    
+    res.status(200).send("Data successfully copied to api_log_backup.");
+  } catch (error) {
+    console.error(error);
+    res.status(400).send("Error copying data.");
+  }
+});
+
+/**
+ * @swagger
+ * /backupPicu:
+ *   post:
+ *     summary: Copy data from the picu table to picu_backup.
+ *     tags:
+ *       - Backup
+ *     responses:
+ *       200:
+ *         description: Data successfully copied.
+ *       400:
+ *         description: There was an error copying the data.
+ */
+app.post("/backupPicu", async (req, res) => {
+  try {
+    copyTable("audit", "picu", "picu_backup");
+    res.status(200).send("Data successfully copied to picu_backup.");
+  } catch (error) {
+    console.error(error);
+    res.status(400).send("Error copying data.");
+  }
+});
+
+/**
+ * @swagger
+ * /backupComplianceData:
+ *   post:
+ *     summary: Copy data from the compliance_data table to compliance_data_backup.
+ *     tags:
+ *       - Backup
+ *     responses:
+ *       200:
+ *         description: Data successfully copied.
+ *       400:
+ *         description: There was an error copying the data.
+ */
+app.post("/backupComplianceData", async (req, res) => {
+  try {
+    copyTable("audit", "compliance_data", "compliance_data_backup");
+    res.status(200).send("Data successfully copied to compliance_data_backup.");
+  } catch (error) {
+    console.error(error);
+    res.status(400).send("Error copying data.");
+  }
+});
+
+/**
+ * @swagger
+ * /backupApiLog:
+ *   post:
+ *     summary: Copy data from the api_log table to api_log_backup.
+ *     tags:
+ *       - Backup
+ *     responses:
+ *       200:
+ *         description: Data successfully copied.
+ *       400:
+ *         description: There was an error copying the data.
+ */
+app.post("/backupApiLog", async (req, res) => {
+  try {
+    copyTable("audit", "api_log", "api_log_backup");
+    res.status(200).send("Data successfully copied to api_log_backup.");
+  } catch (error) {
+    console.error(error);
+    res.status(400).send("Error copying data.");
+  }
+});
+
+
+
+
 
 /**
  * @swagger
@@ -430,9 +541,10 @@ app.delete("/:database/deletedata/:table/:predicate", async (req: Request,res: R
  *       401:
  *         description: Unauthorized access.
  */
-app.get("/test-auth", (request: Request, response: Response, next:NextFunction) => authorise(request, response, next), (request:any, response) => {
-  response.json({ message: "You are authorized to access me" , user: request.params.username, role: request.params.role});
-});
+app.get("/test-auth", (request: Request, response: Response, next:NextFunction) => authorise(request, response, next), (request:any, response:Response, next:NextFunction) => {
+  request.body = { message: "You are authorized to access me" , user: request.params.username, role: request.params.role};
+  next();
+}, (req: Request,res: Response) => logData(req, res));
 
 /**
  * @swagger
@@ -452,9 +564,10 @@ app.get("/test-auth", (request: Request, response: Response, next:NextFunction) 
  *       401:
  *         description: Unauthorized access.
  */
-app.get("/test-auth/admin", (request: Request, response: Response, next:NextFunction) => authorise(request, response, next, "admin"), (request:any, response) => {
-  response.json({ message: "You are authorized to access me" , user: request.params.username, role: request.params.role});
-});
+app.get("/test-auth/admin", (request: Request, response: Response, next:NextFunction) => authorise(request, response, next, "admin"), (request:any, response:Response, next:NextFunction) => {
+  request.body ={ message: "You are authorized to access me" , user: request.params.username, role: request.params.role};
+  next();
+}, (req: Request,res: Response) => logData(req, res));
 
 /**
  * @swagger
@@ -474,9 +587,10 @@ app.get("/test-auth/admin", (request: Request, response: Response, next:NextFunc
  *       401:
  *         description: Unauthorized access.
  */
-app.get("/test-auth/field-engineer", (request: Request, response: Response, next:NextFunction) => authorise(request, response, next, "field_engineer"), (request:any, response) => {
-  response.json({ message: "You are authorized to access me" , user: request.params.username, role: request.params.role});
-});
+app.get("/test-auth/field-engineer", (request: Request, response: Response, next:NextFunction) => authorise(request, response, next, "field_engineer"), (request:any, response:Response, next:NextFunction) => {
+  request.body ={ message: "You are authorized to access me" , user: request.params.username, role: request.params.role};
+  next();
+}, (req: Request,res: Response) => logData(req, res));
 
 /**
  * Retrieves the compliance data of the site requested
@@ -797,76 +911,13 @@ app.put("/update-compliance", (request: Request, response: Response, next:NextFu
  *       400:
  *         description: An error occurred.
  */
-app.delete("/delete-compliance", (request: Request, response: Response, next:NextFunction) => authorise(request, response, next, 'admin'), async (req: Request, res: Response) => {
-  let result = await deleteCompRecords(req.body.comp_ids, req.params.role);
+app.delete("/delete-compliance", (request: Request, response: Response, next:NextFunction) => authorise(request, response, next, 'admin'), async (req: Request, res: Response, next:NextFunction) => {
+   let result = await deleteCompRecords(req.body.comp_ids, req.params.role);
   let status:number = result.toString().includes("Error") ? 400 : 201;
-  res.status(status).send(result);
-});
-
-/**
- * @swagger
- * /update-compliance:
- *   put:
- *     tags:
- *       - Compliance
- *     summary: Update a compliance entry based on the provided data.
- *     security:
- *       - Bearer: []
- *     parameters:
- *       - in: body
- *         name: complianceData
- *         description: The data to update for the compliance entry.
- *         schema:
- *           type: object
- *           $ref: '#/definitions/ComplianceData'
- *     responses:
- *       201:
- *         description: Compliance entry updated successfully.
- *       400:
- *         description: An error occurred.
- */
-app.put("/update-compliance", (request: Request, response: Response, next:NextFunction) => authorise(request, response, next, 'admin'), async (req: Request, res: Response) => {
-  let result:string = await editCompliance(req.body, req.params.role);
-  let status:number = result.toString().includes("Error") ? 400 : 201;
-
-  res.status(status).send(result);
-});
-
-/**
- * @swagger
- * /delete-compliance:
- *   delete:
- *     tags:
- *       - Compliance
- *     summary: Delete multiple compliance records based on provided IDs.
- *     security:
- *       - Bearer: []
- *     parameters:
- *       - in: body
- *         name: body
- *         description: Array of compliance record IDs to delete.
- *         schema:
- *           type: object
- *           required:
- *             - comp_ids
- *           properties:
- *             comp_ids:
- *               type: array
- *               description: The IDs of the compliance records to delete.
- *               items:
- *                 type: number
- *     responses:
- *       200:
- *         description: Compliance records deleted successfully.
- *       400:
- *         description: An error occurred.
- */
-app.delete("/delete-compliance", (request: Request, response: Response, next:NextFunction) => authorise(request, response, next, 'admin'), async (req: Request, res: Response) => {
-  let result = await deleteCompRecords(req.body.comp_ids, req.params.role);
-  let status:number = result.toString().includes("Error") ? 400 : 201;
-  res.status(status).send(result);
-});
-
+  // next();
+   res.status(status).send(result);
+})
+//, (req: Request, res: Response) => log(req, res));
 
 // Used to activate the endpoints through HTTP
 app.listen(port,()=> {

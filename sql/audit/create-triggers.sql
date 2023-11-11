@@ -12,7 +12,7 @@ BEGIN
 END;
 $calculate_score$ LANGUAGE plpgsql SECURITY DEFINER;
 
--- Sets a update trigger on the fields used to calculate the 'score' field within the 'compliance_comp' table
+-- Sets an update trigger on the fields used to calculate the 'score' field within the 'compliance_comp' table
 CREATE TRIGGER update_calc_score
     AFTER UPDATE OF correct_details, comfort_above
     ON compliance_data

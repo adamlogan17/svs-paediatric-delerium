@@ -6,7 +6,6 @@ import { Avatar, Box, Typography } from '@mui/material';
 import BorderColorIcon from '@mui/icons-material/BorderColor';
 import PageLoad from '../../components/Loading/PageLoad';
 
-
 const customInputFields:any[] = [
   {
     key:"picu_role",
@@ -132,7 +131,6 @@ export default function EditPicus() {
           disableDelete={[Number(sessionStorage.getItem('USERNAME'))]}
         />}
       </div>
-
     </Box>
   );
 }

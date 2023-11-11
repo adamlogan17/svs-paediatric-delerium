@@ -57,5 +57,4 @@ function BasicNavBar(props:{theme:string, toggleMode:Function, backgroundColor:s
     </Container>
   );
 }
-
 export default BasicNavBar;

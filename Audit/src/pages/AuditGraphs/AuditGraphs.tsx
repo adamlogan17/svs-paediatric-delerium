@@ -9,7 +9,8 @@ import axios from 'axios';
 import { useEffect, useState } from 'react';
 import { adminAuth } from '../Admin/Admin';
 import { enqueueSnackbar } from 'notistack';
-import { Autocomplete, TextField } from '@mui/material';
+import { Autocomplete, Avatar, TextField, Typography } from '@mui/material';
+import LockOutlinedIcon from '@mui/icons-material/LockOutlined';
 
 Chart.register(CategoryScale);
 
@@ -84,7 +85,14 @@ function AuditGraphs() {
   return (
     <div id='form' className='wrapper' style={{width: '100%'}}>
       <div className = 'content' style={{width: '100%'}}>
-        <h1>Delirium Compliance - Audit Form</h1>
+        {/* <h1>Delirium Compliance - Audit Form</h1> */}
+        <Avatar sx={{ m: 1, bgcolor: 'primary.main' }}>
+          <LockOutlinedIcon />
+        </Avatar>
+
+        <Typography component="h1" variant="h5">
+          Delirium Compliance - Audit Form
+        </Typography>
         <br />
 
         <form id = 'graphContainer' action="" method="get" >          

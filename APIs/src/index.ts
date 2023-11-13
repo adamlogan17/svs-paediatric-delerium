@@ -9,7 +9,7 @@ import { config } from 'dotenv';
 import swaggerJsdoc from 'swagger-jsdoc';
 import swaggerUi from 'swagger-ui-express';
 
-import { copyTable, deleteData, getAll, insertData, updateData } from './crud';
+import { copyTable, deleteData, getAll, getPicuData, insertData, updateData } from './crud';
 import { authenticate, authorise, logData, updatePicuPassword, verifyCaptcha } from './login';
 import { allPicuCompliance, singlePicuCompliance } from './auditCharts';
 import { addPicu, deletePicus, editPicu, getAllIds, nextPicu } from './picuDbManagement';
@@ -387,6 +387,110 @@ app.post("/backupApiLog", async (req, res) => {
 
 
 
+/**
+ * @swagger
+ * /backupPicu:
+ *   post:
+ *     summary: Copy data from the picu table to picu_backup.
+ *     tags:
+ *       - Backup
+ *     responses:
+ *       200:
+ *         description: Data successfully copied.
+ *       400:
+ *         description: There was an error copying the data.
+ */
+app.post("/backupPicu", async (req, res) => {
+  try {
+    copyTable("audit", "picu", "picu_backup");
+    res.status(200).send("Data successfully copied to picu_backup.");
+  } catch (error) {
+    console.error(error);
+    res.status(400).send("Error copying data.");
+  }
+});
+
+/**
+ * @swagger
+ * /backupComplianceData:
+ *   post:
+ *     summary: Copy data from the compliance_data table to compliance_data_backup.
+ *     tags:
+ *       - Backup
+ *     responses:
+ *       200:
+ *         description: Data successfully copied.
+ *       400:
+ *         description: There was an error copying the data.
+ */
+app.post("/backupComplianceData", async (req, res) => {
+  try {
+    copyTable("audit", "compliance_data", "compliance_data_backup");
+    res.status(200).send("Data successfully copied to compliance_data_backup.");
+  } catch (error) {
+    console.error(error);
+    res.status(400).send("Error copying data.");
+  }
+});
+
+/**
+ * @swagger
+ * /backupApiLog:
+ *   post:
+ *     summary: Copy data from the api_log table to api_log_backup.
+ *     tags:
+ *       - Backup
+ *     responses:
+ *       200:
+ *         description: Data successfully copied.
+ *       400:
+ *         description: There was an error copying the data.
+ */
+app.post("/backupApiLog", async (req, res) => {
+  try {
+    copyTable("audit", "api_log", "api_log_backup");
+    res.status(200).send("Data successfully copied to api_log_backup.");
+  } catch (error) {
+    console.error(error);
+    res.status(400).send("Error copying data.");
+  }
+});
+
+
+
+
+
+/**
+ * @swagger
+ * /{database}/getpicudata/{table}:
+ *  get:
+ *    tags:
+ *      - CRUD
+ *    summary: Gets specific picu data from table
+ *    parameters:
+ *      - name: database
+ *        in: path
+ *        description: The name of the selected database
+ *        schema:
+ *          type: "string"
+ *        required: true
+ *      - name: table
+ *        in: path
+ *        description: The name of the selected table
+ *        required: true
+ *        schema:
+ *          type: "string"
+ *    responses:
+ *      '200':
+ *          description: OK
+ *      '400':
+ *          description: Invalid parameters
+ */
+app.get("/:database/getpicudata/:table", async (req: Request,res: Response) => {
+  let result:{allData:any[]}|string = await getPicuData(req.params.database, req.params.table, req.params.role === undefined ? "postgres" : `${req.params.role}_role`, req.params.role === undefined ? "postgrespw": "password", req.params.picuID);
+  let status:number = typeof result === 'string' ? 400 : 200;
+  res.status(status).send(result);
+});
 
 /**
  * @swagger

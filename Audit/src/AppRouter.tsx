@@ -63,6 +63,12 @@ function AppRouter() {
             <Route path="/forgot-password" element={<ForgottenPassword />} />
           </>
         )}
+
+        {(adminAccess || fieldAccess || picuAccess) && (
+          <>
+            <Route path="/auditGraphs" element={<AuditGraphs />} />
+          </>
+        )}
       </Routes>
     </Router>
   )

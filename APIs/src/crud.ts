@@ -136,6 +136,22 @@ export async function getAll(database:string, table:string, userForDb:string, pa
   return results;
 }
 
+export async function getSelectedRecords(database:string, table:string, userForDb:string, passForDb:string): Promise<{allData:any[]}|string> {
+  // const POOL = createPool(database, userForDb, passForDb);
+
+  // let results:any;
+
+  // try {
+  //   results = await POOL.query(createSelect(table));
+  //   results = {
+  //     allData: results.rows
+  //   };
+  // } catch (e:any) {
+  //   results = errorCodeMessage(e.code);
+  // }
+  return "results";
+}
+
 /**
  * Fetches all records from a specified table in a database.
  * 
@@ -179,7 +195,7 @@ export async function getPicuData(database:string, table:string, userForDb:strin
  * @returns {Promise<any>} The result of the insertion operation.
  */
 export async function insertData(database:string ,table:string, dataToAdd:any, returnCols?:string[], user="postgres", password="postgrespw"): Promise<any> {
-  let role = user === "postgres" ? user : `${user}_role`;
+  let role = user === "postgres" ? user : `${user}`;
 
   const data:string[] = Object.values(dataToAdd);
 
@@ -214,7 +230,7 @@ export async function insertData(database:string ,table:string, dataToAdd:any, r
  * @returns {Promise<string>} Promise resolving to a success message if the update was successful, or an error message if it wasn't.
  */
 export async function updateData(database:string ,table:string, dataToAdd:any, predicate:string, user="postgres", password="postgrespw"): Promise<string> {  
-  let role = user === "postgres" ? user : `${user}_role`;
+  let role = user === "postgres" ? user : `${user}`;
 
   const data:string[] = Object.values(dataToAdd);
 
@@ -238,6 +254,7 @@ export async function updateData(database:string ,table:string, dataToAdd:any, p
 /**
  * Deletes data from a specified table of a database.
  *
+ * @author Adam Logan
  * @param {string} database - Name of the database to delete data from.
  * @param {string} table - Name of the table where the data needs to be deleted.
  * @param {string} predicate - Condition specifying which rows to delete.
@@ -246,7 +263,7 @@ export async function updateData(database:string ,table:string, dataToAdd:any, p
  * @returns {Promise<string>} Promise resolving to a success message if the deletion was successful, or an error message if it wasn't.
  */
 export async function deleteData(database:string ,table:string, predicate:string, user="postgres", password="postgrespw"): Promise<string> {
-  let role = user === "postgres" ? user : `${user}_role`;
+  let role = user === "postgres" ? user : `${user}`;
 
   const POOL = createPool(database, role, password);
 
@@ -273,7 +290,7 @@ export async function deleteData(database:string ,table:string, predicate:string
  * @returns {Promise<string>} A Promise that resolves to a success message if the copy was successful, or an error message if it wasn't
  */
 export async function copyTable(database: string, sourceTable: string, destinationTable: string, user = 'postgres', password = 'postgrespw'): Promise<string> {
-  const role = user === 'postgres' ? user : `${user}_role`;
+  const role = user === 'postgres' ? user : `${user}`;
 
   const pool = createPool(database, role, password);
 

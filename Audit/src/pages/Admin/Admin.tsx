@@ -1,9 +1,8 @@
 import { Link, useNavigate } from 'react-router-dom';
-import PButton from '../../components/PButton/PButton';
 
-import '../../shared/layout.css';
-import '../../shared/landing.css';
 import axios from 'axios';
+import { Avatar, Box, Button, Container, Typography } from '@mui/material';
+import AdminPanelSettingsIcon from '@mui/icons-material/AdminPanelSettings';
 
 /**
  * Checks if the current user as the role of 'admin' and if so sends an alert to the user
@@ -25,24 +24,86 @@ export function adminAuth() {
     .catch((error) => error = new Error());
 }
 
+/**
+ * 
+ * @todo ensure that the buttons look appropriate for all screen sizes
+ */
 function Admin() {
+  const buttonStyle = { mt: 3, mb: 2, width:'500px' };
+
   const navigate = useNavigate();
 
   return (
-    <div id='admin' className='wrapper'>
-      <div className='content'>
-        <h1>Admin Page</h1>
-        <div className='button-container'>
-        <PButton text='Add a PICU' primaryColour='#025858' secondaryColour='#013e3e' width='100%' onButtonClick={() => navigate("/add-picu")}/>
-          <PButton text='Reset a PICU account password' primaryColour='#025858' secondaryColour='#013e3e' width='100%' onButtonClick={() => navigate("/forgot-password")}/>
-          <PButton text='View / Edit Compliance Data' primaryColour='#025858' secondaryColour='#013e3e' width='100%' onButtonClick={() => adminAuth()}/>
-          <PButton text='Admin Audit Log' primaryColour='#025858' secondaryColour='#013e3e'  width='100%' onButtonClick={() => navigate("/audit-log")}/>
-        </div>
-        <Link to='/'>
-          <PButton text='Home' primaryColour='#025858' secondaryColour='#013e3e' width='100%' onButtonClick={() => window.location.href = "/"}/>
-        </Link>
-      </div>
-    </div>
+    <Container component="main" maxWidth="xl">
+      <Box
+        sx={{
+          marginTop: 8,
+          display: 'flex',
+          flexDirection: 'column',
+          alignItems: 'center',
+        }}
+      >
+
+        <Avatar sx={{ m: 1, bgcolor: 'primary.main' }}>
+          <AdminPanelSettingsIcon />
+        </Avatar>
+
+        <Typography component="h1" variant="h5">
+          Sign in
+        </Typography>
+
+        <Button 
+          onClick={() => navigate('/add-picu')} 
+          sx={buttonStyle}
+          variant="contained"
+        >
+          Add a PICU
+        </Button>
+
+        <Button 
+          onClick={() => navigate('/forgot-password')} 
+          sx={buttonStyle}
+          variant="contained"
+        >
+          Forgotten Password
+        </Button>
+
+        <Button 
+          onClick={() => navigate('/edit-compliance')} 
+          sx={buttonStyle}
+          variant="contained"
+        >
+          Edit Compliance Data
+        </Button>
+
+        <Button 
+          onClick={() => navigate('/edit-picus')} 
+          sx={buttonStyle}
+          variant="contained"
+        >
+          Edit PICU details
+        </Button>
+
+        <Button 
+          onClick={() => navigate('/audit-log')} 
+          sx={buttonStyle}
+          variant="contained"
+        >
+          View Audit Log
+        </Button>
+
+        <Button 
+          onClick={() => navigate('/audit-graphs')} 
+          sx={buttonStyle}
+          variant="contained"
+        >
+          View Graphs
+        </Button>
+
+      </Box>
+    </Container>
+
+    
   );
 }
 

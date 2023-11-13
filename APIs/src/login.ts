@@ -1,11 +1,15 @@
 import { NextFunction, Request, Response } from "express";
 import jwt, { JwtPayload } from 'jsonwebtoken';
-import {createPool, createSelect, updateData} from './crud';
+import {createPool, createSelect, insertData, updateData} from './crud';
 import bcrypt from 'bcrypt';
 import axios from 'axios';
 import { config } from 'dotenv';
+import { log } from "console";
 
 config();
+
+// Sets the secret key for the JWT token, and provides a default value if the environment variable is not set
+const jwtSecret:string = process.env.JWT_SECRET || "034A55E873E4CCD1B601E08B2EC2EB9BF0A569CA8C87F1A572D0AF16C404C988";
 
 /**
  * Initial login function that creates a JWT token based on the userId and their role
@@ -15,11 +19,11 @@ config();
  * @param { Response } response If valid, the token, the username and the role of the user, and a error message if not
  * @returns { void }
  * 
- * TODO Generalise this function to work with any db
+ * @todo Maybe create a function in crud.ts, to select a specific record rather than directly interacting with db
  */
 export function authenticate(request: Request, response: Response): void {
     // the admin role is used to login in users
-    const POOL = createPool("audit", "admin_role", "password"); 
+    const POOL = createPool("audit", "admin", "password"); 
 
     const { username, password } = request.body;
 
@@ -27,7 +31,7 @@ export function authenticate(request: Request, response: Response): void {
 
     POOL.query(createSelect("picu", condition, ["picu_role", "password"]), async (error:any, results:any) => {
       if (error || results.rows.length === 0) {
-        response.send("Invalid User");
+        response.send("ERROR: Permission Denied");
       }
       else {
         // compares the hashed password with the plaintext one which is provided
@@ -42,7 +46,7 @@ export function authenticate(request: Request, response: Response): void {
                 userId: username,
                 role: results.rows[0].picu_role
               },
-              "REPLACE-WITH-PRIVATE-KEY",
+              jwtSecret,
               {expiresIn: "1d"}
             );
             response.send({
@@ -52,7 +56,7 @@ export function authenticate(request: Request, response: Response): void {
             });
 
           } else {
-            response.send("Invalid User");
+            response.send("ERROR: Permission Denied");
           }
         })
         .catch(err => response.send(err))
@@ -79,8 +83,7 @@ export function authorise(request: Request, response: Response, next:NextFunctio
     const token:string = authHeader.includes("Bearer") ? authHeader.split(" ")[1] : authHeader;
 
     // retrieve the user details of the logged in user
-    const user:JwtPayload|string = jwt.verify(token, "REPLACE-WITH-PRIVATE-KEY");
-    console.log(user);
+    const user:JwtPayload|string = jwt.verify(token, jwtSecret);
 
     // pass the user down to the endpoints here
     if(typeof user === 'string') {
@@ -180,4 +183,42 @@ export async function verifyCaptcha(token:string):Promise<boolean> {
   const captchaValidation = verifyResponse.data;
 
   return captchaValidation.success;
+}
+
+interface APICallDetail {
+  date: string;
+  time: string;
+  method: string;
+  url: string;
+  status: number;
+  userIP: string;
+  userAgent: string;
+  userRole: string;
+  username: string;
+}
+
+const apiCallDetails: APICallDetail[] = [];
+
+export async function logData (request: Request, response: Response) {
+  const now = new Date();
+  console.log(request.params.username);
+  console.log(request.params.role);
+
+  const apiCallDetail: APICallDetail = {
+    date: now.toISOString().split('T')[0], // Separate date
+    time: now.toISOString().split('T')[1].split('.')[0], // Separate time
+    method: request.method,
+    url: request.originalUrl,
+    status: response.statusCode,
+    userIP: request.ip,
+    userAgent: request.headers['user-agent'] || '',
+    username: request.params.username,
+    userRole: request.params.role,
+  };
+
+  // Add the API call detail to the array
+  apiCallDetails.push(apiCallDetail);
+  insertData("audit", "api_log", apiCallDetail);
+  response.status(200).send(request.body);
+  // Continue with the request handling
 }

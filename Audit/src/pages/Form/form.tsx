@@ -11,26 +11,31 @@ import {
 
 import { useRef, useState } from 'react';
 import axios from 'axios';
-
+import { enqueueSnackbar } from 'notistack';
+import { useLocation } from 'react-router-dom';
 
 function insertData(data: any[]): void {
-  const configuration = {
-    method: "post",
-    url: `${process.env.REACT_APP_API_URL}/add-compliance`,
-    headers: { 'Authorization': "bearer " + sessionStorage.getItem('TOKEN') },
-    data: data
-  };
+  console.log("ewan", data);
+  console.log(sessionStorage.getItem('TOKEN'));
 
-  // make the API call
-  axios(configuration)
-    .then((result) => {
-      alert("Data inserted!");
-      window.location.href = "/auditGraphs"
-    })
-    .catch((error) => error = new Error());
-} //
+
+  try {
+    axios.post(`${process.env.REACT_APP_API_URL}/add-compliance`, data, {
+      headers: { Authorization: `Bearer ${sessionStorage.getItem("TOKEN")}` },
+    });
+
+  } catch (error) {
+    console.log(error);
+    console.log(error);
+    enqueueSnackbar("System Error", { variant: "error" });
+    return;
+  }
+}
 
 function Form() {
+  const location = useLocation();
+  const method = location.state.method;
+
   // all the inputs in the form are instantiated here
   const sumvalueRef = useRef<HTMLInputElement>(null);  //these 3 may not need to be included
   const userIDRef = useRef<HTMLInputElement>(null);   // ^^
@@ -46,25 +51,59 @@ function Form() {
   function handleSubmit(): void { //this just prints all the values once the buttons printed
     const sumvalue = sumvalueRef.current?.value;
     const userID = userIDRef.current?.value;
-    const bedNo = bedNoRef.current?.value;
+    const bedNo = parseInt(bedNoRef.current?.value || '0');
     console.log('Summary Value:', sumvalue);
     console.log('User ID:', userID);
     console.log('Bed number:', bedNo);
 
+    // const data:any = {
+    //   comp_id: 9131,
+    //   entry_date: "2023-11-07",
+    //   method: "SOSPD",
+    //   bed_number: 0,
+    //   correct_details: true,
+    //   comfort_recorded: true,
+    //   comfort_above: true,
+    //   all_params_scored: true,
+    //   totalled_correctly: true,
+    //   in_score_range: true,
+    //   observer_name: true,
+    //   picu_id: 1
+    // }
+
     let userData: string[] = [patientDetails, isComfortBRecorded, isComfortBScore12OrMore, isComfortBScore12OrMoreIn24Hrs, isCAPDTotalledCorrectly, isCAPDScore9OrMore, isChartInitialled];
+    let convertedData: any[] = userData.map((data: string) => data === "True" ? true : false);
 
-    let convertedData: any[] = userData.map((data: string) => data === "Yes" ? true : false);
+    let today = new Date();
+    let dd = String(today.getDate()).padStart(2, '0');
+    let mm = String(today.getMonth() + 1).padStart(2, '0'); //January is 0!
+    let yyyy = today.getFullYear();
 
-    convertedData.push(bedNo);
-    convertedData.push("CAPD");
+    let todayFormatted = yyyy + '-' + mm + '-' + dd;
 
-    insertData(convertedData);
+    const data: any = {
+      method: method,
+      entry_date: todayFormatted,
+      bed_number: bedNo,
+      correct_details: convertedData[0],
+      comfort_recorded: convertedData[1],
+      comfort_above: convertedData[2],
+      all_params_scored: convertedData[3],
+      totalled_correctly: convertedData[4],
+      in_score_range: convertedData[5],
+      observer_name: convertedData[6],
+      picu_id: parseInt(sessionStorage.getItem('USERNAME') || '0')
+    };
+
+    insertData(data);
   };
 
   return (
     <Container id="form" className="wrapper">
       <div className="content">
-        <Typography variant="h4">Delirium Compliance - Audit Form</Typography>
+        <Typography variant="h4">
+        {method === 'SOSPD' ? 'Delirium Compliance - Audit Form (SOS-PD)' : 'Delirium Compliance - Audit Form (CAPD)'}
+        </Typography>
         <br />
         <form onSubmit={handleSubmit}>
           <div className="data-input" style={{ marginTop: '20px' }}>
@@ -84,8 +123,8 @@ function Form() {
               onChange={(e) => setPatientDetails(e.target.value)}
             >
               <div className="radio-group">
-                <FormControlLabel className="radio-label" value="Yes" control={<Radio />} label="Yes" />
-                <FormControlLabel className="radio-label" value="No" control={<Radio />} label="No" />
+                <FormControlLabel className="radio-label" value="True" control={<Radio />} label="Yes" />
+                <FormControlLabel className="radio-label" value="False" control={<Radio />} label="No" />
               </div>
             </RadioGroup>
             <br />
@@ -98,8 +137,8 @@ function Form() {
               onChange={(e) => setIsComfortBRecorded(e.target.value)}
             >
               <div className="radio-group">
-                <FormControlLabel className="radio-label" value="Yes" control={<Radio />} label="Yes" />
-                <FormControlLabel className="radio-label" value="No" control={<Radio />} label="No" />
+                <FormControlLabel className="radio-label" value="True" control={<Radio />} label="Yes" />
+                <FormControlLabel className="radio-label" value="False" control={<Radio />} label="No" />
               </div>
             </RadioGroup>
             <br />
@@ -111,49 +150,54 @@ function Form() {
               value={isComfortBScore12OrMore}
               onChange={(e) => setIsComfortBScore12OrMore(e.target.value)}
             >              <div className="radio-group">
-                <FormControlLabel className="radio-label" value="Yes" control={<Radio />} label="Yes" />
-                <FormControlLabel className="radio-label" value="No" control={<Radio />} label="No" />
+                <FormControlLabel className="radio-label" value="True" control={<Radio />} label="Yes" />
+                <FormControlLabel className="radio-label" value="False" control={<Radio />} label="No" />
               </div>
             </RadioGroup>
             <br />
 
             <Typography variant="subtitle1">
-              Has the Comfort B is 12 or more in the last 24 hours and ALL CAPD parameters 1-8 scored:
+            {method === 'SOSPD' ? 'Is Comfort B 12 or more in the last 24 hours, have all SOS-PD parameters been scored?' : 'Is Comfort B 12 or more in the last 24 hours, are ALL CAPD parameters 1-8 scored :'}
+              
             </Typography>
             <RadioGroup
-              aria-label="comfort-b-score-12-or-more-24hrs"
-              name="comfort-b-score-12-or-more-24hrs"
+                          aria-label={method === 'SOSPD' ? 'sospd-comfort-b-score-12-or-more-24hrs' : 'capd-comfort-b-score-12-or-more-24hrs'}
+                          name={method === 'SOSPD' ? 'sospd-comfort-b-score-12-or-more-24hrs' : 'capd-comfort-b-score-12-or-more-24hrs'}
               value={isComfortBScore12OrMoreIn24Hrs}
               onChange={(e) => setIsComfortBScore12OrMoreIn24Hrs(e.target.value)}
             ><div className="radio-group">
-                <FormControlLabel className="radio-label" value="Yes" control={<Radio />} label="Yes" />
-                <FormControlLabel className="radio-label" value="No" control={<Radio />} label="No" />
+                <FormControlLabel className="radio-label" value="True" control={<Radio />} label="Yes" />
+                <FormControlLabel className="radio-label" value="False" control={<Radio />} label="No" />
               </div>
             </RadioGroup>
             <br />
 
-            <Typography variant="subtitle1">Has CAPD been totalled correctly:</Typography>
+            <Typography variant="subtitle1">
+              {method === 'SOSPD' ? 'Has the SOSPD been totalled correctly:' : 'Has CAPD been totalled correctly:'}
+            </Typography>
             <RadioGroup
-              aria-label="capd-totalled-correctly"
-              name="capd-totalled-correctly"
+              aria-label={method === 'SOSPD' ? 'sospd-totalled-correctly' : 'capd-totalled-correctly'}
+              name={method === 'SOSPD' ? 'sospd-totalled-correctly' : 'capd-totalled-correctly'}
               value={isCAPDTotalledCorrectly}
               onChange={(e) => setIsCAPDTotalledCorrectly(e.target.value)}
             > <div className="radio-group">
-                <FormControlLabel className="radio-label" value="Yes" control={<Radio />} label="Yes" />
-                <FormControlLabel className="radio-label" value="No" control={<Radio />} label="No" />
+                <FormControlLabel className="radio-label" value="True" control={<Radio />} label="Yes" />
+                <FormControlLabel className="radio-label" value="False" control={<Radio />} label="No" />
               </div>
             </RadioGroup>
             <br />
 
-            <Typography variant="subtitle1">Is CAPD score 9 or more:</Typography>
+            <Typography variant="subtitle1">
+              {method === 'SOSPD' ? 'Do parents NOT recognise their child’s behaviour AND/OR SOS-PD score is ≥ 4 OR symptom with * is positive?' : 'Is CAPD score 9 or more:'}
+            </Typography>
             <RadioGroup
-              aria-label="capd-score-9-or-more"
-              name="capd-score-9-or-more"
+              aria-label={method === 'SOSPD' ? 'sospd-score-9-or-more' : 'capd-score-9-or-more'}
+              name={method === 'SOSPD' ? 'sospd-score-9-or-more' : 'capd-score-9-or-more'}
               value={isCAPDScore9OrMore}
               onChange={(e) => setIsCAPDScore9OrMore(e.target.value)}
             > <div className="radio-group">
-                <FormControlLabel className="radio-label" value="Yes" control={<Radio />} label="Yes" />
-                <FormControlLabel className="radio-label" value="No" control={<Radio />} label="No" />
+                <FormControlLabel className="radio-label" value="True" control={<Radio />} label="Yes" />
+                <FormControlLabel className="radio-label" value="False" control={<Radio />} label="No" />
               </div>
             </RadioGroup>
             <br />
@@ -165,8 +209,8 @@ function Form() {
               value={isChartInitialled}
               onChange={(e) => setIsChartInitialled(e.target.value)}
             > <div className="radio-group">
-                <FormControlLabel className="radio-label" value="Yes" control={<Radio />} label="Yes" />
-                <FormControlLabel className="radio-label" value="No" control={<Radio />} label="No" />
+                <FormControlLabel className="radio-label" value="True" control={<Radio />} label="Yes" />
+                <FormControlLabel className="radio-label" value="False" control={<Radio />} label="No" />
               </div>
             </RadioGroup>
             <br />

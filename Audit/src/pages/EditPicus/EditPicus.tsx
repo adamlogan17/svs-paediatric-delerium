@@ -14,7 +14,7 @@ const customInputFields:any[] = [
   }
 ]
 
-const noEditFields:string[] = ["picu_id", "overall_compliance"];
+const noEditFields:string[] = ["picu_id", "overall_compliance", "delirium_positive_patients"];
 
 const uniqueIdName:string = "picu_id";
 
@@ -24,7 +24,8 @@ const columnNameMap:any = {
   hospital_name: "Hospital Name",
   auditor: "Auditor",
   picu_role: "PICU Role",
-  overall_compliance: "Overall Compliance"
+  overall_compliance: "Overall Compliance",
+  delirium_positive_patients:"Delirium Positive Patients"
 }
 
 function validateData(data:any) {
@@ -84,7 +85,8 @@ export default function EditPicus() {
             hospital_name: picu.hospital_name,
             auditor: picu.auditor,
             picu_role: picu.picu_role,
-            overall_compliance: picu.overall_compliance === null ? 0 : Math.round(picu.overall_compliance * 100) / 100
+            overall_compliance: picu.overall_compliance === null ? 0 : Math.round(picu.overall_compliance * 100) / 100,
+            delirium_positive_patients: picu.delirium_positive_patients === null ? 0 : Math.round(picu.delirium_positive_patients * 100) / 100,
           });
         }
         setData(picus.sort((a, b) => Number(a.picu_id) - Number(b.picu_id)));

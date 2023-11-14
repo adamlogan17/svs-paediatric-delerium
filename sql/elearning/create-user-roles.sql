@@ -8,7 +8,7 @@ GRANT SELECT, INSERT, UPDATE ON progression TO learner_role;
 
 -- Creates the admin role
 CREATE ROLE elearning_admin_role WITH LOGIN PASSWORD 'password';
-ALTER ROLE admin_role SUPERUSER;
+ALTER ROLE elearning_admin_role SUPERUSER;
 
 GRANT SELECT, INSERT, UPDATE, DELETE ON users TO elearning_admin_role;
 GRANT SELECT, INSERT, UPDATE, DELETE ON courses TO elearning_admin_role;

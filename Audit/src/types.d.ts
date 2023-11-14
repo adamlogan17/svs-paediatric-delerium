@@ -26,6 +26,7 @@ type RoleAutoComplete = {
  * @property {string} password - Password associated with the PICU, possibly for access control.
  * @property {string|number} [picu_id] - Optional unique identifier for the PICU.
  * @property {number|null} [overall_compliance] - Optional overall compliance score for the PICU, which is calculated within the database.
+ * @property {number|null} [delirium_positive_patients] - Optional average of the number of patients that are delirium positive
  */
 type Picu = {
   [key: string]: string|number|null|undefined, // allows the Picu['key'] syntax to work
@@ -36,6 +37,7 @@ type Picu = {
   password?:string, 
   picu_id?:string|number,
   overall_compliance?:number|null,
+  delirium_positive_patients?:number|null
 }
 
 /**

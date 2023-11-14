@@ -12,10 +12,12 @@ const dbPassword:string = process.env.DBPASSWORD || "No password found";
  * 
  * @property {string} hospital_name - The name of the hospital where the PICU is located.
  * @property {string} ward_name - The specific name of the PICU ward.
- * @property {string} picu_role - Role assigned within the PICU database.
+ * @property {string} picu_role - Role assigned within the PICU, within the database.
  * @property {string} auditor - The individual responsible for auditing within this PICU.
  * @property {string} [password] - Password associated with the PICU, possibly for access control.
- * @property {string} [picu_id] - Optional unique identifier for the PICU.
+ * @property {string|number} [picu_id] - Optional unique identifier for the PICU.
+ * @property {number|null} [overall_compliance] - Optional overall compliance score for the PICU, which is calculated within the database.
+ * @property {number|null} [delirium_positive_patients] - Optional average of the number of patients that are delirium positive
  */
 type Picu = {
   hospital_name:string, 
@@ -25,6 +27,7 @@ type Picu = {
   ward_name:string,
   picu_id?:string,
   overall_compliance?:number,
+  delirium_positive_patients?:number|null
 }
 
 /**

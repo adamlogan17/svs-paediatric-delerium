@@ -1,5 +1,5 @@
 import {describe, expect, test} from '@jest/globals';
-import { createSelect, createInsert, createUpdate, createDelete} from '../src/crud';
+import { createPool, createSelect, createInsert, createUpdate, createDelete, getAll, getSelectedRecords, getPicuData, insertData, updateData, deleteData, copyTable} from '../src/crud';
 
 describe('testCreateSelect (Tests the select query on the database, database with default columns and database with default columns and no condition', () => {
   it('returns a valid SELECT query for a given table', () => {

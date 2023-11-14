@@ -41,7 +41,7 @@ $calculate_overall_score$ LANGUAGE plpgsql SECURITY DEFINER;
 CREATE FUNCTION calculate_positive_delirium() 
 RETURNS trigger AS $calculate_positive_delirium$
 BEGIN
-    UPDATE picu SET delirium_positive_patients=(SELECT SUM(in_score_range::INTEGER) FROM compliance_data WHERE picu_id=NEW.picu_id)/(SELECT COUNT(*) FROM compliance_data WHERE picu_id=NEW.picu_id) WHERE picu_id=NEW.picu_id;
+    UPDATE picu SET delirium_positive_patients=(SELECT AVG(in_score_range::INTEGER) FROM compliance_data WHERE picu_id=NEW.picu_id) WHERE picu_id=NEW.picu_id;
     RETURN NEW;
 END;
 

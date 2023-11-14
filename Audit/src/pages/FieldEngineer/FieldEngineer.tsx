@@ -1,5 +1,4 @@
 import { Link, useNavigate } from 'react-router-dom';
-import PButton from '../../components/PButton/PButton';
 
 import '../../shared/layout.css';
 import '../../shared/landing.css';
@@ -34,14 +33,14 @@ function FieldEngineer() {
     <div id='fieldEngineer' className='wrapper'>
       <div className='content'>
         <h1>Field Agent Page</h1>
-        <div className='button-container'>
+        {/* <div className='button-container'>
           <PButton text='Reset a PICU account password' primaryColour='#025858' secondaryColour='#013e3e' width='100%' onButtonClick={() => navigate("/forgot-password")} />
           <PButton text='View Compliance Data' primaryColour='#025858' secondaryColour='#013e3e' width='100%' onButtonClick={() => fieldAuth()} />
           <PButton text='Top Secret Admin Button' primaryColour='#025858' secondaryColour='#013e3e' width='100%' onButtonClick={() => adminAuth()} />
         </div>
         <Link to='/'>
           <PButton text='Home' primaryColour='#025858' secondaryColour='#013e3e' width='100%' />
-        </Link>
+        </Link> */}
       </div>
     </div>
   );

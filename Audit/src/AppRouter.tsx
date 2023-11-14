@@ -1,7 +1,6 @@
 import { BrowserRouter as Router, Route, Routes} from "react-router-dom";
 
 import Home from './pages/Home/Home'; // example component being added
-import OtherPage from './pages/OtherPage/OtherPage'; // to demonstrate routing
 import NoPage from './pages/NoPage/NoPage'; // to demonstrate routing
 import Form from './pages/Form/Form';
 import Admin from './pages/Admin/Admin';
@@ -37,7 +36,6 @@ function AppRouter() {
         {picuAccess && (
           <>
             <Route path="/form" element={<Form />} />
-            <Route path="/otherPage" element={<OtherPage />} />
             <Route path="/audit-graphs" element={<AuditGraphs />} />
           </>
         )}

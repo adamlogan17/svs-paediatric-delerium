@@ -7,7 +7,6 @@ import './graphs.css';
 import LineGraph from '../../components/LineGraph/LineGraph';
 import axios from 'axios';
 import { useEffect, useState } from 'react';
-import { adminAuth } from '../Admin/Admin';
 import { enqueueSnackbar } from 'notistack';
 import { Autocomplete, Avatar, TextField, Typography } from '@mui/material';
 import LockOutlinedIcon from '@mui/icons-material/LockOutlined';

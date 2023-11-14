@@ -1,28 +1,7 @@
-import { Link, useNavigate } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
 
-import axios from 'axios';
 import { Avatar, Box, Button, Container, Typography } from '@mui/material';
 import AdminPanelSettingsIcon from '@mui/icons-material/AdminPanelSettings';
-
-/**
- * Checks if the current user as the role of 'admin' and if so sends an alert to the user
- * @author Adam Logan
- * @date 2023-04-28
- * TODO Change the 'Link' component to a MUI link component
- */
-export function adminAuth() {  
-  const configuration = {
-    method: "get",
-    url: `${process.env.REACT_APP_API_URL}/test-auth/admin`,
-    headers: { 'Authorization': "bearer " + sessionStorage.getItem('TOKEN') } 
-  };
-  
-  axios(configuration)
-    .then((result) => {
-      alert(result.data);
-    })
-    .catch((error) => error = new Error());
-}
 
 /**
  * 
@@ -49,7 +28,7 @@ function Admin() {
         </Avatar>
 
         <Typography component="h1" variant="h5">
-          Sign in
+          Admin Page
         </Typography>
 
         <Button 
@@ -102,8 +81,6 @@ function Admin() {
 
       </Box>
     </Container>
-
-    
   );
 }
 

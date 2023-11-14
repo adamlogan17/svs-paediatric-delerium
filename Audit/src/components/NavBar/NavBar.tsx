@@ -11,14 +11,8 @@ import BorderColor from '@mui/icons-material/BorderColor';
  * The NavBar to be used site wide and should be placed at the top of the page
  * @author Adam Logan
  * @date 2023-04-28*/
- 
-function BasicNavBar(props:{theme:string, toggleMode:Function, backgroundColor:string, textColor:string}) {
-  const options = [
-    { label: "Contrast", value: "contrast" },
-    { label: "Dark", value: "dark" },
-    { label: "Light", value: "light" },
-  ];
 
+function BasicNavBar(props:{theme:string, toggleMode:Function, backgroundColor:string, textColor:string, buttonColor:string, modeOptions:{label:string, value:string}[]}) {
   return (
     <Container>
     <Navbar expand="lg" style={{ backgroundColor:props.backgroundColor, color:props.textColor}}>
@@ -35,14 +29,14 @@ function BasicNavBar(props:{theme:string, toggleMode:Function, backgroundColor:s
             value={props.theme}
             onChange={(e) => props.toggleMode(e.target.value)}
           >
-            {options.map((option, index) => 
+            {props.modeOptions.map((option, index) => 
               <MenuItem key={index} value={option.value}>
                 {option.label}
               </MenuItem>
             )}
           </Select>
         </Navbar.Brand>
-        <Navbar.Toggle aria-controls="basic-navbar-nav" style={{backgroundColor: '#009999'}} />
+        <Navbar.Toggle aria-controls="basic-navbar-nav" style={{backgroundColor: props.buttonColor}} />
         <Navbar.Collapse id="basic-navbar-nav">
           <Nav className="me-auto" >
             <Nav.Link href="#home" style={{color:'inherit'}}>Background</Nav.Link>

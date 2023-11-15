@@ -304,9 +304,9 @@ app.get("/:database/getall/:table", async (req: Request,res: Response) => {
 app.post("/backupAllData", async (req, res) => {
   try {
 
-    copyTable("audit", "api_log", "api_log_backup");
-    copyTable("audit", "compliance_data", "compliance_data_backup");
-    copyTable("audit", "picu", "picu_backup");
+    copyTable("backup", "api_log", "api_log_backup");
+    copyTable("backup", "compliance_data", "compliance_data_backup");
+    copyTable("backup", "picu", "picu_backup");
     
     res.status(200).send("Data successfully copied to api_log_backup.");
   } catch (error) {
@@ -330,7 +330,7 @@ app.post("/backupAllData", async (req, res) => {
  */
 app.post("/backupPicu", async (req, res) => {
   try {
-    copyTable("audit", "picu", "picu_backup");
+    copyTable("backup", "picu", "picu_backup");
     res.status(200).send("Data successfully copied to picu_backup.");
   } catch (error) {
     console.error(error);
@@ -353,7 +353,7 @@ app.post("/backupPicu", async (req, res) => {
  */
 app.post("/backupComplianceData", async (req, res) => {
   try {
-    copyTable("audit", "compliance_data", "compliance_data_backup");
+    copyTable("backup", "compliance_data", "compliance_data_backup");
     res.status(200).send("Data successfully copied to compliance_data_backup.");
   } catch (error) {
     console.error(error);
@@ -376,7 +376,7 @@ app.post("/backupComplianceData", async (req, res) => {
  */
 app.post("/backupApiLog", async (req, res) => {
   try {
-    copyTable("audit", "api_log", "api_log_backup");
+    copyTable("backup", "api_log", "api_log_backup");
     res.status(200).send("Data successfully copied to api_log_backup.");
   } catch (error) {
     console.error(error);

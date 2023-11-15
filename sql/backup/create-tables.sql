@@ -1,9 +1,10 @@
 CREATE TABLE IF NOT EXISTS picu_backup(
-    picu_id SERIAL PRIMARY KEY,
+  picu_id SERIAL PRIMARY KEY,
   password CHAR(60) NOT NULL,
   ward_name VARCHAR NOT NULL,
   hospital_name VARCHAR NOT NULL,
   auditor VARCHAR NOT NULL,
+  delirium_positive_patients DECIMAL,
   picu_role VARCHAR NOT NULL 
     DEFAULT 'picu'
     CHECK(picu_role IN ('picu', 'admin', 'field_engineer')),
@@ -11,7 +12,7 @@ CREATE TABLE IF NOT EXISTS picu_backup(
 );
 
 CREATE TABLE IF NOT EXISTS api_log_backup(
-      date DATE,
+    date DATE,
     time TIME,
     method VARCHAR(10),
     url VARCHAR(255),
@@ -25,7 +26,7 @@ CREATE TABLE IF NOT EXISTS api_log_backup(
 CREATE TABLE IF NOT EXISTS compliance_data_backup(
     comp_id SERIAL PRIMARY KEY,
   entry_date DATE NOT NULL,
-  method VARCHAR(5) 
+  method VARCHAR(5) NOT NULL
     CHECK(method IN ('SOSPD', 'CAPD')),
   bed_number INTEGER NOT NULL,
   correct_details BOOLEAN NOT NULL,
@@ -39,6 +40,6 @@ CREATE TABLE IF NOT EXISTS compliance_data_backup(
   picu_id INTEGER NOT NULL,
   CONSTRAINT fk_picu
     FOREIGN KEY (picu_id) 
-	  REFERENCES picu (picu_id)
+	  REFERENCES picu_backup (picu_id)
 	  ON DELETE CASCADE
 );

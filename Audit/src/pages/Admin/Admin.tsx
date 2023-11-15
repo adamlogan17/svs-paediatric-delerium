@@ -1,7 +1,8 @@
 import { useNavigate } from 'react-router-dom';
 
-import { Avatar, Box, Button, Container, Typography } from '@mui/material';
+import { Avatar, Box, Button, Container, Dialog, DialogTitle, List, ListItemButton, ListItemText, Typography } from '@mui/material';
 import AdminPanelSettingsIcon from '@mui/icons-material/AdminPanelSettings';
+import React from 'react';
 
 /**
  * 
@@ -11,6 +12,16 @@ function Admin() {
   const buttonStyle = { mt: 3, mb: 2, width:'500px' };
 
   const navigate = useNavigate();
+  
+  const [open, setOpen] = React.useState(false);
+
+  const handleClickOpen = () => {
+    setOpen(true);
+  };
+
+  const handleClose = () => {
+    setOpen(false);
+  };
 
   return (
     <Container component="main" maxWidth="xl">
@@ -78,6 +89,32 @@ function Admin() {
         >
           View Graphs
         </Button>
+
+        <Button 
+          onClick={handleClickOpen} 
+          sx={buttonStyle}
+          variant="contained"
+        >
+          Backup Data
+        </Button>
+
+        <Dialog onClose={handleClose} open={open}>
+          <DialogTitle>Choose data to backup</DialogTitle>
+          <List>
+            <ListItemButton onClick={() => { handleClose(); /* handle backup all data */}}>
+              <ListItemText primary="All data" />
+            </ListItemButton>
+            <ListItemButton onClick={() => {handleClose(); /* handle backup picu */}}>
+              <ListItemText primary="PICU" />
+            </ListItemButton>
+            <ListItemButton onClick={() => {handleClose(); /* handle backup compliance data */}}>
+              <ListItemText primary="Compliance data" />
+            </ListItemButton>
+            <ListItemButton onClick={() => {handleClose(); /* handle backup api log */}}>
+              <ListItemText primary="API log" />
+            </ListItemButton>
+          </List>
+        </Dialog>
 
       </Box>
     </Container>

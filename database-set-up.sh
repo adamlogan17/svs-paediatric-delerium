@@ -1,7 +1,7 @@
 echo "Executing Start Up Script"
 
 # the array of the databases to create
-dbs=(test_database audit elearning)
+dbs=(test_database audit elearning backup)
 
 for db in "${dbs[@]}"; do 
     echo "Creating Database ${db}"

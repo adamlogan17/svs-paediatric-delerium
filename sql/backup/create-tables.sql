@@ -1,5 +1,5 @@
-CREATE TABLE IF NOT EXISTS picu (
-  picu_id SERIAL PRIMARY KEY,
+CREATE TABLE IF NOT EXISTS picu_backup(
+    picu_id SERIAL PRIMARY KEY,
   password CHAR(60) NOT NULL,
   ward_name VARCHAR NOT NULL,
   hospital_name VARCHAR NOT NULL,
@@ -10,9 +10,8 @@ CREATE TABLE IF NOT EXISTS picu (
   overall_compliance DECIMAL
 );
 
--- TODO: Add a primary key to this table
-CREATE TABLE IF NOT EXISTS api_log (
-    date DATE,
+CREATE TABLE IF NOT EXISTS api_log_backup(
+      date DATE,
     time TIME,
     method VARCHAR(10),
     url VARCHAR(255),
@@ -23,10 +22,10 @@ CREATE TABLE IF NOT EXISTS api_log (
     userRole VARCHAR(50)
 );
 
-CREATE TABLE IF NOT EXISTS compliance_data (
-  comp_id SERIAL PRIMARY KEY,
+CREATE TABLE IF NOT EXISTS compliance_data_backup(
+    comp_id SERIAL PRIMARY KEY,
   entry_date DATE NOT NULL,
-  method VARCHAR(5) NOT NULL
+  method VARCHAR(5) 
     CHECK(method IN ('SOSPD', 'CAPD')),
   bed_number INTEGER NOT NULL,
   correct_details BOOLEAN NOT NULL,
@@ -40,6 +39,6 @@ CREATE TABLE IF NOT EXISTS compliance_data (
   picu_id INTEGER NOT NULL,
   CONSTRAINT fk_picu
     FOREIGN KEY (picu_id) 
-	  REFERENCES picu (picu_id)
+	  REFERENCES picu_backup (picu_id)
 	  ON DELETE CASCADE
 );

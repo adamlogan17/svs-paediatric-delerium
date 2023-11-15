@@ -5,6 +5,7 @@ import '../../shared/layout.css';
 import '../../shared/landing.css';
 import axios from 'axios';
 
+
 /**
  * Checks if the current user as the role of 'admin' and if so sends an alert to the user
  * @author Adam Logan

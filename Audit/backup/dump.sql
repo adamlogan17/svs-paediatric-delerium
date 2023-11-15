@@ -1,0 +1,1 @@
+pg_dump -U postgres -d backup -t picu_backup -t api_log_backup -t compliance_data_backup > backup.sql

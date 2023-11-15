@@ -10,7 +10,7 @@ import { createPool, createSelect } from "./crud";
  * @returns { void }
  */
 export function singlePicuCompliance(request: Request, response: Response): void {
-    const POOL = createPool("audit", "admin_role", "password");
+    const POOL = createPool("audit", "admin", "password");
 
     let condition:string = "picu_id=" + request.params.siteId;
 
@@ -44,7 +44,7 @@ export function singlePicuCompliance(request: Request, response: Response): void
  * TODO Retain the correct ID for the site which requested the data
  */
 export function allPicuCompliance(request: Request, response: Response): void {
-    const POOL = createPool("audit", "admin_role", "password");
+    const POOL = createPool("audit", "admin", "password");
 
     POOL.query(createSelect("picu", undefined, ["overall_compliance"]), (error:any, results:any) => {
         if (error) {

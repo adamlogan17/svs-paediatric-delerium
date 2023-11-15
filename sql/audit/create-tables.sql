@@ -4,6 +4,7 @@ CREATE TABLE IF NOT EXISTS picu (
   ward_name VARCHAR NOT NULL,
   hospital_name VARCHAR NOT NULL,
   auditor VARCHAR NOT NULL,
+  delirium_positive_patients DECIMAL,
   picu_role VARCHAR NOT NULL 
     DEFAULT 'picu'
     CHECK(picu_role IN ('picu', 'admin', 'field_engineer')),

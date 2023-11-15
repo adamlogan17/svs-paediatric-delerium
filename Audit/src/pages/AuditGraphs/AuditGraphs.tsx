@@ -3,31 +3,54 @@ import Chart from "chart.js/auto";
 import { CategoryScale } from "chart.js";
 
 import '../../shared/layout.css';
+import './graphs.css';
 import LineGraph from '../../components/LineGraph/LineGraph';
 import axios from 'axios';
 import { useEffect, useState } from 'react';
+import { enqueueSnackbar } from 'notistack';
+import { Autocomplete, Avatar, TextField, Typography } from '@mui/material';
+import LockOutlinedIcon from '@mui/icons-material/LockOutlined';
 
 Chart.register(CategoryScale);
 
 /**
- * Creates the object required to set the values for a Line Chart, an important note is that the parameters must be the same length
+ * Calls the 'login' API and, if successful, sets the role, username and JWT token in session storage
  * @author Adam Logan
  * @date 2023-04-28
- * @param { string[] } xValues The va
- * @param { number[] } yValues
- * @returns { any }
+ * @param { string|undefined } username The username provided
+ * @param { string|undefined } password The password provided
+ * @returns { void }
  */
-function getLineChartData(xValues: string[], yValues:number[]) : any {
-  return {
-    labels: xValues,
-    datasets: [{
-      pointRadius: 1,
-      borderColor: "rgba(255,255,255,1)",
-      data: yValues
-    }]
-  }
-}
+function getPicuCompData(username:string|undefined, password:string|undefined):void {
+    const configuration = {
+        method: "get",
+        url: "https://localhost:8000/getPicuData", 
+        headers: { 'Authorization': "bearer " + sessionStorage.getItem('TOKEN')}
+    };
+    
+    // make the API call
+    axios(configuration)
+      .then((result) => {
+        console.log(result);
+        })
+      .catch((error) => error = new Error());
+    }
 
+    function getAllCompData(username:string|undefined, password:string|undefined):void {
+    const configuration = {
+        method: "get",
+        url: "https://localhost:8000/getAll", 
+        headers: { 'Authorization': "bearer " + sessionStorage.getItem('TOKEN')}
+    };
+    
+    // make the API call
+    axios(configuration)
+      .then((result) => {
+        console.log(result);
+        return result;
+        })
+      .catch((error) => error = new Error());
+    }
 
 /**
  * Displays a line chart of the compliance data for site 1
@@ -36,56 +59,78 @@ function getLineChartData(xValues: string[], yValues:number[]) : any {
  * TODO Make the data displayed actually show that of the current user and not just site 1
  */
 function AuditGraphs() {
-  // the below code is required to call the API when the page loads
-  const [chartData, setChartData] = useState({
-    entryDates: ['1970-01-01T00:00:00.000Z'], complianceScore:[0]
-  });
+  const [picuID, setPicuID]  = useState<string|null>(sessionStorage.getItem('ROLE') === 'picu' ? sessionStorage.getItem('SITE')!== null ? sessionStorage.getItem('SITE') : '0' : '0');
+  const [idOptions, setIdOptions] = useState<AutoCompleteValues[]>([]);
+  const [chartTypeOptions, setChartTypeOptions] = useState<AutoCompleteValues[]>([]);
 
-  useEffect(() => {
-      const fetchAPI = async () => {
-          const configuration = {
-                  method: "get",
-                  url: `${process.env.REACT_APP_API_URL}/chartData/singleSite/1`,
-                  headers: { 'Authorization': "bearer " + sessionStorage.getItem('TOKEN') }
-              };
-          try {
-              let response = await axios(configuration);
-              console.log(response);
-              setChartData(response.data);
-          } catch (err:any) {
-              console.log(err);
-          }
-      };
-      fetchAPI();
-  }, []);
+  // useEffect(() => {
+  //   const configuration = {
+  //     method: "get",
+  //     url: `${process.env.REACT_APP_API_URL}/getPicuIds`,
+  //     headers: { 'Authorization': "Bearer " + sessionStorage.getItem('TOKEN') } 
+  //   };
 
-  console.log(chartData);
+  //   axios(configuration)
+  //     .then((result) => {
+  //       const allIds = result.data.map((element:{picu_id:string}) => (element.picu_id.toString()));
+  //       allIds.sort((a:string, b:string) => (parseInt(a) - parseInt(b)));
+  //       setIdOptions(allIds);
+  //     })
+  //     .catch((error) => enqueueSnackbar(error.message, { variant: 'error' }));
+  // }, []);
+
+  // setChartTypeOptions({["Line Graph", "Pie Chart", "Bar Chart"]})
 
   return (
-    <div id='form' className='wrapper'>
-      <div className = 'content'>
-        <h1>Delirium Compliance - Audit Form</h1>
+    <div id='form' className='wrapper' style={{width: '100%'}}>
+      <div className = 'content' style={{width: '100%'}}>
+        {/* <h1>Delirium Compliance - Audit Form</h1> */}
+        <Avatar sx={{ m: 1, bgcolor: 'primary.main' }}>
+          <LockOutlinedIcon />
+        </Avatar>
+
+        <Typography component="h1" variant="h5">
+          Delirium Compliance - Audit Form
+        </Typography>
         <br />
 
-        <form action="" method="get">
-          <div className="data-input">
-            <div className = 'row' id = 'UpperTextContainer'>
-              <div className='col'>
-                <h5>Select the type of chart you would like: </h5>
+        <form id = 'graphContainer' action="" method="get" >          
+          <div className = 'gRow' id = 'gInputContainer' style={{margin: 'auto', borderRadius: 25, backgroundColor: '#009379'}}>
+              <div className='gRow' style={{width: '100%', margin: 'auto', paddingLeft: '5%', paddingTop: '2%'}}>
+                <h3>Select the type of chart you would like: </h3>
               </div>
-              <div className='col'>
-                <TypeDropDown text="Chart Type" primaryColour='#025858' secondaryColour='#013e3e' options={["Line Graph", "Pie Chart", "Bar Chart"]}/>
+             <div className = 'gRow' id = 'UpperTextContainer' style={{width: '95%', margin: 'auto', display: 'flex'}}> 
+               <div className='gCol' style={{width: '48%', padding: '2%'}}>
+                {/* {<TypeDropDown text="Chart Type" primaryColour='#025858' secondaryColour='#013e3e' options={["Line Graph", "Pie Chart", "Bar Chart"]}/>} */}
+                <Autocomplete
+                disablePortal
+                id="chartType"
+                autoComplete
+                autoHighlight
+                isOptionEqualToValue = {(option:AutoCompleteValues, value:AutoCompleteValues) => option.label === value.label}
+                options={idOptions}
+                renderInput={(params:any) => <TextField {...params} required margin="normal" name="chartType" label="Chart Type" />}
+              />
               </div>
+              <div className='gCol' style={{width: '48%', padding: '2%'}}>
+              <Autocomplete
+                disablePortal
+                id="id"
+                autoComplete
+                autoHighlight
+                isOptionEqualToValue = {(option:AutoCompleteValues, value:AutoCompleteValues) => option.label === value.label}
+                options={idOptions}
+                renderInput={(params:any) => <TextField {...params} required margin="normal" name="id" label="id" />}
+              />
             </div>
           </div>
+          </div>
 
-          <div className = 'row' id = 'ButtonContainer'>
+          <div className = 'gRow' id = 'graphContaine' style={{margin: 'auto', borderRadius: 25, backgroundColor: '#009999'}}>
             <div className="canvas">
-              <LineGraph chartData={getLineChartData(chartData.entryDates.map((date:string) => new Date(date).toLocaleDateString("en-GB")), chartData.complianceScore)} /> 
+              <LineGraph id={'1'} />
             </div>
-          </div>
-
-          {/* <PButton text="Submit" onButtonClick = {() => {console.log("Hello World")}} primaryColour='#025858' secondaryColour='#013e3e'/> */}
+          </div> 
         </form>
       </div>
     </div>

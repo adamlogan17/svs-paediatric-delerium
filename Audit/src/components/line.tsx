@@ -1,6 +1,5 @@
 import { useEffect, useState } from "react";
 import useGetAPI from "../hooks/useAPI/useAPI";
-import PButton from "./PButton/PButton";
 import axios from "axios";
 
 function ConsumeAPI() {

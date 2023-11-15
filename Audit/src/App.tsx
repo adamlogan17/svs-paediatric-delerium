@@ -21,7 +21,8 @@ const darkTheme:PaletteOptions = {
     main: '#009999'
   },
   background: {
-    paper: '#000000'
+    default:'#181818',
+    paper: '#181818'
   }
 }
 
@@ -39,6 +40,12 @@ const contrastTheme:PaletteOptions = {
 
   }
 }
+
+const options = [
+  { label: "Contrast", value: "contrast" },
+  { label: "Dark", value: "dark" },
+  { label: "Light", value: "light" },
+];
 
 function getDesignTokens(mode: string):ThemeOptions {
   let theme;
@@ -112,10 +119,12 @@ export default function App() {
 
       <SnackbarProvider maxSnack={3} Components={customVarients}>
         <BasicNavBar 
+          modeOptions={options}
           toggleMode={colorMode.toggleColorMode} 
           theme={mode} 
           backgroundColor={theme.palette.background.paper} 
           textColor={theme.palette.text.primary}
+          buttonColor={theme.palette.primary.main}
         />
         
         <br />

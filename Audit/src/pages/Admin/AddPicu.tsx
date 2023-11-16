@@ -40,7 +40,7 @@ export default function AddPicu() {
   
   // Confirm dialog
   const [isOpen, setIsOpen] = useState(false);
-  const [picuDetails, setPicuDetails] = useState<Picu>({hospital_name:"", ward_name:"", picu_role:"", auditor:"", password:"", picu_id:""});
+  const [picuDetails, setPicuDetails] = useState<Picu>({hospital_name:"", ward_name:"", picu_role:"picu", auditor:"", password:"", picu_id:""});
   const [dialogError, setDialogError] = useState("");
 
   const roleOptions:RoleAutoComplete[] = [{label:'PICU', role:'picu'}, {label:'Admin', role:'admin'}, {label:'Field Engineer', role:'field_engineer'}];
@@ -102,7 +102,7 @@ export default function AddPicu() {
         });
 
       setIsOpen(true);
-      const role:string = roleOptions.find((role) => role.label === roleLabel)?.role || "";
+      const role:Role = roleOptions.find((role:RoleAutoComplete) => role.label === roleLabel)?.role || "picu";
 
       setPicuDetails({hospital_name, ward_name, picu_role:role, auditor, password, picu_id:id ? id.data.toString() : '0'});
     }
@@ -145,7 +145,6 @@ export default function AddPicu() {
   return (
     <Container  maxWidth="xl">
       <PageLoad loading={isLoading} />
-      {/* <ConfirmAddPicuDialog open={isOpen} handleClose={() => { setIsOpen(false)}} picuDetails={picuDetails} roleOptions={roleOptions} handlePasswordError={setDialogError}/> */}
       <ConfirmDialog open={isOpen} handleClose={() => { setIsOpen(false)}} handleConfirm={() => addPicu(picuDetails)} title='Confrim User Details' description={
         <>
           Would you like to and the user with the following details?

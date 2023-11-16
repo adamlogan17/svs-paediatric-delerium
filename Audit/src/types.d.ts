@@ -6,12 +6,24 @@
  * a user-friendly label and a system-recognized role identifier.
  * 
  * @property {('PICU'|'Admin'|'Field Engineer')} label - The user-friendly display name of the role.
- * @property {('picu'|'admin'|'field_engineer')} role - The internal system identifier for the role.
+ * @property {Role} role - The internal system identifier for the role.
  */
 type RoleAutoComplete = {
   label: 'PICU'|'Admin'|'Field Engineer';
-  role: 'picu'|'admin'|'field_engineer';
+  role: Role;
 }
+
+/**
+ * Defines the various levels of severity.for the 'Alert' MUI component.
+ * 
+ * @author Adam Logan
+ * 
+ * @typedef {object} Role
+ * @property {"picu"} - Represents a PICU role.
+ * @property {"admin"} - Represents an admin role.
+ * @property {"field_engineer"} - Represents a field engineer role.
+ */
+type Role = 'picu'|'admin'|'field_engineer';
 
 type AutoCompleteValues = {
   label:string,
@@ -37,7 +49,7 @@ type Picu = {
   [key: string]: string|number|null|undefined, // allows the Picu['key'] syntax to work
   hospital_name:string, 
   ward_name:string, 
-  picu_role:string, 
+  picu_role:Role, 
   auditor:string, 
   password?:string, 
   picu_id?:string|number,

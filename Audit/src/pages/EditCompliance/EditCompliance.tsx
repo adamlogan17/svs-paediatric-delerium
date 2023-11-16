@@ -2,9 +2,8 @@ import { useEffect, useState } from 'react';
 import EditTable from '../../components/EditTable/EditTable';
 import axios from 'axios';
 import { enqueueSnackbar } from 'notistack';
-import { Avatar, Box, Typography } from '@mui/material';
 import BorderColorIcon from '@mui/icons-material/BorderColor';
-import PageLoad from '../../components/Loading/PageLoad';
+import PageContainer from '../../components/PageContainer/PageContainer';
 
 const booleanValues:{label:string, value:boolean}[] = [{label:'Yes', value:true}, {label:'No', value:false}];
 
@@ -179,27 +178,8 @@ export default function EditCompliance() {
   }, []);
   
   return (
-    <Box
-      sx={{
-        marginTop: 8,
-        display: 'flex',
-        flexDirection: 'column',
-        alignItems: 'center',
-      }}
-    >
-      <PageLoad loading={isLoading} />
-
-      <Avatar sx={{ m: 1, bgcolor: 'primary.main' }}>
-        <BorderColorIcon />
-      </Avatar>
-
-      <Typography component="h1" variant="h5">
-        Edit Compliance Scores
-      </Typography>
-
-      <br />
-
-      <div style={{width:'90%', margin:'auto'}}>
+    <PageContainer title="Edit Compliance Scores" icon={<BorderColorIcon />} loading={isLoading}>
+      <div style={{width:'90%', margin:'auto', marginTop:'25px'}}>
         {data.length > 0 && 
           <EditTable
             title='Compliance Scores'
@@ -214,7 +194,6 @@ export default function EditCompliance() {
           />
         }
       </div>
-
-    </Box>
+    </PageContainer>
   );
 }

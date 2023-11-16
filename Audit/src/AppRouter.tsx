@@ -33,13 +33,6 @@ function AppRouter() {
 
         <Route path="/sandbox" element={<Sandbox /> }/> 
 
-        {picuAccess && (
-          <>
-            <Route path="/form" element={<Form />} />
-            <Route path="/audit-graphs" element={<AuditGraphs />} />
-          </>
-        )}
-
         {adminAccess && (
           <>
             <Route path="/admin" element={<Admin />} />
@@ -62,9 +55,10 @@ function AppRouter() {
           </>
         )}
 
-        {(adminAccess || fieldAccess || picuAccess) && (
+        {(adminAccess || picuAccess) && (
           <>
             <Route path="/auditGraphs" element={<AuditGraphs />} />
+            <Route path="/form" element={<Form />} />
           </>
         )}
       </Routes>

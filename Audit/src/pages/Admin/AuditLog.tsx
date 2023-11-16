@@ -1,9 +1,9 @@
 import { useState, useEffect } from 'react';
 import axios from 'axios';
-import { Box, Avatar, Typography } from '@mui/material';
-import PageLoad from '../../components/Loading/PageLoad';
 import BaseTable from '../../components/EditTable/BaseTable';
 import PreviewIcon from '@mui/icons-material/Preview';
+import PageContainer from '../../components/PageContainer/PageContainer';
+import { enqueueSnackbar } from 'notistack';
 
 interface AuditLogData {
   date: string;
@@ -19,13 +19,13 @@ interface AuditLogData {
 
 function getAPIData() {
     return axios.get(`${process.env.REACT_APP_API_URL}/audit/getall/api_log`, {
-        headers: { 'Authorization': "bearer " + sessionStorage.getItem('TOKEN') } 
+      headers: { 'Authorization': "bearer " + sessionStorage.getItem('TOKEN') } 
     })
     .then((response) => {
-        return response.data.allData;
+      return response.data.allData;
     })
     .catch((error) => {
-        return [];
+      enqueueSnackbar("System Error", { variant: 'error' });
     });
 }
 
@@ -63,27 +63,8 @@ function AuditLog() {
 
 
     return (
-      <Box
-        sx={{
-          marginTop: 8,
-          display: 'flex',
-          flexDirection: 'column',
-          alignItems: 'center',
-        }}
-      >
-        <PageLoad loading={isLoading} />
-
-        <Avatar sx={{ m: 1, bgcolor: 'primary.main' }}>
-          <PreviewIcon />
-        </Avatar>
-
-        <Typography component="h1" variant="h5">
-          Audit Log Display
-        </Typography>
-
-        <br />
-
-        <div style={{width:'90%', margin:'auto'}}>
+      <PageContainer title="Audit Log" icon={<PreviewIcon />} loading={isLoading}>
+        <div style={{width:'90%', margin:'auto', marginTop:'25px'}}>
           {auditLogData.length > 0 && 
           <BaseTable
             title='Audit Log'
@@ -92,8 +73,7 @@ function AuditLog() {
             columnNameMap={auditColumnNameMap}
           />}
         </div>
-
-      </Box>
+      </PageContainer>
     );
 }
 

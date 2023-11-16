@@ -2,9 +2,8 @@ import { useEffect, useState } from 'react';
 import EditTable from '../../components/EditTable/EditTable';
 import axios from 'axios';
 import { enqueueSnackbar } from 'notistack';
-import { Avatar, Box, Typography } from '@mui/material';
 import BorderColorIcon from '@mui/icons-material/BorderColor';
-import PageLoad from '../../components/Loading/PageLoad';
+import PageContainer from '../../components/PageContainer/PageContainer';
 
 const customInputFields:any[] = [
   {
@@ -43,7 +42,7 @@ function deletePicu(picuIds:number[]) {
       enqueueSnackbar("The data has been deleted", { variant: "success" });
     })
     .catch((error:any) => {
-      enqueueSnackbar("System Error", { variant: "error" });
+      enqueueSnackbar("System Error" , { variant: "error" });
     }
   );
 }
@@ -98,27 +97,8 @@ export default function EditPicus() {
   }, []);
   
   return (
-    <Box
-      sx={{
-        marginTop: 8,
-        display: 'flex',
-        flexDirection: 'column',
-        alignItems: 'center',
-      }}
-    >
-      <PageLoad loading={isLoading} />
-
-      <Avatar sx={{ m: 1, bgcolor: 'primary.main' }}>
-        <BorderColorIcon />
-      </Avatar>
-
-      <Typography component="h1" variant="h5">
-        Edit PICUs
-      </Typography>
-
-      <br />
-
-      <div style={{width:'90%', margin:'auto'}}>
+    <PageContainer title="Edit PICUs" icon={<BorderColorIcon />} loading={isLoading}>
+      <div style={{width:'90%', margin:'auto', marginTop:'25px'}}>
         {data.length > 0 && 
         <EditTable
           title='PICUs'
@@ -133,6 +113,6 @@ export default function EditPicus() {
           disableDelete={[Number(sessionStorage.getItem('USERNAME'))]}
         />}
       </div>
-    </Box>
+    </PageContainer>
   );
 }

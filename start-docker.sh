@@ -28,6 +28,17 @@ done
 
 docker-compose down
 
+# Ensures the 'database-set-up.sh' file is in the correct format
+# vi database-set-up.sh<<EOF
+# :set ff=unix
+# :wq
+# EOF
+
+# The below effictively does the same as the above, but without the need for vi
+tr -d '\r' < database-set-up.sh > temp-file
+mv temp-file database-set-up.sh
+rm temp-file
+
 if [ "$c" ] || [ "$n" ]; then
     # Remove the postgres server volume
     echo "Removing all containers with 'svs' in the name..."

@@ -14,6 +14,13 @@ param(
 
 docker-compose down
 
+# Ensures the 'database-set-up.sh' file is in the correct format
+$filePath = "database-set-up.sh"
+$content = Get-Content -Raw -Path $filePath
+# Replace Windows line endings (CRLF) with Unix line endings (LF)
+$content = $content -replace "`r`n", "`n"
+Set-Content -Value $content -Path $filePath -NoNewline -Encoding utf8
+
 if($c -or $n) {
     Write-Host "Removing all containers with 'svs' within the name..." -ForegroundColor Cyan -BackgroundColor Black
     Write-Host ""

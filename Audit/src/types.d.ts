@@ -80,7 +80,7 @@ type Picu = {
 type ComplianceData = {
   [key: string]: string|number|null|undefined|boolean|Date,
   comp_id?: number,
-  entry_date: Date,
+  entry_date?: Date,
   method: 'SOSPD' | 'CAPD',
   bed_number: number,
   correct_details: boolean,

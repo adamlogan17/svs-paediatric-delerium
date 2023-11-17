@@ -2,7 +2,6 @@ import { Button } from '@mui/material';
 import Dialog from '@mui/material/Dialog';
 import DialogActions from '@mui/material/DialogActions';
 import DialogContent from '@mui/material/DialogContent';
-import DialogContentText from '@mui/material/DialogContentText';
 import DialogTitle from '@mui/material/DialogTitle';
 
 /**
@@ -33,9 +32,7 @@ export default function ConfirmDialog(props:{open:boolean, handleClose:() => voi
         {props.title}
       </DialogTitle>
       <DialogContent>
-        <DialogContentText id="alert-dialog-description">
-          {props.description}
-        </DialogContentText>
+        {props.description}
       </DialogContent>
       <DialogActions>
         <Button onClick={props.handleClose}>Cancel</Button>

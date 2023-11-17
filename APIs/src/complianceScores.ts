@@ -50,7 +50,8 @@ type ComplianceData = {
  * @todo make sure that the data is being added to an actual PICU, so need to check the role to be PICU
  */
 export async function insertCompData(dataToAdd:ComplianceData, role:string): Promise<{comp_id:number}|string> {
-  const columnsToReturn = ['comp_id'];
+  const columnsToReturn = ['comp_id']; 
+  dataToAdd.entry_date = new Date();
 
   // The db does not allow for null values and therefore will throw an error if the data is not provided, so no need to check here
   return await insertData(db, tableName, dataToAdd, columnsToReturn, role, dbPassword);

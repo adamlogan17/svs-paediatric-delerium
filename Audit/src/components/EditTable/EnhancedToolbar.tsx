@@ -58,7 +58,7 @@ export default function EnhancedToolbar(props: EnhancedToolbarProps) {
         {props.numSelected > 0 ? (
           <Typography
             color="inherit"
-            variant="subtitle1"
+            variant="h6"
             component="div"
           >
             {props.numSelected} selected

@@ -21,6 +21,7 @@ import PageContainer from '../../components/PageContainer/PageContainer';
  * 
  * @returns {JSX.Element} The rendered component
  * 
+ * @todo Change error handling to that of 'ComplianceForm.tsx'
  * @todo Separate the form button into its own component
  * @todo Maybe separate the text-fields into their own component, but there may be no point in doing so
  */

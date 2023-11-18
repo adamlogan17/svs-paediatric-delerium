@@ -14,6 +14,7 @@ import { authenticate, authorise, logData, updatePicuPassword, verifyCaptcha } f
 import { allPicuCompliance, singlePicuCompliance } from './auditCharts';
 import { addPicu, deletePicus, editPicu, getAllIds, nextPicu } from './picuDbManagement';
 import { deleteCompRecords, editCompliance, insertCompData } from './complianceScores';
+import { exec } from 'child_process';
 
 
 // initialise process.env
@@ -383,6 +384,58 @@ app.post("/backupApiLog", async (req, res) => {
   }
 });
 
+
+/**
+ * @swagger
+ * /backupPostgres:
+ *   post:
+ *     summary: makes a dump of postgres
+ *     tags:
+ *       - Backup
+ *     responses:
+ *       200:
+ *         description: Data successfully copied.
+ *       400:
+ *         description: There was an error copying the data.
+ */
+
+app.post('/backupPostgres', (req, res) => {
+  const command = '/bin/bash -c "docker exec -t dev_svs_postgres pg_dumpall -c -U postgres > dump_1"';
+  exec(command, (error, stdout, stderr) => {
+    if (error) {
+      console.error(`exec error: ${error}`);
+      res.status(500).send('Error running backup command.');
+      return;
+    }
+    res.status(200).send('Backup command ran successfully.');
+  });
+});
+
+/**
+ * @swagger
+ * /restorePostgres:
+ *   post:
+ *     summary: Restore a dump of PostgreSQL
+ *     tags:
+ *       - Restore
+ *     responses:
+ *       200:
+ *         description: Data successfully restored.
+ *       500:
+ *         description: There was an error restoring the data.
+ */
+
+app.post('/restorePostgres', (req, res) => {
+  const command = '/bin/bash -c "cat dump_1.sql | docker exec -i dev_svs_postgres psql -U postgres"';
+  exec(command, (error, stdout, stderr) => {
+    if (error) {
+      console.error(`exec error: ${error}`);
+      res.status(500).send('Error running restore command.');
+      return;
+    }
+    res.status(200).send('Restore command ran successfully.');
+  });
+});
 
 
 

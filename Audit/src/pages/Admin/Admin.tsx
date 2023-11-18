@@ -1,8 +1,9 @@
 import { useNavigate } from 'react-router-dom';
-
 import { Avatar, Box, Button, Container, Dialog, DialogTitle, List, ListItemButton, ListItemText, Typography } from '@mui/material';
 import AdminPanelSettingsIcon from '@mui/icons-material/AdminPanelSettings';
 import React from 'react';
+import axios from 'axios';
+import { enqueueSnackbar } from 'notistack';
 
 /**
  * 
@@ -15,13 +16,27 @@ function Admin() {
   
   const [open, setOpen] = React.useState(false);
 
-  const handleClickOpen = () => {
-    setOpen(true);
+
+  // ...
+
+  const handleBackup = () => {
+    axios.post(`${process.env.REACT_APP_API_URL}/backupPostgres`)
+      .then(response => console.log(response.data))
+      .catch(error => {
+        console.error('Error:', error);
+        enqueueSnackbar("System Error", { variant: "error" });
+      });
+  };
+  
+  const handleRestore = () => {
+    axios.post(`${process.env.REACT_APP_API_URL}/restorePostgres`)
+      .then(response => console.log(response.data))
+      .catch(error => {
+        console.error('Error:', error);
+        enqueueSnackbar("System Error", { variant: "error" });
+      });
   };
 
-  const handleClose = () => {
-    setOpen(false);
-  };
 
   return (
     <Container component="main" maxWidth="xl">
@@ -91,30 +106,20 @@ function Admin() {
         </Button>
 
         <Button 
-          onClick={handleClickOpen} 
+          onClick={handleBackup} 
           sx={buttonStyle}
           variant="contained"
         >
           Backup Data
         </Button>
 
-        <Dialog onClose={handleClose} open={open}>
-          <DialogTitle>Choose data to backup</DialogTitle>
-          <List>
-            <ListItemButton onClick={() => { handleClose(); /* handle backup all data */}}>
-              <ListItemText primary="All data" />
-            </ListItemButton>
-            <ListItemButton onClick={() => {handleClose(); /* handle backup picu */}}>
-              <ListItemText primary="PICU" />
-            </ListItemButton>
-            <ListItemButton onClick={() => {handleClose(); /* handle backup compliance data */}}>
-              <ListItemText primary="Compliance data" />
-            </ListItemButton>
-            <ListItemButton onClick={() => {handleClose(); /* handle backup api log */}}>
-              <ListItemText primary="API log" />
-            </ListItemButton>
-          </List>
-        </Dialog>
+        <Button 
+          onClick={handleRestore} 
+          sx={buttonStyle}
+          variant="contained"
+        >
+          Restore Data
+        </Button>
 
       </Box>
     </Container>

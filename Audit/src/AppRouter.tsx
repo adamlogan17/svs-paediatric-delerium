@@ -1,4 +1,4 @@
-import { BrowserRouter as Router, Route, Routes} from "react-router-dom";
+import { BrowserRouter as Router, Route, Routes } from "react-router-dom";
 
 import Home from './pages/Home/Home'; // example component being added
 import NoPage from './pages/NoPage/NoPage'; // to demonstrate routing
@@ -13,8 +13,10 @@ import ForgottenPassword from "./pages/ForgottenPassword/ForgottenPassword";
 import Auditlog from "./pages/Admin/AuditLog";
 import EditPicus from "./pages/EditPicus/EditPicus";
 import EditCompliance from "./pages/EditCompliance/EditCompliance";
+import Redirect from "./components/Redirect/Redirect";
 
 const token:string|null = sessionStorage.getItem("TOKEN");
+console.log(token);
 const role:string|null = sessionStorage.getItem("ROLE");
 
 // Below are the access conditions for each role, and which pages they can access
@@ -26,7 +28,12 @@ function AppRouter() {
   return (
     <Router>
       <Routes>
-        <Route index path="/" element={<Home />}/>
+        <Route index path="/" element={
+          <Redirect to="/login" condition={token === (undefined || null)} >
+            <Home />
+          </Redirect>
+        }/>
+
         <Route path="*" element={<NoPage />} />
 
         <Route path="/login" element={<SignIn /> }/>

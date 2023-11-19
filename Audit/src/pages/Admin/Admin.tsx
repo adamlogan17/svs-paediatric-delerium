@@ -1,9 +1,8 @@
 import { useNavigate } from 'react-router-dom';
+
 import { Avatar, Box, Button, Container, Dialog, DialogTitle, List, ListItemButton, ListItemText, Typography } from '@mui/material';
 import AdminPanelSettingsIcon from '@mui/icons-material/AdminPanelSettings';
 import React from 'react';
-import axios from 'axios';
-import { enqueueSnackbar } from 'notistack';
 
 /**
  * 
@@ -16,27 +15,13 @@ function Admin() {
   
   const [open, setOpen] = React.useState(false);
 
-
-  // ...
-
-  const handleBackup = () => {
-    axios.post(`${process.env.REACT_APP_API_URL}/backupPostgres`)
-      .then(response => console.log(response.data))
-      .catch(error => {
-        console.error('Error:', error);
-        enqueueSnackbar("System Error", { variant: "error" });
-      });
-  };
-  
-  const handleRestore = () => {
-    axios.post(`${process.env.REACT_APP_API_URL}/restorePostgres`)
-      .then(response => console.log(response.data))
-      .catch(error => {
-        console.error('Error:', error);
-        enqueueSnackbar("System Error", { variant: "error" });
-      });
+const handleClickOpen = () => {
+    setOpen(true);
   };
 
+const handleClose = () => {
+    setOpen(false);
+  };
 
   return (
     <Container component="main" maxWidth="xl">
@@ -104,23 +89,6 @@ function Admin() {
         >
           View Graphs
         </Button>
-
-        <Button 
-          onClick={handleBackup} 
-          sx={buttonStyle}
-          variant="contained"
-        >
-          Backup Data
-        </Button>
-
-        <Button 
-          onClick={handleRestore} 
-          sx={buttonStyle}
-          variant="contained"
-        >
-          Restore Data
-        </Button>
-
       </Box>
     </Container>
   );

@@ -1,5 +1,67 @@
 #!/bin/bash
 
+# Add this function to your script
+dump_database() {
+    # Get the current day of the month
+    day=$(date +%d)
+
+    # Check if the day is a multiple of 28
+    if (( day % 28 == 0 )); then
+        eocker exec -t dev_svs_postgres pg_dumpall -c -U postgres > dump_grandfather.sql
+        Echo "Dumping grandfather database..."
+    # Check if the day is a multiple of 7 but not 28
+    elif (( day % 7 == 0 )); then
+        docker exec -t dev_svs_postgres pg_dumpall -c -U postgres > dump_father.sql
+        echo "Dumping father database..."
+    else
+        docker exec -t dev_svs_postgres pg_dumpall -c -U postgres > dump_child.sql
+        echo "Dumping child database..."
+    fi
+}
+
+restore_database() {
+    # Check the argument passed to -r
+    case "$1" in
+        c)
+            echo "Restoring child database..."
+            /bin/bash -c "cat dump_child.sql | docker exec -i dev_svs_postgres psql -U postgres"
+            ;;
+        f)
+            echo "Restoring father database..."
+            /bin/bash -c "cat dump_father.sql | docker exec -i dev_svs_postgres psql -U postgres"
+            ;;
+        g)
+            echo "Restoring grandfather database..."
+            /bin/bash -c "cat dump_grandfather.sql | docker exec -i dev_svs_postgres psql -U postgres"
+            ;;
+        *)
+            echo "Invalid argument to -r: $1"
+            exit 1
+            ;;
+    esac
+}
+
+create_cron_job() {
+    # Write out current crontab
+    crontab -l > mycron
+    # Echo new cron into cron file
+    echo "0 0 * * * start-docker.sh -d" >> mycron
+    # Install new cron file
+    crontab mycron
+    rm mycron
+}
+
+# Add this function to your script
+stop_cron_job() {
+    # Write out current crontab
+    crontab -l > mycron
+    # Remove the cron job
+    sed -i '/start-docker.sh -d/d' mycron
+    # Install new cron file
+    crontab mycron
+    rm mycron
+}
+
 # Parse command-line options
 while [[ $# -gt 0 ]]; do
     case "$1" in
@@ -18,6 +80,23 @@ while [[ $# -gt 0 ]]; do
         -p|--p)
             p=true
             shift
+            ;;
+        -d|--d)
+            dump_database
+            exit 0
+            ;;
+        -r|--r)
+            shift
+            restore_database $1
+            exit 0
+            ;;
+        -startcron)
+            create_cron_job
+            exit 0
+            ;;
+        -stopcron)
+            stop_cron_job
+            exit 0
             ;;
         *)
             echo "Unknown option: $1"

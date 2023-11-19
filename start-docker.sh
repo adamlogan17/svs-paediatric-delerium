@@ -1,6 +1,5 @@
 #!/bin/bash
 
-# Add this function to your script
 dump_database() {
     # Get the current day of the month
     day=$(date +%d)
@@ -22,15 +21,15 @@ dump_database() {
 restore_database() {
     # Check the argument passed to -r
     case "$1" in
-        c)
+        c) #child dump
             echo "Restoring child database..."
             /bin/bash -c "cat dump_child.sql | docker exec -i dev_svs_postgres psql -U postgres"
             ;;
-        f)
+        f) #father dump
             echo "Restoring father database..."
             /bin/bash -c "cat dump_father.sql | docker exec -i dev_svs_postgres psql -U postgres"
             ;;
-        g)
+        g) #grandfather dump
             echo "Restoring grandfather database..."
             /bin/bash -c "cat dump_grandfather.sql | docker exec -i dev_svs_postgres psql -U postgres"
             ;;

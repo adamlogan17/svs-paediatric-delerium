@@ -5,6 +5,7 @@ services:
     container_name: dev_svs_apis
     volumes:
       - ./APIs/src:/app/src
+      - /var/run/docker.sock:/var/run/docker.sock
     build:
       dockerfile: Dockerfile
     ports:

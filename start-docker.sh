@@ -7,7 +7,7 @@ dump_database() {
 
     # Check if the day is a multiple of 28
     if (( day % 28 == 0 )); then
-        eocker exec -t dev_svs_postgres pg_dumpall -c -U postgres > dump_grandfather.sql
+        docker exec -t dev_svs_postgres pg_dumpall -c -U postgres > dump_grandfather.sql
         Echo "Dumping grandfather database..."
     # Check if the day is a multiple of 7 but not 28
     elif (( day % 7 == 0 )); then

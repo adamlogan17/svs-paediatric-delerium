@@ -46,6 +46,14 @@ The following arguments can be supplied to each script
 - ```-stopcron```
   - Stops the crontab daemon.
 
+### Restore (only on linux)
+
+- ```-r c```
+  - Restores the child dump.
+- ```-r f```
+  - Restores the father dump.
+- ```-r g```
+  - Restores the grandfather dump.
 
 #### **Windows**
 

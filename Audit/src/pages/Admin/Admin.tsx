@@ -1,8 +1,7 @@
 import { useNavigate } from 'react-router-dom';
 
-import { Avatar, Box, Button, Container, Dialog, DialogTitle, List, ListItemButton, ListItemText, Typography } from '@mui/material';
+import { Avatar, Box, Button, Container, Typography } from '@mui/material';
 import AdminPanelSettingsIcon from '@mui/icons-material/AdminPanelSettings';
-import React from 'react';
 
 /**
  * 
@@ -13,15 +12,6 @@ function Admin() {
 
   const navigate = useNavigate();
   
-  const [open, setOpen] = React.useState(false);
-
-const handleClickOpen = () => {
-    setOpen(true);
-  };
-
-const handleClose = () => {
-    setOpen(false);
-  };
 
   return (
     <Container component="main" maxWidth="xl">

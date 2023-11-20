@@ -17,7 +17,7 @@ const dbPassword:string = process.env.DBPASSWORD || "No password found";
  * @property {string} [password] - Password associated with the PICU, possibly for access control.
  * @property {string} [picu_id] - Optional unique identifier for the PICU.
  */
-type Picu = {
+export type Picu = {
   hospital_name:string, 
   auditor:string, 
   picu_role:'picu'|'admin'|'field_engineer',
@@ -25,8 +25,8 @@ type Picu = {
   ward_name:string,
   picu_id?:string,
   overall_compliance?:number,
-}
-
+} 
+ 
 /**
  * Updates a PICU record in the database.
  * 

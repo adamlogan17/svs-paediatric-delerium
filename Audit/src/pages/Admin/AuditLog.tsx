@@ -17,9 +17,13 @@ interface AuditLogData {
   userrole: string;
 }
 
+/**
+ * 
+ * @todo set isLoading to false when there is an error
+ */
 function getAPIData() {
-    return axios.get(`${process.env.REACT_APP_API_URL}/audit/getall/api_log`, {
-      headers: { 'Authorization': "bearer " + sessionStorage.getItem('TOKEN') } 
+    return axios.get(`${process.env.REACT_APP_API_URL}/get-all-logs`, {
+      headers: { 'Authorization': "Bearer " + sessionStorage.getItem('TOKEN') } 
     })
     .then((response) => {
       return response.data.allData;

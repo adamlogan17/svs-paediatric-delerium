@@ -9,11 +9,12 @@ import { config } from 'dotenv';
 import swaggerJsdoc from 'swagger-jsdoc';
 import swaggerUi from 'swagger-ui-express';
 
-import { copyTable, deleteData, getAll, getPicuData, insertData, updateData } from './crud';
+import { copyTable, deleteData, getAll, insertData, updateData } from './crud';
 import { authenticate, authorise, logData, updatePicuPassword, verifyCaptcha } from './login';
 import { allPicuCompliance, singlePicuCompliance } from './auditCharts';
-import { addPicu, deletePicus, editPicu, getAllIds, nextPicu } from './picuDbManagement';
-import { deleteCompRecords, editCompliance, insertCompData } from './complianceScores';
+import { addPicu, deletePicus, editPicu, getAllIds, nextPicu, getPicuData } from './picuDbManagement';
+import { deleteCompRecords, editCompliance, getComplianceData, insertCompData } from './complianceScores';
+import { getLogData } from './logging';
 
 
 // initialise process.env
@@ -103,11 +104,9 @@ app.use((request:Request, response:Response, next) => {
 
 app.use((request:Request, response:Response, next:NextFunction) => {
   // forces the middleware to wait until the response has been sent
-  console.log(request.statusCode);
-  console.log(response.statusCode);
-
   response.on('finish', () => {
     const now = new Date();
+    console.log("request");
     const apiCallDetail: APICallDetail = {
       date: now.toISOString().split('T')[0], // Separate date
       time: now.toISOString().split('T')[1].split('.')[0], // Separate time
@@ -122,7 +121,6 @@ app.use((request:Request, response:Response, next:NextFunction) => {
 
     // Add the API call detail to the array
     apiCallDetails.push(apiCallDetail);
-    console.log(apiCallDetail);
     insertData("audit", "api_log", apiCallDetail);
   })
 
@@ -526,42 +524,6 @@ app.post("/backupApiLog", async (req, res) => {
   }
 });
 
-
-
-
-
-/**
- * @swagger
- * /{database}/getpicudata/{table}:
- *  get:
- *    tags:
- *      - CRUD
- *    summary: Gets specific picu data from table
- *    parameters:
- *      - name: database
- *        in: path
- *        description: The name of the selected database
- *        schema:
- *          type: "string"
- *        required: true
- *      - name: table
- *        in: path
- *        description: The name of the selected table
- *        required: true
- *        schema:
- *          type: "string"
- *    responses:
- *      '200':
- *          description: OK
- *      '400':
- *          description: Invalid parameters
- */
-app.get("/:database/getpicudata/:table", async (req: Request,res: Response) => {
-  let result:{allData:any[]}|string = await getPicuData(req.params.database, req.params.table, req.params.role === undefined ? "postgres" : `${req.params.role}_role`, req.params.role === undefined ? "postgrespw": "password", req.params.picuID);
-  let status:number = typeof result === 'string' ? 400 : 200;
-  res.status(status).send(result);
-});
-
 /**
  * @swagger
  * /{database}/{table}/insertdata:
@@ -912,6 +874,36 @@ app.put("/updatePicu", (request: Request, response: Response, next:NextFunction)
   res.status(status).send(result);
 });
 
+  /**
+ * @swagger
+ * /get-all-picu:
+ *   get:
+ *     tags:
+ *       - Picu
+ *     summary: Get all compliance data
+ *     security:
+ *       - Bearer: []
+ *     responses:
+ *       201:
+ *         description: PICU data retrieved successfully.
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 allData:
+ *                   type: array
+ *                   items:
+ *                     $ref: '#/definitions/Picu'
+ *       400:
+ *         description: An error occurred.
+ */
+app.get("/get-all-picu", (request: Request, response: Response, next:NextFunction) => authorise(request, response, next, 'admin'), async (req: Request, res: Response) => {
+  let result:{allData:any[]}|string = await getPicuData(req.params.role);
+  let status:number = result.toString().includes("Error") ? 400 : 201;
+  res.status(status).send(result);
+});
+
 /**
  * @swagger
  * /verify-captcha:
@@ -1008,12 +1000,68 @@ app.put("/update-compliance", (request: Request, response: Response, next:NextFu
  *         description: An error occurred.
  */
 app.delete("/delete-compliance", (request: Request, response: Response, next:NextFunction) => authorise(request, response, next, 'admin'), async (req: Request, res: Response, next:NextFunction) => {
-   let result = await deleteCompRecords(req.body.comp_ids, req.params.role);
+  let result:string = await deleteCompRecords(req.body.comp_ids, req.params.role);
   let status:number = result.toString().includes("Error") ? 400 : 201;
-  // next();
-   res.status(status).send(result);
-})
-//, (req: Request, res: Response) => log(req, res));
+  res.status(status).send(result);
+});
+
+/**
+ * @swagger
+ * /get-all-compliance:
+ *   get:
+ *     tags:
+ *       - Compliance
+ *     summary: Get all compliance data
+ *     security:
+ *       - Bearer: []
+ *     responses:
+ *       201:
+ *         description: Compliance data retrieved successfully.
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 allData:
+ *                   type: array
+ *                   items:
+ *                     $ref: '#/definitions/ComplianceData'
+ *       400:
+ *         description: An error occurred.
+ */
+app.get("/get-all-compliance", (request: Request, response: Response, next:NextFunction) => authorise(request, response, next, 'admin'), async (req: Request, res: Response) => {
+  let result:{allData:any[]}|string = await getComplianceData(req.params.role);
+  let status:number = result.toString().includes("Error") ? 400 : 201;
+  res.status(status).send(result);
+});
+
+  /**
+ * @swagger
+ * /get-all-logs:
+ *   get:
+ *     tags:
+ *       - Log
+ *     summary: Get all log data
+ *     security:
+ *       - Bearer: []
+ *     responses:
+ *       201:
+ *         description: Log data retrieved successfully.
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 allData:
+ *                   type: array
+ *       400:
+ *         description: An error occurred.
+ */
+  app.get("/get-all-logs", (request: Request, response: Response, next:NextFunction) => authorise(request, response, next, 'admin'), async (req: Request, res: Response) => {
+    let result:{allData:any[]}|string = await getLogData(req.params.role);
+    let status:number = result.toString().includes("Error") ? 400 : 201;
+    res.status(status).send(result);
+  });
 
 // Used to activate the endpoints through HTTP
 app.listen(port,()=> {

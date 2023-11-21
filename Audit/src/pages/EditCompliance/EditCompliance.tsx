@@ -142,7 +142,9 @@ async function updateCompliance(compToUpdate: ComplianceData): Promise<Complianc
  * @returns {Promise<ComplianceData[]>} - A promise that resolves to an array of compliance data records.
  */
 function getCompData():Promise<ComplianceData[]> {
-  return axios.get(`${process.env.REACT_APP_API_URL}/audit/getall/compliance_data`)
+  return axios.get(`${process.env.REACT_APP_API_URL}/get-all-compliance`, {
+    headers: { Authorization: `Bearer ${sessionStorage.getItem("TOKEN")}` },
+  })
     .then((response:any) => {
       const compData:any[] = [];
       for (let singleScore of response.data.allData) {

@@ -1,5 +1,4 @@
-import { Request, Response } from "express";
-import { createInsert, createPool, deleteData, insertData, updateData } from "./crud";
+import { getAll, deleteData, insertData, updateData } from "./crud";
 import { config } from 'dotenv';
 
 config();
@@ -87,4 +86,20 @@ export async function editCompliance(dataToEdit:ComplianceData, role:string): Pr
  */
 export async function deleteCompRecords(ids:number[], role:string): Promise<string> {
   return await deleteData(db, tableName, `comp_id IN (${ids.join()})`, role, dbPassword);
+}
+
+/**
+ * Gets all the information stored within the compliance table
+ * 
+ * @author Adam Logan
+ * @function getComplianceData
+ * @param role The role which will be accessing the data
+ * 
+ * @returns The data within the compliance table
+ * 
+ * @todo sort out the types for the data
+ */
+export async function getComplianceData(role:string): Promise<{allData:any[]}|string> {
+  let result:{allData:any[]}|string = await getAll(db, tableName, role, dbPassword);
+  return result;
 }

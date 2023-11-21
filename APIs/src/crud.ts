@@ -153,35 +153,6 @@ export async function getSelectedRecords(database:string, table:string, userForD
 }
 
 /**
- * Fetches all records from a specified table in a database.
- * 
- * @author Andrew Robb
- * @function getPICUData
- * @param {string} database - The name of the database.
- * @param {string} table - The name of the table from which to fetch the records.
- * @param {string} userForDb - The username for the database connection.
- * @param {string} passForDb - The password for the database connection.
- * 
- * @returns {Promise<{allData:any[]}|string>} A promise that resolves with all records from the specified table or an error message.
- */
-export async function getPicuData(database:string, table:string, userForDb:string, passForDb:string, picuID:string): Promise<{allData:any[]}|string> {
-  const POOL = createPool(database, userForDb, passForDb);
-
-  let condition:string = `picu_id=${picuID}`;
-  let results:any;
-
-  try {
-    results = await POOL.query(createSelect(table, condition));
-    results = {
-      specificData: results.rows
-    };
-  } catch (e:any) {
-    results = errorCodeMessage(e.code);
-  }
-  return results;
-}
-
-/**
  * Inserts data into the specified table of the database.
  * 
  * @author Adam Logan
@@ -282,12 +253,15 @@ export async function deleteData(database:string ,table:string, predicate:string
 
 /**
  * Copies a table to an existing table with a different name
+ * @author Ewan Forsythe
  * @param {string} database The name of the database to copy the table from
  * @param {string} sourceTable The name of the table to copy
  * @param {string} destinationTable The name of the existing table to insert the data into
  * @param {string} [user="postgres"] Username for the database
  * @param {string} [password="postgrespw"] Password for the database
  * @returns {Promise<string>} A Promise that resolves to a success message if the copy was successful, or an error message if it wasn't
+ * 
+ * @todo remove as this is no longer needed
  */
 export async function copyTable(database: string, sourceTable: string, destinationTable: string, user = 'postgres', password = 'postgrespw'): Promise<string> {
   const role = user === 'postgres' ? user : `${user}`;

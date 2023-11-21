@@ -74,7 +74,7 @@ export default function EditPicus() {
   const [isLoading, setIsLoading] = useState<boolean>(true);
 
   useEffect(() => {
-    axios.get(`${process.env.REACT_APP_API_URL}/audit/getall/picu`)
+    axios.get(`${process.env.REACT_APP_API_URL}/get-all-picu`, { headers: { 'Authorization': `Bearer ${sessionStorage.getItem('TOKEN')}` } })
       .then((response:any) => {
         const picus:Picu[] = [];
         for (let picu of response.data.allData) {

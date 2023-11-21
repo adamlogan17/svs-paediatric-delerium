@@ -1,8 +1,9 @@
-import { createPool, createSelect, deleteData, insertData, updateData } from './crud';
+import { createPool, createSelect, deleteData, insertData, updateData, getAll } from './crud';
 import { hashPassword } from './login';
 
 const db:string = process.env.DATABASE || "No database found";
 const dbPassword:string = process.env.DBPASSWORD || "No password found";
+const tableName:string = 'picu';
 
 /**
  * @typedef Picu
@@ -55,7 +56,7 @@ export async function editPicu(dataToEdit:Picu, role:string): Promise<string> {
   delete dataToEdit.picu_id;
   delete dataToEdit.overall_compliance;
 
-  return await updateData(db, 'picu', dataToEdit, `picu_id = ${Number(id)}`, role, dbPassword);
+  return await updateData(db, tableName, dataToEdit, `picu_id = ${Number(id)}`, role, dbPassword);
 }
 
 /**
@@ -68,7 +69,7 @@ export async function editPicu(dataToEdit:Picu, role:string): Promise<string> {
  * @returns {Promise<string>} A message indicating the success or failure of the deletion.
  */
 export async function deletePicus(ids:number[], role:string): Promise<string> {
-  return await deleteData(db, 'picu', `picu_id IN (${ids.join()})`, role, dbPassword);
+  return await deleteData(db, tableName, `picu_id IN (${ids.join()})`, role, dbPassword);
 }
 
 /**
@@ -81,7 +82,6 @@ export async function deletePicus(ids:number[], role:string): Promise<string> {
  * @returns {Promise<{picu_id: number} | string>} The ID of the added record or an error message.
  */
 export async function addPicu(dataToAdd:Picu, role:string): Promise<{picu_id:number}|string> {
-  const table:string = 'picu';
   const columnsToReturn = ['picu_id'];
 
   for (const [key, value] of Object.entries(dataToAdd)) {
@@ -102,7 +102,7 @@ export async function addPicu(dataToAdd:Picu, role:string): Promise<{picu_id:num
     return dataToAdd.password;
   }
 
-  return await insertData(db, table, dataToAdd, columnsToReturn, role, dbPassword);
+  return await insertData(db, tableName, dataToAdd, columnsToReturn, role, dbPassword);
 }
 
 /**
@@ -133,7 +133,7 @@ export async function nextPicu(role:string) {
 export async function getAllIds(role:string): Promise<{picu_id:string, picu_role:string}[]> {
   const POOL = createPool(db, role, dbPassword);
 
-  const sqlStatement = createSelect("picu", "", ["picu_id", "picu_role"]);
+  const sqlStatement = createSelect(tableName, "", ["picu_id", "picu_role"]);
 
   const allIds = (await POOL.query(sqlStatement)).rows;
 
@@ -145,4 +145,20 @@ export async function getAllIds(role:string): Promise<{picu_id:string, picu_role
       return id.picu_role === "picu";
     }
   });
+}
+
+/**
+ * Gets all the information stored within the picu table
+ * 
+ * @author Adam Logan
+ * @function getPicuData
+ * @param role The role which will be accessing the data
+ * 
+ * @returns The data within the picu table
+ * 
+ * @todo sort out the types for the data
+ */
+export async function getPicuData(role:string): Promise<{allData:any[]}|string> {
+  let result:{allData:any[]}|string = await getAll(db, tableName, role, dbPassword);
+  return result;
 }

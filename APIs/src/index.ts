@@ -88,49 +88,46 @@ app.use(bp.json())
 app.use(bp.urlencoded({ extended: true }));
 
 // Disables CORS errors, for developments
-app.use((req:Request, res:Response, next) => {
-    res.setHeader("Access-Control-Allow-Origin", "*");
-    res.setHeader(
+app.use((request:Request, response:Response, next) => {
+    response.setHeader("Access-Control-Allow-Origin", "*");
+    response.setHeader(
         "Access-Control-Allow-Headers",
         "Origin, X-Requested-With, Content, Accept, Content-Type, Authorization"
     );
-    res.setHeader(
+    response.setHeader(
         "Access-Control-Allow-Methods",
         "GET, POST, PUT, DELETE, PATCH, OPTIONS"
     );
     next();
 });
 
+app.use((request:Request, response:Response, next:NextFunction) => {
+  // forces the middleware to wait until the response has been sent
+  console.log(request.statusCode);
+  console.log(response.statusCode);
 
+  response.on('finish', () => {
+    const now = new Date();
+    const apiCallDetail: APICallDetail = {
+      date: now.toISOString().split('T')[0], // Separate date
+      time: now.toISOString().split('T')[1].split('.')[0], // Separate time
+      method: request.method,
+      url: request.originalUrl,
+      status: response.statusCode,
+      userIP: request.ip,
+      userAgent: request.headers['user-agent'] || '',
+      username: request.params.username,
+      userRole: request.params.role
+    };
 
-app.use((req:Request, res:Response, next:NextFunction) => {
+    // Add the API call detail to the array
+    apiCallDetails.push(apiCallDetail);
+    console.log(apiCallDetail);
+    insertData("audit", "api_log", apiCallDetail);
+  })
 
-  const now = new Date();
-  const apiCallDetail: APICallDetail = {
-    date: now.toISOString().split('T')[0], // Separate date
-    time: now.toISOString().split('T')[1].split('.')[0], // Separate time
-    method: req.method,
-    url: req.originalUrl,
-    status: res.statusCode,
-    userIP: req.ip,
-    userAgent: req.headers['user-agent'] || '',
-    username: req.params.username,
-    userRole: req.params.role,
-  };
-
-  // Add the API call detail to the array
-  apiCallDetails.push(apiCallDetail);
-  insertData("audit", "api_log", apiCallDetail);
-
-  // Continue with the request handling
   next();
 });
-
-// app.get("/test-auth", (request: Request, response: Response, next:NextFunction) => authorise(request, response, next), (request:any, response:Response, next:NextFunction) => {
-//   request.body = { message: "You are authorized to access me" , user: request.params.username, role: request.params.role};
-//   next();
-// }, (req: Request,res: Response) => logData(req, res));
-
 
 /**
  * @swagger
@@ -208,15 +205,88 @@ app.use((req:Request, res:Response, next:NextFunction) => {
  *      '200':
  *          description: OK
  */
-app.get("/test/:val", (request: Request, respond: Response, next:NextFunction) => {
-    request.body = {
-          hello:"world",
-          val: request.params.val
-      }
-    console.log("in", request.body);
+app.get("/test/:val", (request: Request, response: Response, next:NextFunction) => {
+    const body = { hello:"world", val: request.params.val };
+    response.status(201).send(body);
+});
 
-    next();
-}, (req: Request,res: Response) => logData(req, res));
+/**
+ * @swagger
+ * /test-auth:
+ *   get:
+ *     tags:
+ *       - Testing
+ *     summary: Tests authentication
+ *     description: Endpoint that requires authorisation.
+ *     security:
+ *       - Bearer: []
+ *     produces:
+ *       - application/json
+ *     responses:
+ *       200:
+ *         description: Message indicating the user is authorized and the user's details.
+ *         schema:
+ *           type: object
+ *           properties:
+ *             message:
+ *               type: string
+ *             user:
+ *               type: string
+ *             role:
+ *               type: string
+ *       401:
+ *         description: Unauthorized access.
+ */
+app.get("/test-auth", (request: Request, response: Response, next:NextFunction) => authorise(request, response, next), (request:any, response:Response) => {
+  const body = { message: "You are authorized to access me" , user: request.params.username, role: request.params.role};
+  response.status(201).send(body);
+});
+
+/**
+ * @swagger
+ * /test-auth/admin:
+ *   get:
+ *     tags:
+ *       - Testing
+ *     summary: Tests Admin authentication
+ *     description: Endpoint that requires authorisation.
+ *     security:
+ *       - Bearer: []
+ *     produces:
+ *       - application/json
+ *     responses:
+ *       200:
+ *         description: Message indicating the user is authorized and the user's details.
+ *       401:
+ *         description: Unauthorized access.
+ */
+app.get("/test-auth/admin", (request: Request, response: Response, next:NextFunction) => authorise(request, response, next, "admin"), (request:any, response:Response, next:NextFunction) => {
+  const body ={ message: "You are authorized to access me" , user: request.params.username, role: request.params.role};
+  response.status(201).send(body);
+});
+
+/**
+ * @swagger
+ * /test-auth/field-engineer:
+ *   get:
+ *     tags:
+ *       - Testing
+ *     summary: Tests field engineer authentication
+ *     description: Endpoint that requires authorisation.
+ *     security:
+ *       - Bearer: []
+ *     produces:
+ *       - application/json
+ *     responses:
+ *       200:
+ *         description: Message indicating the user is authorized and the user's details.
+ *       401:
+ *         description: Unauthorized access.
+ */
+app.get("/test-auth/field-engineer", (request: Request, response: Response, next:NextFunction) => authorise(request, response, next, "field_engineer"), (request:any, response:Response, next:NextFunction) => {
+  const body ={ message: "You are authorized to access me" , user: request.params.username, role: request.params.role};
+  response.status(201).send(body);
+});
 
 /**
  * @swagger
@@ -617,84 +687,6 @@ app.delete("/:database/deletedata/:table/:predicate", async (req: Request,res: R
   let status:number = result.includes("ERROR") ? 400 : 200;
   res.status(status).send(result);
 });
-
-/**
- * @swagger
- * /test-auth:
- *   get:
- *     tags:
- *       - Testing
- *     summary: Tests authentication
- *     description: Endpoint that requires authorisation.
- *     security:
- *       - Bearer: []
- *     produces:
- *       - application/json
- *     responses:
- *       200:
- *         description: Message indicating the user is authorized and the user's details.
- *         schema:
- *           type: object
- *           properties:
- *             message:
- *               type: string
- *             user:
- *               type: string
- *             role:
- *               type: string
- *       401:
- *         description: Unauthorized access.
- */
-app.get("/test-auth", (request: Request, response: Response, next:NextFunction) => authorise(request, response, next), (request:any, response:Response, next:NextFunction) => {
-  request.body = { message: "You are authorized to access me" , user: request.params.username, role: request.params.role};
-  next();
-}, (req: Request,res: Response) => logData(req, res));
-
-/**
- * @swagger
- * /test-auth/admin:
- *   get:
- *     tags:
- *       - Testing
- *     summary: Tests Admin authentication
- *     description: Endpoint that requires authorisation.
- *     security:
- *       - Bearer: []
- *     produces:
- *       - application/json
- *     responses:
- *       200:
- *         description: Message indicating the user is authorized and the user's details.
- *       401:
- *         description: Unauthorized access.
- */
-app.get("/test-auth/admin", (request: Request, response: Response, next:NextFunction) => authorise(request, response, next, "admin"), (request:any, response:Response, next:NextFunction) => {
-  request.body ={ message: "You are authorized to access me" , user: request.params.username, role: request.params.role};
-  next();
-}, (req: Request,res: Response) => logData(req, res));
-
-/**
- * @swagger
- * /test-auth/field-engineer:
- *   get:
- *     tags:
- *       - Testing
- *     summary: Tests field engineer authentication
- *     description: Endpoint that requires authorisation.
- *     security:
- *       - Bearer: []
- *     produces:
- *       - application/json
- *     responses:
- *       200:
- *         description: Message indicating the user is authorized and the user's details.
- *       401:
- *         description: Unauthorized access.
- */
-app.get("/test-auth/field-engineer", (request: Request, response: Response, next:NextFunction) => authorise(request, response, next, "field_engineer"), (request:any, response:Response, next:NextFunction) => {
-  request.body ={ message: "You are authorized to access me" , user: request.params.username, role: request.params.role};
-  next();
-}, (req: Request,res: Response) => logData(req, res));
 
 /**
  * Retrieves the compliance data of the site requested

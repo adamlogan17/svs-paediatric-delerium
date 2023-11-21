@@ -35,7 +35,6 @@ export function authenticate(request: Request, response: Response): void {
       }
       else {
         // compares the hashed password with the plaintext one which is provided
-        console.log(results);
         bcrypt
         .compare(password, results.rows[0].password)
         .then(res => {
@@ -56,7 +55,7 @@ export function authenticate(request: Request, response: Response): void {
             });
 
           } else {
-            response.send("ERROR: Permission Denied");
+            response.status(401).send("ERROR: Permission Denied");
           }
         })
         .catch(err => response.send(err))
@@ -72,6 +71,7 @@ export function authenticate(request: Request, response: Response): void {
  * @param { any } request
  * @param { Response } response
  * @param { NextFunction } next
+ * @param { string } [level] - The role required to access the endpoint
  * @returns { void }
  * 
  * @todo check the role from the db is correct for the one embedded in the token

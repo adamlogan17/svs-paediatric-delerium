@@ -17,7 +17,7 @@ const dbPassword:string = process.env.DBPASSWORD || "No password found";
  * @property {string} [password] - Password associated with the PICU, possibly for access control.
  * @property {string} [picu_id] - Optional unique identifier for the PICU.
  */
-type Picu = {
+export type Picu = {
   hospital_name:string, 
   auditor:string, 
   picu_role:'picu'|'admin'|'field_engineer',
@@ -26,6 +26,7 @@ type Picu = {
   picu_id?:string,
   overall_compliance?:number,
 }
+export const Types = {}
 
 /**
  * Updates a PICU record in the database.
@@ -36,6 +37,7 @@ type Picu = {
  * @param {string} role - The role for which the database pool will be created. 
  * @returns {Promise<string>} - A message indicating the success or failure of the update.
  */
+
 export async function editPicu(dataToEdit:Picu, role:string): Promise<string> {
   for (const [key, value] of Object.entries(dataToEdit)) {
     if (key === 'password') {

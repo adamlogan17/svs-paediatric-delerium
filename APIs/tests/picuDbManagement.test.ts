@@ -1,40 +1,26 @@
 import {describe, expect, test} from '@jest/globals';
 import {editPicu, deletePicus, addPicu, nextPicu, getAllIds, Picu} from '../src/picuDbManagement';
 import * as crud from '../src/crud';
-import { hashPassword } from '../src/login';
+import * as login from '../src/login';
 
 jest.mock('../src/crud');
 jest.mock('../src/login');
 const insertData = jest.fn();
 const createPool = jest.fn();
-// Mock the database pool creation function
+const hashPassword = jest.fn();
+// Mock the crud functions
 jest.mock('../src/crud', () => ({
   createPool: jest.fn(),
   updateData: jest.fn(),
+  createSelect: jest.fn(),
+  deleteData: jest.fn(),
+  insertData: jest.fn(),
 }));
 
-// /**
-//  * @typedef Picu
-//  * 
-//  * Represents a PICU (Paediatric Intensive Care Unit) entity in the system. This can be used for
-//  * storing information related to a particular PICU.
-//  * 
-//  * @property {string} hospital_name - The name of the hospital where the PICU is located.
-//  * @property {string} ward_name - The specific name of the PICU ward.
-//  * @property {string} picu_role - Role assigned within the PICU database.
-//  * @property {string} auditor - The individual responsible for auditing within this PICU.
-//  * @property {string} [password] - Password associated with the PICU, possibly for access control.
-//  * @property {string} [picu_id] - Optional unique identifier for the PICU.
-//  */
-// type Picu = {
-//   hospital_name:string, 
-//   auditor:string, 
-//   picu_role:'picu'|'admin'|'field_engineer',
-//   password?:string
-//   ward_name:string,
-//   picu_id?:string,
-//   overall_compliance?:number,
-// }
+// // Mock the login functions
+// jest.mock('../src/login', () => ({
+//   hashPassword: jest.fn(),
+// }));
 
 describe('Picu Functions', () => {
   const db = 'audit'; //db name
@@ -45,93 +31,123 @@ describe('Picu Functions', () => {
   });
 
   describe('addPicu', () => {
-    it('should add a new PICU record to the database', async () => {
-      const dataToAdd: Picu = {
-        hospital_name:'Test Hospital', 
-        auditor:'Test Auditor', 
-        picu_role:'picu',
-        password:'testPassword',
-        ward_name:'Test Ward'
-      };
-
-      (crud.insertData as jest.Mock).mockResolvedValueOnce({ picu_id: 1 });
-      (hashPassword as jest.Mock).mockResolvedValueOnce('hashedPassword');
-
-      const result = await addPicu(dataToAdd, 'admin');
-
-      expect(insertData).toHaveBeenCalledWith(
-        db,
-        'picu',
-        {
-          auditor: 'Test Auditor',
-          hospital_name: 'Test Hospital',
-          password: 'hashedPassword',
-          picu_role: 'picu',
-          ward_name: 'Test Ward',
-        },
-        ['picu_id'],
-        'admin',
-        dbPassword
-      );
-      expect(result).toEqual({ picu_id: 1 });
+    beforeEach(() => {
+      // Clear the mock calls before each test
+      jest.clearAllMocks();
     });
 
-    // need to add more
+    it('should return an error if any field is empty', async () => {
+      const dataToAdd: Picu = {
+        picu_id: '1',
+        hospital_name: '',
+        picu_role: 'admin',
+        auditor: 'Auditor',
+        ward_name: 'Ward',
+        password: 'password',
+      };
+      const role = 'admin';
+
+      const result = await addPicu(dataToAdd, role);
+
+      expect(result).toBe('ERROR: hospital_name is empty.');
+      // Ensure that the insertData function was not called
+      expect(require('../src/crud').insertData).not.toHaveBeenCalled();
+    });
+
+    it('should return an error if password is empty', async () => {
+      const dataToAdd: Picu = {
+        picu_id: '1',
+        hospital_name: 'Hospital',
+        picu_role: 'admin',
+        auditor: 'Auditor',
+        ward_name: 'Ward',
+        password: '',
+      };
+      const role = 'admin';
+
+      const result = await addPicu(dataToAdd, role);
+
+      expect(result).toBe('ERROR: password is empty.');
+      // Ensure that the insertData function was not called
+      expect(require('../src/crud').insertData).not.toHaveBeenCalled();
+    });
+
+    it('should return an error if password hashing fails', async () => {
+      const dataToAdd: Picu = {
+        picu_id: '1',
+        hospital_name: 'Hospital',
+        picu_role: 'admin',
+        auditor: 'Auditor',
+        ward_name: 'Ward',
+        password: 'password',
+      };
+      const role = 'admin';
+
+      // Mock the hashPassword function to return an error
+      (require('../src/login') as any).hashPassword.mockResolvedValue('Error: Password hashing failed');
+
+      const result = await addPicu(dataToAdd, role);
+
+      expect(result).toBe('Error: Password hashing failed');
+      // Ensure that the insertData function was not called
+      expect(require('../src/crud').insertData).not.toHaveBeenCalled();
+    });
+
+    it('should call insertData with the correct parameters', async () => {
+      const dataToAdd: Picu = {
+        picu_id: '123',
+        hospital_name: 'Success Hospital',
+        picu_role: 'admin',
+        auditor: 'Auditor',
+        ward_name: 'Ward',
+        password: 'password',
+      };
+      const role = 'admin';
+
+      // Mock the hashPassword function to return a hashed password
+      (require('../src/login') as any).hashPassword.mockResolvedValue('hashedPassword-hashedPassword-hashedPassword-hashedPassword-');
+
+      // Mock the insertData function to return a success message
+      (require('../src/crud') as any).insertData.mockResolvedValue({ picu_id: 123 });
+
+      const result = await addPicu(dataToAdd, role);
+
+      expect(result).toEqual({ picu_id: 123 });
+      // Ensure that the insertData function was called with the correct parameters
+      expect(require('../src/crud').insertData).toHaveBeenCalledWith(db, 'picu', dataToAdd, ['picu_id'], role, dbPassword);
+    });
+
+    // Add more test cases for different scenarios
+    // hashed password conditions
   });
+
+//-----------------------------------------------------------------------------------------------------------------
 
   describe('deletePicus', () => {
-    it('should delete PICUs from the database', async () => {
-      const ids = [1, 2, 3];
-
-      (crud.deleteData as jest.Mock).mockResolvedValueOnce('Success');
-
-      const result = await deletePicus(ids, 'admin');
-
-      expect(crud.deleteData).toHaveBeenCalledWith(
-        db,
-        'picu',
-        'picu_id IN (1,2,3)',
-        'admin',
-        dbPassword
-      );
-      expect(result).toEqual('Success');
+    beforeEach(() => {
+      // Clear the mock calls before each test
+      jest.clearAllMocks();
     });
 
-    // Add more test cases for error scenarios
+    it('should call deleteData with the correct parameters', async () => {
+      const ids = [1, 2, 3];
+      const role = 'admin';
+
+      // Mock the deleteData function to return a success message
+      (require('../src/crud') as any).deleteData.mockResolvedValue('Deletion successful');
+
+      const result = await deletePicus(ids, role);
+
+      expect(result).toBe('Deletion successful');
+      // Ensure that the deleteData function was called with the correct parameters
+      expect(require('../src/crud').deleteData).toHaveBeenCalledWith(db, 'picu', `picu_id IN (1,2,3)`, role, dbPassword);
+    });
+
+    // Add more test cases for different scenarios
   });
 
-  // describe('editPicu', () => {
-  //   it('should edit a PICU record in the database', async () => {
-  //     const dataToEdit: Picu = {
-  //       picu_id: '1',
-  //       hospital_name: 'Updated Hospital',
-  //       ward_name: 'Updated Ward',
-  //       auditor: 'Updated Auditor',
-  //       picu_role: 'picu',
-  //     };
 
-  //     (crud.updateData as jest.Mock).mockResolvedValueOnce('Success');
-
-  //     const result = await editPicu(dataToEdit, 'admin');
-
-  //     expect(crud.updateData).toHaveBeenCalledWith(
-  //       db,
-  //       'picu',
-  //       {
-  //         hospital_name: 'Updated Hospital',
-  //         ward_name: 'Updated Ward',
-  //         auditor: 'Updated Auditor',
-  //         picu_role: 'picu',
-  //       },
-  //       'picu_id = 1',
-  //       'admin',
-  //       dbPassword
-  //     );
-  //     expect(result).toEqual('Success');
-  //   });
-
-  //   // Add more test cases for error scenarios
-  // });
+  //---------------------------------------------------------------------------------------------------------
 
   describe('editPicu', () => {
     beforeEach(() => {
@@ -154,7 +170,7 @@ describe('Picu Functions', () => {
 
       expect(result).toBe('ERROR: password cannot be edited.');
       // Ensure that the updateData function was not called
-      expect(require('./crud').updateData).not.toHaveBeenCalled();
+      expect(require('../src/crud').updateData).not.toHaveBeenCalled();
     });
 
     it('should return an error if any field is empty', async () => {
@@ -170,51 +186,33 @@ describe('Picu Functions', () => {
 
       expect(result).toBe('ERROR: hospital_name is empty.');
       // Ensure that the updateData function was not called
-      expect(require('./crud').updateData).not.toHaveBeenCalled();
+      expect(require('../src/crud').updateData).not.toHaveBeenCalled();
     });
 
     it('should call updateData with the correct parameters', async () => {
       const dataToEdit: Picu = {
         picu_id: '1',
-        hospital_name: '',
+        hospital_name: 'Hospital',
         picu_role: 'admin',
-        auditor: 'Updated Auditor',
-        ward_name: 'Updated Ward',
+        auditor: 'Auditor',
+        ward_name: 'Ward',
       };
       const role = 'admin';
 
       // Mock the updateData function to return a success message
-      (require('./crud') as any).updateData.mockResolvedValue('Update successful');
+      (require('../src/crud') as any).updateData.mockResolvedValue('Update successful');
 
       const result = await editPicu(dataToEdit, role);
 
       expect(result).toBe('Update successful');
       // Ensure that the updateData function was called with the correct parameters
-      expect(require('./crud').updateData).toHaveBeenCalledWith(db, 'picu', dataToEdit, `picu_id = 1`, role, dbPassword);
+      expect(require('../src/crud').updateData).toHaveBeenCalledWith(db, 'picu', dataToEdit, `picu_id = 1`, role, dbPassword);
     });
 
     // Add more test cases for different scenarios
   });
 
-  // describe('nextPicu', () => {
-  //   it('should retrieve the next PICU ID from the database', async () => {
-  //     (crud.createPool as jest.Mock).mockReturnValueOnce({
-  //       query: jest.fn().mockResolvedValueOnce({ rows: [{ nextval: 1 }] }),
-  //     });
-
-  //     const result = await nextPicu('admin');
-
-  //     expect(result).toEqual(1);
-  //     expect(crud.createPool).toHaveBeenCalledWith(db, 'admin', dbPassword);
-
-  //     const testPOOL = await crud.createPool(db, 'admin', dbPassword);
-  //     expect((testPOOL.query as jest.Mock)).toHaveBeenCalledWith(
-  //       "SELECT nextval('picu_picu_id_seq');"
-  //     );
-  //   });
-
-  //   // Add more test cases for error scenarios
-  // });
+  //---------------------------------------------------------------------------------------------------------------------------------------
 
   describe('nextPicu', () => {
     beforeEach(() => {
@@ -246,35 +244,7 @@ describe('Picu Functions', () => {
     // Add more test cases for different scenarios
   });
 
-
-//   describe('getAllIds', () => {
-//     it('should retrieve all PICU IDs based on a given role', async () => {
-//       (crud.createPool as jest.Mock).mockReturnValueOnce({
-//         query: jest.fn().mockResolvedValueOnce({
-//           rows: [
-//             { picu_id: '1', picu_role: 'picu' },
-//             { picu_id: '2', picu_role: 'admin' },
-//             // Add more rows as needed
-//           ],
-//         }),
-//       });
-
-//       const result = await getAllIds('admin');
-
-//       expect(result).toEqual([
-//         { picu_id: '1', picu_role: 'picu' },
-//         { picu_id: '2', picu_role: 'admin' },
-//       ]);
-//       expect(crud.createPool).toHaveBeenCalledWith(db, 'admin', dbPassword);
-//       // expect((crud.createPool(db, 'admin', dbPassword).query as jest.Mock)).toHaveBeenCalledWith(
-//       //   expect.any(String)
-//       // );
-//       expect(require('../src/crud').createPool().query).toHaveBeenCalledWith(expect.any(String));
-//     });
-
-//     // Add more test cases for error scenarios
-//   });
-// });
+//---------------------------------------------------------------------------------------------------------------------
 
 describe('getAllIds', () => {
   beforeEach(() => {
@@ -292,6 +262,9 @@ describe('getAllIds', () => {
     (require('../src/crud') as any).createPool.mockReturnValue({
       query: jest.fn().mockResolvedValue({ rows: mockRows }),
     });
+
+    // Mock the crud createSelect function
+    (require('../src/crud') as any).createSelect.mockReturnValue("SELECT picu_id, picu_role FROM picu;");
 
     // Call the function with an admin role
     const result = await getAllIds('admin');
@@ -316,6 +289,9 @@ describe('getAllIds', () => {
     (require('../src/crud') as any).createPool.mockReturnValue({
       query: jest.fn().mockResolvedValue({ rows: mockRows }),
     });
+
+    // Mock the crud createSelect function
+    (require('../src/crud') as any).createSelect.mockReturnValue("SELECT picu_id, picu_role FROM picu;");
 
     // Call the function with a field_engineer role
     const result = await getAllIds('field_engineer');

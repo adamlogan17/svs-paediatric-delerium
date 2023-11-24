@@ -16,6 +16,12 @@ const tableName:string = 'api_log';
  * @todo sort out the types for the data
  */
 export async function getLogData(role:string): Promise<{allData:any[]}|string> {
-  let result:{allData:any[]}|string = await getAll(db, tableName, role, dbPassword);
-  return result;
+  let data:{allData:any[]}|string = await getAll(db, tableName, role, dbPassword);
+  if (typeof data !== 'string') {
+    data.allData = data.allData.map(item => {
+      const { log_id, ...rest } = item;
+      return rest;
+    });
+  }
+  return data;
 }

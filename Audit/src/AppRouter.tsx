@@ -16,7 +16,6 @@ import EditCompliance from "./pages/EditCompliance/EditCompliance";
 import Redirect from "./components/Redirect/Redirect";
 
 const token:string|null = sessionStorage.getItem("TOKEN");
-console.log(token);
 const role:string|null = sessionStorage.getItem("ROLE");
 
 // Below are the access conditions for each role, and which pages they can access

@@ -1,6 +1,6 @@
 import { ChangeEvent, useMemo, useState } from 'react';
 import { Paper, Table, TableBody, TableCell, TableHead, TableRow, SxProps, Theme, TablePagination, TableContainer } from '@mui/material';
-import { alpha } from '@mui/material/styles';
+// import { alpha } from '@mui/material/styles';
 import EnhancedToolbar from './EnhancedToolbar';
 
 /**
@@ -38,6 +38,9 @@ export default function BaseTable(props: BaseTableProps) {
   const [filteredData, setFilteredData] = useState<any[]>(props.initialData);
   const [page, setPage] = useState(0);
   const [rowsPerPage, setRowsPerPage] = useState(5);
+
+  // ensures that the columns and data are always in sync
+  const dataKeys = Object.keys(data[0]);
 
   // Avoid a layout jump when reaching the last page with empty rows.
   const emptyRows = page > 0 ? Math.max(0, (1 + page) * rowsPerPage - filteredData.length) : 0;
@@ -81,7 +84,7 @@ export default function BaseTable(props: BaseTableProps) {
           <TableHead>
             <TableRow>
               {/* If the user provides a columnNameMap, use that, otherwise use the keys from the first object in the data array */}
-              {Object.keys(props.columnNameMap ?? data[0]).map((key:string, index:number) => (
+              {dataKeys.map((key:string, index:number) => (
                 <TableCell sx={cellStyle} key={index}>{props.columnNameMap?.[key] ?? key}</TableCell>
               ))}
             </TableRow>
@@ -99,12 +102,10 @@ export default function BaseTable(props: BaseTableProps) {
                   // }),
                 }}>
                 
-                {Object.keys(row).map((key, index) => (
-                  <>
-                    <TableCell>
-                      {row[key].toString()}
-                    </TableCell>
-                  </>
+                {dataKeys.map((key, index) => (
+                  <TableCell key={index}>
+                    {row[key].toString()}
+                  </TableCell>
                 ))}
               </TableRow>
             ))}

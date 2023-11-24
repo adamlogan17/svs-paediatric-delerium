@@ -26,26 +26,11 @@ const app = express();
 const port: number = 8000;
 const baseIP:string = process.env.BASE_IP || "localhost";
 
-interface APICallDetail {
-  date: string;
-  time: string;
-  method: string;
-  url: string;
-  status: number;
-  userIP: string;
-  userAgent: string;
-  userRole: string;
-  username: string;
-}
-
-
 // apps certs for https
 const options = {
   key: fs.readFileSync("server.key"),
   cert: fs.readFileSync("server.cert"),
 };
-
-const apiCallDetails: APICallDetail[] = [];
 
 // swagger configuration
 const specs = swaggerJsdoc(
@@ -102,24 +87,33 @@ app.use((request:Request, response:Response, next) => {
     next();
 });
 
+type APILog = {
+  datetime: Date;
+  method: string;
+  endpoint: string;
+  status_code: number;
+  user_ip: string;
+  user_agent: string;
+  user_role: string;
+  username: string;
+}
+
 app.use((request:Request, response:Response, next:NextFunction) => {
   // forces the middleware to wait until the response has been sent
   response.on('finish', () => {
-    const now = new Date();
-    console.log("request");
-    const apiCallDetail: APICallDetail = {
-      date: now.toISOString().split('T')[0], // Separate date
-      time: now.toISOString().split('T')[1].split('.')[0], // Separate time
+    const apiCallDetail:APILog = {
+      datetime: new Date(),
       method: request.method,
-      url: request.originalUrl,
-      status: response.statusCode,
-      userIP: request.ip,
-      userAgent: request.headers['user-agent'] || '',
+      endpoint: request.originalUrl,
+      status_code: response.statusCode,
+      user_ip: request.ip,
+      user_agent: request.headers['user-agent'] || '',
       username: request.params.username,
-      userRole: request.params.role
+      user_role: request.params.role
     };
 
     // Add the API call detail to the array
+    let apiCallDetails: APILog[] = [];
     apiCallDetails.push(apiCallDetail);
     insertData("audit", "api_log", apiCallDetail);
   })

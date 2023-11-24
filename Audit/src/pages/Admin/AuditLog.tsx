@@ -5,16 +5,24 @@ import PreviewIcon from '@mui/icons-material/Preview';
 import PageContainer from '../../components/PageContainer/PageContainer';
 import { enqueueSnackbar } from 'notistack';
 
-interface AuditLogData {
-  date: string;
-  time: string;
+type APILog = {
+  datetime?: string;
   method: string;
-  url: string;
-  status: number;
-  userip: string;
-  useragent: string;
+  endpoint: string;
+  status_code: number;
+  user_ip: string;
+  user_agent: string;
+  user_role: string;
   username: string;
-  userrole: string;
+}
+
+/**
+ * @todo make the date, time and datetime more specific types (if possible)
+ */
+type ModifiedAPILog = APILog & {
+  [key: string]: string|number|null
+  date: string,
+  time: string
 }
 
 /**
@@ -25,7 +33,8 @@ function getAPIData() {
     return axios.get(`${process.env.REACT_APP_API_URL}/get-all-logs`, {
       headers: { 'Authorization': "Bearer " + sessionStorage.getItem('TOKEN') } 
     })
-    .then((response) => {
+    .then((response) => {      
+      console.log("Response: ", response.data.allData)
       return response.data.allData;
     })
     .catch((error) => {
@@ -35,29 +44,43 @@ function getAPIData() {
 
 const auditColumnNameMap = {
   date: "Date",
-  time: "Time",
+  time:"Time",
   method: "Method",
-  url: "URL",
-  status: "Status",
-  userip: "User IP",
-  useragent: "User Agent",
+  endpoint: "URL",
+  status_code: "Status",
+  user_ip: "User IP",
+  user_agent: "User Agent",
   username: "Username",
-  userrole: "User Role"
+  user_role: "User Role"
 };
 
-function AuditLog() {
-    const [auditLogData, setAuditLogData] = useState<AuditLogData[]>([]);
+export default function AuditLog() {
+    const [auditLogData, setAuditLogData] = useState<ModifiedAPILog[]>([]);
     const [isLoading, setIsLoading] = useState(true);
 
     useEffect(() => {
         const fetchAuditLogData = async () => {
             const data = await getAPIData();
-            const processedData = data.map((item:AuditLogData) => {
-              const newItem: { [key: string]: string } = {};
-              for (const [key, value] of Object.entries(item)) {
-                newItem[key] = value === null ? "NULL" : String(value);
+            console.log(data);
+            const processedData = data.map((item:APILog) => {
+              let processingLog:ModifiedAPILog = {
+                ...item,
+                date: '',
+                time: ''
+              };
+              if (item.datetime !== undefined) {
+                const date = new Date(item.datetime);
+                processingLog.date = date.toLocaleDateString('en-GB');
+                processingLog.time = date.toLocaleTimeString('en-GB', { hour: '2-digit', minute: '2-digit', second: '2-digit' });
               }
-              return newItem;
+              delete processingLog.datetime;
+
+              for (let key in processingLog) {
+                if (processingLog[key] === null) {
+                  processingLog[key] = "NULL";
+                }
+              }
+              return processingLog;
             });
             setAuditLogData(processedData);
             setIsLoading(false);
@@ -65,6 +88,7 @@ function AuditLog() {
         fetchAuditLogData();
     }, []);
 
+    console.log(auditLogData);
 
     return (
       <PageContainer title="Audit Log" icon={<PreviewIcon />} loading={isLoading}>
@@ -80,5 +104,3 @@ function AuditLog() {
       </PageContainer>
     );
 }
-
-export default AuditLog;

@@ -48,7 +48,7 @@ export function authenticate(request: Request, response: Response): void {
               jwtSecret,
               {expiresIn: "1d"}
             );
-            response.send({
+            response.status(201).send({
               token: userToken,
               role: results.rows[0].picu_role,
               username: username

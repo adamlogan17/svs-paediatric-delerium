@@ -51,7 +51,7 @@ function AppRouter() {
 
         {fieldAccess && (
           <>
-            <Route path="/fieldengineer" element={<FieldEngineer />} />
+            <Route path="/field-engineer" element={<FieldEngineer />} />
           </>
         )}
 

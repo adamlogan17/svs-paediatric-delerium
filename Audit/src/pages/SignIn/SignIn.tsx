@@ -9,9 +9,8 @@ import { useState } from "react";
 import axios from 'axios';
 import { enqueueSnackbar } from 'notistack';
 import PasswordTextField from '../../components/PasswordTextField/PasswordTextField';
-import ReCAPTCHA from "react-google-recaptcha";
 import PageContainer from '../../components/PageContainer/PageContainer';
-
+import Captcha from '../../components/Cpatcha/Captcha';
 
 /**
  * This is the 'SignIn' template from {@link https://mui.com/material-ui/getting-started/templates/}[here]
@@ -31,6 +30,22 @@ export default function SignIn() {
 
   const captchaRef = useRef<any>(null); // need to debug issue with type
 
+  function storeUserDetails(username:string, role:string, token:string):void {
+    sessionStorage.setItem("TOKEN", username);
+    sessionStorage.setItem("ROLE", role);
+    sessionStorage.setItem("USERNAME", token);
+  
+    // redirects the user depending on role
+    if(role === "admin") {
+      window.location.href = "/admin";
+    } else if (role === "field_engineer") {
+      window.location.href = "/field-engineer";
+    }
+    else if (role === "picu") {
+      window.location.href = "/";
+    }
+  }
+
   /**
    * Handles form submission.
    * Sends a POST request with user credentials for authentication.
@@ -43,6 +58,10 @@ export default function SignIn() {
     const username:FormDataEntryValue|null  = data.get('username');
     const password:FormDataEntryValue|null  = data.get('password');
 
+    let validUsername:string = "";
+    let role:string = "";
+    let jwtToken:string = "";
+
     if(captchaRef === null || captchaRef.current === undefined) {
       enqueueSnackbar("no login in!", { variant: "error" });
       setIsLoading(false);
@@ -51,29 +70,6 @@ export default function SignIn() {
 
     const token = captchaRef.current.getValue();
     captchaRef.current.reset();
-
-    const capcthaConfig = {
-      method: "post",
-      url: `${process.env.REACT_APP_API_URL}/verify-captcha`, 
-      data: {
-        token: token
-      }
-    }
-
-    // using the await keyword, ensures this is called before the next request
-    try {
-      const captchaResult = await axios(capcthaConfig);
-      if(!captchaResult.data.success) {
-        enqueueSnackbar("Please complete the captcha", { variant: "error" });
-        setIsLoading(false);
-        return;
-      }
-    } catch (error) {
-      // the type cannot be set within 'catch' and therefore is cast here
-      enqueueSnackbar((error as Error).message, { variant: "error" })
-      return;
-    }
-    
 
     const loginConfig = {
       method: "post",
@@ -86,27 +82,49 @@ export default function SignIn() {
 
     try {
       const loginResult = await axios(loginConfig);
-      // sets the cookies
-      sessionStorage.setItem("TOKEN", loginResult.data.token);
-      sessionStorage.setItem("ROLE", loginResult.data.role);
-      sessionStorage.setItem("USERNAME", loginResult.data.username);
       if(loginResult.data.token === undefined) {
         setIncorrectDetails(true);
+        setIsLoading(false);
+        return;
       } else {
-        // redirects the user depending on role
-        if(loginResult.data.role === "admin") {
-          window.location.href = "/admin";
-        } else if (loginResult.data.role === "field_engineer") {
-          window.location.href = "/fieldengineer";
-        }
-        else if (loginResult.data.role === "picu") {
-          window.location.href = "/";
-        }
+        validUsername = loginResult.data.username;
+        role = loginResult.data.role;
+        jwtToken = loginResult.data.token;
       }
+    } catch (error:any) {
+      if(error.response.status === 401) {
+        setIncorrectDetails(true);
+        setIsLoading(false);
+        return;
+      }
+      enqueueSnackbar("System Error", { variant: "error" });
+    } finally {
       setIsLoading(false);
-    } catch (error) {
-      enqueueSnackbar((error as Error).message, { variant: "error" })
     }
+
+    const captchaConfig = {
+      method: "post",
+      url: `${process.env.REACT_APP_API_URL}/verify-captcha`, 
+      data: {
+        token: token
+      }
+    }
+
+    // using the await keyword, ensures this is called before the next request
+    try {
+      const captchaResult = await axios(captchaConfig);
+      if(!captchaResult.data.success) {
+        enqueueSnackbar("Please complete the captcha", { variant: "error" });
+      } else {
+        storeUserDetails(validUsername, role, jwtToken);
+      }
+    } catch (error) {
+      // the type cannot be set within 'catch' and therefore is cast here
+      enqueueSnackbar("System Error", { variant: "error" })
+    } finally {
+      setIsLoading(false);
+    }
+
   }
 
   return (
@@ -124,12 +142,8 @@ export default function SignIn() {
 
         <PasswordTextField id="password" error={incorrectDetails} helperText={incorrectDetails ? "Incorrect Username or Password" : "" } label="Password" />
 
-        {/* @see {@link https://stackoverflow.com/questions/57639200/google-recaptcha-component-with-dynamic-theme-value-next-js} on how to change the theme without refreshing the page */}
-        <ReCAPTCHA
-          sitekey={process.env.REACT_APP_CAPTCHA_SITE_KEY ? process.env.REACT_APP_CAPTCHA_SITE_KEY : ""}
-          ref={captchaRef}
-          // onChange={(value) => {console.log("val", value)} }  // this can also be used, instead of using ref, although a state, will need to be added as well as the disadvantage of not being able to reset the captcha
-        />
+        <br />
+        <Captcha captchaRef={captchaRef} />
         
         <Button
           type="submit"

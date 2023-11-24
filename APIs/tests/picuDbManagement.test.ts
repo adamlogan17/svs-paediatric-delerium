@@ -3,11 +3,10 @@ import {editPicu, deletePicus, addPicu, nextPicu, getAllIds, Picu} from '../src/
 import * as crud from '../src/crud';
 import * as login from '../src/login';
 
-jest.mock('../src/crud');
+// Mock the login functions
 jest.mock('../src/login');
-const insertData = jest.fn();
-const createPool = jest.fn();
 const hashPassword = jest.fn();
+
 // Mock the crud functions
 jest.mock('../src/crud', () => ({
   createPool: jest.fn(),
@@ -16,11 +15,6 @@ jest.mock('../src/crud', () => ({
   deleteData: jest.fn(),
   insertData: jest.fn(),
 }));
-
-// // Mock the login functions
-// jest.mock('../src/login', () => ({
-//   hashPassword: jest.fn(),
-// }));
 
 describe('Picu Functions', () => {
   const db = 'audit'; //db name

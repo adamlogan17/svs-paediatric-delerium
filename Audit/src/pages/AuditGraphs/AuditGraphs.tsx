@@ -6,6 +6,7 @@ import '../../shared/layout.css';
 import './graphs.css';
 import LineGraph from '../../components/LineGraph/LineGraph';
 import BarGraph from '../../components/BarChart/BarChart';
+import PieChart from '../../components/PieChart/PieChart';
 import axios from 'axios';
 import { useEffect, useState } from 'react';
 import { enqueueSnackbar } from 'notistack';
@@ -134,8 +135,10 @@ function AuditGraphs() {
 
           <div className = 'gRow' id = 'graphContaine' style={{margin: 'auto', borderRadius: 25, backgroundColor: '#009999'}}>
           <div className="canvas">
-        {chartType === 'Bar Chart' ? <BarGraph id={'1'} /> : <LineGraph id={'1'} />}
-      </div>
+          {chartType === 'Bar Chart' ? <BarGraph id={'1'} /> : 
+           chartType === 'Line Graph' ? <LineGraph id={'1'} /> : 
+           <PieChart id={'1'} />}
+        </div>
           </div> 
         </form>
       </div>

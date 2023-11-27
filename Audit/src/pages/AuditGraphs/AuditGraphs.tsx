@@ -5,6 +5,7 @@ import { CategoryScale } from "chart.js";
 import '../../shared/layout.css';
 import './graphs.css';
 import LineGraph from '../../components/LineGraph/LineGraph';
+import BarGraph from '../../components/BarChart/BarChart';
 import axios from 'axios';
 import { useEffect, useState } from 'react';
 import { enqueueSnackbar } from 'notistack';
@@ -61,7 +62,7 @@ function getPicuCompData(username:string|undefined, password:string|undefined):v
 function AuditGraphs() {
   const [picuID, setPicuID]  = useState<string|null>(sessionStorage.getItem('ROLE') === 'picu' ? sessionStorage.getItem('SITE')!== null ? sessionStorage.getItem('SITE') : '0' : '0');
   const [idOptions, setIdOptions] = useState<AutoCompleteValues[]>([]);
-  const [chartTypeOptions, setChartTypeOptions] = useState<AutoCompleteValues[]>([]);
+  const [chartType, setChartType] = useState<string>('Line Graph');
 
   // useEffect(() => {
   //   const configuration = {
@@ -79,7 +80,11 @@ function AuditGraphs() {
   //     .catch((error) => enqueueSnackbar(error.message, { variant: 'error' }));
   // }, []);
 
-  // setChartTypeOptions({["Line Graph", "Pie Chart", "Bar Chart"]})
+  const [chartTypeOptions, setChartTypeOptions] = useState<AutoCompleteValues[]>([
+    { label: 'Line Graph', value: 'line' },
+    { label: 'Pie Chart', value: 'pie' },
+    { label: 'Bar Chart', value: 'bar' },
+  ]);
 
   return (
     <div id='form' className='wrapper' style={{width: '100%'}}>
@@ -103,14 +108,15 @@ function AuditGraphs() {
                <div className='gCol' style={{width: '48%', padding: '2%'}}>
                 {/* {<TypeDropDown text="Chart Type" primaryColour='#025858' secondaryColour='#013e3e' options={["Line Graph", "Pie Chart", "Bar Chart"]}/>} */}
                 <Autocomplete
-                disablePortal
-                id="chartType"
-                autoComplete
-                autoHighlight
-                isOptionEqualToValue = {(option:AutoCompleteValues, value:AutoCompleteValues) => option.label === value.label}
-                options={idOptions}
-                renderInput={(params:any) => <TextField {...params} required margin="normal" name="chartType" label="Chart Type" />}
-              />
+                  disablePortal
+                  id="chartType"
+                  autoComplete
+                  autoHighlight
+                  isOptionEqualToValue = {(option:AutoCompleteValues, value:AutoCompleteValues) => option.label === value.label}
+                  options={chartTypeOptions}
+                  onChange={(event: any, newValue: any) => setChartType(newValue.label)}
+                  renderInput={(params:any) => <TextField {...params} required margin="normal" name="chartType" label="Chart Type" />}
+                />
               </div>
               <div className='gCol' style={{width: '48%', padding: '2%'}}>
               <Autocomplete
@@ -127,9 +133,9 @@ function AuditGraphs() {
           </div>
 
           <div className = 'gRow' id = 'graphContaine' style={{margin: 'auto', borderRadius: 25, backgroundColor: '#009999'}}>
-            <div className="canvas">
-              <LineGraph id={'1'} />
-            </div>
+          <div className="canvas">
+        {chartType === 'Bar Chart' ? <BarGraph id={'1'} /> : <LineGraph id={'1'} />}
+      </div>
           </div> 
         </form>
       </div>

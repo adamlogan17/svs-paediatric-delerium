@@ -10,11 +10,12 @@ import swaggerJsdoc from 'swagger-jsdoc';
 import swaggerUi from 'swagger-ui-express';
 
 import { copyTable, deleteData, getAll, insertData, updateData } from './crud';
-import { authenticate, authorise, logData, updatePicuPassword, verifyCaptcha } from './login';
+import { authenticate, authorise, updatePicuPassword, verifyCaptcha } from './login';
 import { allPicuCompliance, singlePicuCompliance } from './auditCharts';
 import { addPicu, deletePicus, editPicu, getAllIds, nextPicu, getPicuData } from './picuDbManagement';
 import { deleteCompRecords, editCompliance, getComplianceData, insertCompData } from './complianceScores';
-import { getLogData } from './logging';
+import { EndpointLog, getLogData, logEndpoint } from './logging';
+import { request } from 'http';
 
 
 // initialise process.env
@@ -87,21 +88,10 @@ app.use((request:Request, response:Response, next) => {
     next();
 });
 
-type APILog = {
-  datetime: Date;
-  method: string;
-  endpoint: string;
-  status_code: number;
-  user_ip: string;
-  user_agent: string;
-  user_role: string;
-  username: string;
-}
-
 app.use((request:Request, response:Response, next:NextFunction) => {
   // forces the middleware to wait until the response has been sent
   response.on('finish', () => {
-    const apiCallDetail:APILog = {
+    const apiCallDetail:EndpointLog = {
       datetime: new Date(),
       method: request.method,
       endpoint: request.originalUrl,
@@ -112,10 +102,12 @@ app.use((request:Request, response:Response, next:NextFunction) => {
       user_role: request.params.role
     };
 
+    logEndpoint(apiCallDetail);
+
     // Add the API call detail to the array
-    let apiCallDetails: APILog[] = [];
-    apiCallDetails.push(apiCallDetail);
-    insertData("audit", "api_log", apiCallDetail);
+    // let apiCallDetails: APILog[] = [];
+    // apiCallDetails.push(apiCallDetail);
+    // insertData("audit", "api_log", apiCallDetail);
   })
 
   next();
@@ -679,9 +671,10 @@ app.get("/chartData/allSites", allPicuCompliance);
  *         description: Error occurred.
  */
 app.post("/add-compliance", (request: Request, response: Response, next:NextFunction) => authorise(request, response, next), async (req: Request, res: Response) => {
-  if(req.params.role === "picu" && req.body.picu_id !== Number(req.params.username)) {
+  if(req.params.role === "picu" && (Number(req.body.picu_id) !== Number(req.params.username) && req.body.picu_id !== undefined)) {
     res.status(401).send("ERROR: Permission Denied");
   } else {
+    req.body.picu_id = req.body.picu_id ?? req.params.username;
     let result = await insertCompData(req.body, req.params.role);
     let status:number = result.toString().includes("Error") ? 400 : 201;
     res.status(status).send(result);

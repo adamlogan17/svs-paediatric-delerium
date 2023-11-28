@@ -11,7 +11,9 @@ CREATE TABLE IF NOT EXISTS picu (
     overall_compliance DECIMAL
 );
 
--- TODO: Add a primary key to this table
+-- A 'NULL' value within the username and user_role, indicate a potential unauthorised user or an endpoint that does not require authentication
+-- username is not a foreign key user's who are invalid still need to be recorded for security reasons
+-- If user_role is NULL for login, this means the login request was denied (this can also be seen within the status code)
 CREATE TABLE IF NOT EXISTS api_log (
     log_id SERIAL PRIMARY KEY,
     datetime TIMESTAMP NOT NULL,
@@ -20,8 +22,9 @@ CREATE TABLE IF NOT EXISTS api_log (
     status_code INT NOT NULL,
     user_ip VARCHAR(50) NOT NULL,
     user_agent VARCHAR(255) NOT NULL,
-    username VARCHAR(50),
+    username INTEGER,
     user_role VARCHAR(50)
+        CHECK(user_role IN ('picu', 'admin', 'field_engineer'))
 );
 
 CREATE TABLE IF NOT EXISTS compliance_data (

@@ -8,8 +8,8 @@ import ConfirmDialog from '../ConfirmDialog/ConfirmDialog';
 /**
  * The NavBar to be used site wide and should be placed at the top of the page
  * @author Adam Logan
- * @date 2023-04-28*/
-
+ * @date 2023-04-28
+ */
 function BasicNavBar(props:{theme:string, toggleMode:Function, backgroundColor:string, textColor:string, buttonColor:string, modeOptions:{label:string, value:string}[]}) {
   const [showDialog, setShowDialog] = useState<boolean>(false);
 

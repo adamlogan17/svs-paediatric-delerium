@@ -1,15 +1,26 @@
-import { getAll } from "./crud";
+import { getAll, insertData } from "./crud";
 
 const db:string = process.env.DATABASE || "No database found";
 const dbPassword:string = process.env.DBPASSWORD || "No password found";
 const tableName:string = 'api_log';
+
+export type EndpointLog = {
+  datetime: Date;
+  method: string;
+  endpoint: string;
+  status_code: number;
+  user_ip: string;
+  user_agent: string;
+  user_role: string;
+  username: string;
+}
 
 /**
  * Gets all the information stored within the log table
  * 
  * @author Adam Logan
  * @function getLogData
- * @param role The role which will be accessing the data
+ * @param { string } role sThe role which will be accessing the data
  * 
  * @returns The data within the log table
  * 
@@ -24,4 +35,16 @@ export async function getLogData(role:string): Promise<{allData:any[]}|string> {
     });
   }
   return data;
+}
+
+/**
+ * Adds a log into the database
+ * 
+ * @author Adam Logan
+ * @function logEndpoint
+ * 
+ * @param { EndpointLog } endpointDetails The data to log
+ */
+export async function logEndpoint(endpointDetails:EndpointLog):Promise<void> {
+  await insertData(db, tableName, endpointDetails);
 }

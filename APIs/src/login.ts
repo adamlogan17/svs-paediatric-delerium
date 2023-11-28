@@ -27,6 +27,9 @@ export function authenticate(request: Request, response: Response): void {
 
     const { username, password } = request.body;
 
+    // this is for logging purposes
+    request.params.username = username;
+
     let condition:string = "picu_id=" + username;
 
     POOL.query(createSelect("picu", condition, ["picu_role", "password"]), async (error:any, results:any) => {
@@ -39,6 +42,8 @@ export function authenticate(request: Request, response: Response): void {
         .compare(password, results.rows[0].password)
         .then(res => {
           if(res) {
+            request.params.role = results.rows[0].picu_role;
+
             // adds the userID and role to the JWT token
             const userToken = jwt.sign(
               {
@@ -183,42 +188,4 @@ export async function verifyCaptcha(token:string):Promise<boolean> {
   const captchaValidation = verifyResponse.data;
 
   return captchaValidation.success;
-}
-
-interface APICallDetail {
-  date: string;
-  time: string;
-  method: string;
-  url: string;
-  status: number;
-  userIP: string;
-  userAgent: string;
-  userRole: string;
-  username: string;
-}
-
-const apiCallDetails: APICallDetail[] = [];
-
-export async function logData (request: Request, response: Response) {
-  const now = new Date();
-  console.log(request.params.username);
-  console.log(request.params.role);
-
-  const apiCallDetail: APICallDetail = {
-    date: now.toISOString().split('T')[0], // Separate date
-    time: now.toISOString().split('T')[1].split('.')[0], // Separate time
-    method: request.method,
-    url: request.originalUrl,
-    status: response.statusCode,
-    userIP: request.ip,
-    userAgent: request.headers['user-agent'] || '',
-    username: request.params.username,
-    userRole: request.params.role,
-  };
-
-  // Add the API call detail to the array
-  apiCallDetails.push(apiCallDetail);
-  insertData("audit", "api_log", apiCallDetail);
-  response.status(200).send(request.body);
-  // Continue with the request handling
 }

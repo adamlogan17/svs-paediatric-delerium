@@ -16,6 +16,7 @@ import { addPicu, deletePicus, editPicu, getAllIds, nextPicu, getPicuData } from
 import { deleteCompRecords, editCompliance, getComplianceData, insertCompData } from './complianceScores';
 import { EndpointLog, getLogData, logEndpoint } from './logging';
 import { request } from 'http';
+import { exec } from 'child_process';
 
 
 // initialise process.env
@@ -357,11 +358,10 @@ app.get("/:database/getall/:table", async (req: Request,res: Response) => {
  */
 app.post("/backupAllData", async (req, res) => {
   try {
+    await copyTable("audit","backup", "picu", "picu_backup");
+    await copyTable("audit","backup", "compliance_data", "compliance_data_backup");
+    await copyTable("audit","backup", "api_log", "api_log_backup");
 
-    copyTable("backup", "api_log", "api_log_backup");
-    copyTable("backup", "compliance_data", "compliance_data_backup");
-    copyTable("backup", "picu", "picu_backup");
-    
     res.status(200).send("Data successfully copied to api_log_backup.");
   } catch (error) {
     console.error(error);
@@ -384,7 +384,7 @@ app.post("/backupAllData", async (req, res) => {
  */
 app.post("/backupPicu", async (req, res) => {
   try {
-    copyTable("backup", "picu", "picu_backup");
+    copyTable("audit","backup", "picu", "picu_backup");
     res.status(200).send("Data successfully copied to picu_backup.");
   } catch (error) {
     console.error(error);
@@ -407,7 +407,7 @@ app.post("/backupPicu", async (req, res) => {
  */
 app.post("/backupComplianceData", async (req, res) => {
   try {
-    copyTable("backup", "compliance_data", "compliance_data_backup");
+    copyTable("audit","backup", "compliance_data", "compliance_data_backup");
     res.status(200).send("Data successfully copied to compliance_data_backup.");
   } catch (error) {
     console.error(error);
@@ -430,7 +430,7 @@ app.post("/backupComplianceData", async (req, res) => {
  */
 app.post("/backupApiLog", async (req, res) => {
   try {
-    copyTable("backup", "api_log", "api_log_backup");
+    copyTable("audit","backup", "api_log", "api_log_backup");
     res.status(200).send("Data successfully copied to api_log_backup.");
   } catch (error) {
     console.error(error);
@@ -440,12 +440,11 @@ app.post("/backupApiLog", async (req, res) => {
 
 
 
-
 /**
  * @swagger
- * /backupPicu:
+ * /backupPostgres:
  *   post:
- *     summary: Copy data from the picu table to picu_backup.
+ *     summary: makes a dump of postgres
  *     tags:
  *       - Backup
  *     responses:
@@ -454,60 +453,43 @@ app.post("/backupApiLog", async (req, res) => {
  *       400:
  *         description: There was an error copying the data.
  */
-app.post("/backupPicu", async (req, res) => {
-  try {
-    copyTable("audit", "picu", "picu_backup");
-    res.status(200).send("Data successfully copied to picu_backup.");
-  } catch (error) {
-    console.error(error);
-    res.status(400).send("Error copying data.");
-  }
+
+app.post('/backupPostgres', (req, res) => {
+  const command = '/bin/bash -c "docker exec -t dev_svs_postgres pg_dumpall -c -U postgres > dump_manual"';
+  exec(command, (error, stdout, stderr) => {
+    if (error) {
+      console.error(`exec error: ${error}`);
+      res.status(500).send('Error running backup command.');
+      return;
+    }
+    res.status(200).send('Backup command ran successfully.');
+  });
 });
 
 /**
  * @swagger
- * /backupComplianceData:
+ * /restorePostgres:
  *   post:
- *     summary: Copy data from the compliance_data table to compliance_data_backup.
+ *     summary: Restore a dump of PostgreSQL
  *     tags:
- *       - Backup
+ *       - Restore
  *     responses:
  *       200:
- *         description: Data successfully copied.
- *       400:
- *         description: There was an error copying the data.
+ *         description: Data successfully restored.
+ *       500:
+ *         description: There was an error restoring the data.
  */
-app.post("/backupComplianceData", async (req, res) => {
-  try {
-    copyTable("audit", "compliance_data", "compliance_data_backup");
-    res.status(200).send("Data successfully copied to compliance_data_backup.");
-  } catch (error) {
-    console.error(error);
-    res.status(400).send("Error copying data.");
-  }
-});
 
-/**
- * @swagger
- * /backupApiLog:
- *   post:
- *     summary: Copy data from the api_log table to api_log_backup.
- *     tags:
- *       - Backup
- *     responses:
- *       200:
- *         description: Data successfully copied.
- *       400:
- *         description: There was an error copying the data.
- */
-app.post("/backupApiLog", async (req, res) => {
-  try {
-    copyTable("audit", "api_log", "api_log_backup");
-    res.status(200).send("Data successfully copied to api_log_backup.");
-  } catch (error) {
-    console.error(error);
-    res.status(400).send("Error copying data.");
-  }
+app.post('/restorePostgres', (req, res) => {
+  const command = '/bin/bash -c "cat dump_manual | docker exec -i dev_svs_postgres psql -U postgres"';
+  exec(command, (error, stdout, stderr) => {
+    if (error) {
+      console.error(`exec error: ${error}`);
+      res.status(500).send('Error running restore command.');
+      return;
+    }
+    res.status(200).send('Restore command ran successfully.');
+  });
 });
 
 /**

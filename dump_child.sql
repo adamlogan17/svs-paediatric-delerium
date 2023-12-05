@@ -38,21 +38,21 @@ DROP ROLE test_user;
 --
 
 CREATE ROLE admin;
-ALTER ROLE admin WITH SUPERUSER INHERIT NOCREATEROLE NOCREATEDB LOGIN NOREPLICATION NOBYPASSRLS PASSWORD 'SCRAM-SHA-256$4096:S6qNl0XMfpIC3kwF2Fn6xA==$pi0EkkP4NF10M91jo+P9hKUcSJl+7tQXLIIRed064AA=:QJhlhVZz/TlLoFYpM7eFP51ESFbMsOATV0mtw1IgDe0=';
+ALTER ROLE admin WITH SUPERUSER INHERIT NOCREATEROLE NOCREATEDB LOGIN NOREPLICATION NOBYPASSRLS PASSWORD 'SCRAM-SHA-256$4096:6SdLi5YWveEvSrNvK0PdWw==$fbVMVbz6UEbYoI7iUOdtmqKdwCRMGU99FZaOBEenPDA=:QUcGcdI1Ri5FqfxtFUej9K3U7E7uy1b5ZRhGbSCZmuY=';
 CREATE ROLE elearning_admin_role;
-ALTER ROLE elearning_admin_role WITH SUPERUSER INHERIT NOCREATEROLE NOCREATEDB LOGIN NOREPLICATION NOBYPASSRLS PASSWORD 'SCRAM-SHA-256$4096:N48H/0ZAGpwXbaZOQYYvlQ==$cX/Ymr6h2zeLPCPRIN89ikW5lqN7bR3w3x+uuSmQ5i0=:AonwSzUq3E40+Y/2h8/FBgPVlpp0VZ8eAx63ANVevrQ=';
+ALTER ROLE elearning_admin_role WITH SUPERUSER INHERIT NOCREATEROLE NOCREATEDB LOGIN NOREPLICATION NOBYPASSRLS PASSWORD 'SCRAM-SHA-256$4096:aQZIuYz1lbeEakm6J0QRdQ==$/d0Hqr3n9yIW3uEjy8k8+1jfDdFPTIZQAZePNb39/bc=:M0IaHugAZ0gyjAc7MPxmpA5OirbFNYRpibB8NTReIg0=';
 CREATE ROLE elearning_field_engineer_role;
-ALTER ROLE elearning_field_engineer_role WITH NOSUPERUSER INHERIT NOCREATEROLE NOCREATEDB LOGIN NOREPLICATION NOBYPASSRLS PASSWORD 'SCRAM-SHA-256$4096:4z1y8X0iI6rqmPs638Mb2Q==$BvKjhsAdbv4o1WVHhEiRhduHYVciId9e3dikG+UjhrI=:dn9CD7+OSKb7ba0haPhsvjC5nsporTcr/kohjI5YYN0=';
+ALTER ROLE elearning_field_engineer_role WITH NOSUPERUSER INHERIT NOCREATEROLE NOCREATEDB LOGIN NOREPLICATION NOBYPASSRLS PASSWORD 'SCRAM-SHA-256$4096:BNDUMNXa7UoqyblXtOHQsg==$+ekRWwNugiZNDw+vU7R7W2YzktgXS87NCTp9P0sQNxU=:HqVBX9TcHI7w6ycr8zUz9z675mxQJbA1+ltJ7sJSIr0=';
 CREATE ROLE field_engineer;
-ALTER ROLE field_engineer WITH NOSUPERUSER INHERIT NOCREATEROLE NOCREATEDB LOGIN NOREPLICATION NOBYPASSRLS PASSWORD 'SCRAM-SHA-256$4096:eBjLberOFn8mlZ57MgUd7w==$+EWhb6+SStPsUTYRHtTpXrNUpYfTwC3AHxaJYsfP9lQ=:hn+YCKHK6vkRmhf43n9pPMYm6yw7OSwySWH0pSP3C+k=';
+ALTER ROLE field_engineer WITH NOSUPERUSER INHERIT NOCREATEROLE NOCREATEDB LOGIN NOREPLICATION NOBYPASSRLS PASSWORD 'SCRAM-SHA-256$4096:fSRE59DnOlw09M8two7vAw==$6kyQxMWTnCe28xRy+lzb4VRde13n0pfd9g8dVSKUUMY=:bMmn7AB0KMbhkAQT9HxExEeBPiw3LtV0OLb1nPdGXbg=';
 CREATE ROLE learner_role;
-ALTER ROLE learner_role WITH NOSUPERUSER INHERIT NOCREATEROLE NOCREATEDB LOGIN NOREPLICATION NOBYPASSRLS PASSWORD 'SCRAM-SHA-256$4096:9YiNgYGN1NXh35b+IitItw==$mo0hAqdGZ6kt0ysjF3VJN1azxofhbqeVt9Kh6KZT5jQ=:F04qj58hIBFD5u2tGrR7KOoNwfRMs3sb8NYzJSN+wjg=';
+ALTER ROLE learner_role WITH NOSUPERUSER INHERIT NOCREATEROLE NOCREATEDB LOGIN NOREPLICATION NOBYPASSRLS PASSWORD 'SCRAM-SHA-256$4096:Vyauqrk+DA6GuBOThydTLA==$pqMKIB7VbAK8hNIiKa7RBEVJXzC9erWHCV10kESyfdc=:HK1W5qXKvmGQ/NNb8MQMe+PpnJIfuTVH9clk3rCCods=';
 CREATE ROLE picu;
-ALTER ROLE picu WITH NOSUPERUSER INHERIT NOCREATEROLE NOCREATEDB LOGIN NOREPLICATION NOBYPASSRLS PASSWORD 'SCRAM-SHA-256$4096:yJz0Kn6MHNc3IaY+MAJnXQ==$EuszVJIqcvZt5/tUEEhh9taY4l5J+3Jd2zSzBFMDKY8=:afiiNCQC4AsgUARHZz8WABl32WGPbgsFv7SaoGr6txw=';
+ALTER ROLE picu WITH NOSUPERUSER INHERIT NOCREATEROLE NOCREATEDB LOGIN NOREPLICATION NOBYPASSRLS PASSWORD 'SCRAM-SHA-256$4096:2aT+Sl1er0fSbPcTmhw6lg==$cSaLs9hUHmqhOKmgxcz6HdvCdfvkTjNV9St2UGsLTH8=:kDrdXmgzKewNkfbo4/Dcqyc897yjwPSZs3fTVZt/SfA=';
 CREATE ROLE postgres;
-ALTER ROLE postgres WITH SUPERUSER INHERIT CREATEROLE CREATEDB LOGIN REPLICATION BYPASSRLS PASSWORD 'SCRAM-SHA-256$4096:EerdY6qXqXyoZtgnFtX69Q==$8pXfiGt2YITMJvqIEBQ/9o9nWXnWK3RWjrrbsDs0Ppo=:iEVtWvTMSvuT0s+JKlVOqFrlptxhgkExdnF6v684ASM=';
+ALTER ROLE postgres WITH SUPERUSER INHERIT CREATEROLE CREATEDB LOGIN REPLICATION BYPASSRLS PASSWORD 'SCRAM-SHA-256$4096:0/XZI4Ql35Yh06ZzuK0BCQ==$DaxX7eB3HU6CaeofV7tTcgiA+o/vikL/0rfOo8UxG7A=:KV8NjHIndMu2QCO4BfOwTGtTvd4kQgbuK5bcRL9uGtk=';
 CREATE ROLE test_user;
-ALTER ROLE test_user WITH SUPERUSER INHERIT NOCREATEROLE CREATEDB LOGIN NOREPLICATION NOBYPASSRLS PASSWORD 'SCRAM-SHA-256$4096:Co3qPmWfrumY3s09AVuuUg==$psGqpQ5/Y/0FZa2HzVkIdN4droPZaJgTdXYei4S8O+g=:mpPzEls6wl4uwYQRG930fsDJoBIoTMZkt0CjdoonDqI=';
+ALTER ROLE test_user WITH SUPERUSER INHERIT NOCREATEROLE CREATEDB LOGIN NOREPLICATION NOBYPASSRLS PASSWORD 'SCRAM-SHA-256$4096:CjyFAH6t+yZmgTPIDag79A==$PMdcg3EJdpZUxgH4TetROogwBTp6Or0V+CjgEv8twsc=:jHOeiC1XZaXjmlw8WSpCZzQ7sLXhbp6o5o3Hw5S62K8=';
 
 --
 -- User Configurations
@@ -204,11 +204,11 @@ SET row_security = off;
 
 CREATE FUNCTION public.calculate_overall_score() RETURNS trigger
     LANGUAGE plpgsql SECURITY DEFINER
-    AS $$
-BEGIN
-    UPDATE picu SET overall_compliance=(SELECT AVG(score) FROM compliance_data WHERE picu_id=NEW.picu_id) WHERE picu_id=NEW.picu_id;
-    RETURN NEW;
-END;
+    AS $$
+BEGIN
+    UPDATE picu SET overall_compliance=(SELECT AVG(score) FROM compliance_data WHERE picu_id=NEW.picu_id) WHERE picu_id=NEW.picu_id;
+    RETURN NEW;
+END;
 $$;
 
 
@@ -220,12 +220,12 @@ ALTER FUNCTION public.calculate_overall_score() OWNER TO postgres;
 
 CREATE FUNCTION public.calculate_positive_delirium() RETURNS trigger
     LANGUAGE plpgsql SECURITY DEFINER
-    AS $$
-BEGIN
-    UPDATE picu SET delirium_positive_patients=(SELECT AVG(in_score_range::INTEGER) FROM compliance_data WHERE picu_id=NEW.picu_id) WHERE picu_id=NEW.picu_id;
-    RETURN NEW;
-END;
-
+    AS $$
+BEGIN
+    UPDATE picu SET delirium_positive_patients=(SELECT AVG(in_score_range::INTEGER) FROM compliance_data WHERE picu_id=NEW.picu_id) WHERE picu_id=NEW.picu_id;
+    RETURN NEW;
+END;
+
 $$;
 
 
@@ -237,14 +237,14 @@ ALTER FUNCTION public.calculate_positive_delirium() OWNER TO postgres;
 
 CREATE FUNCTION public.calculate_score() RETURNS trigger
     LANGUAGE plpgsql SECURITY DEFINER
-    AS $$
-BEGIN
-    UPDATE compliance_data SET score=(SELECT ((((correct_details::INTEGER + comfort_recorded::INTEGER
-        + all_params_scored::INTEGER + totalled_correctly::INTEGER + observer_name::INTEGER)/5.0)* comfort_recorded::INTEGER)*100) 
-        FROM compliance_data WHERE comp_id = NEW.comp_id) WHERE comp_id = NEW.comp_id;
-
-    RETURN NEW;
-END;
+    AS $$
+BEGIN
+    UPDATE compliance_data SET score=(SELECT ((((correct_details::INTEGER + comfort_recorded::INTEGER
+        + all_params_scored::INTEGER + totalled_correctly::INTEGER + observer_name::INTEGER)/5.0)* comfort_recorded::INTEGER)*100) 
+        FROM compliance_data WHERE comp_id = NEW.comp_id) WHERE comp_id = NEW.comp_id;
+
+    RETURN NEW;
+END;
 $$;
 
 
@@ -291,7 +291,7 @@ CREATE TABLE public.compliance_data (
     observer_name boolean NOT NULL,
     score numeric,
     picu_id integer NOT NULL,
-    CONSTRAINT compliance_data_method_check CHECK (((method)::text = ANY (ARRAY[('SOSPD'::character varying)::text, ('CAPD'::character varying)::text])))
+    CONSTRAINT compliance_data_method_check CHECK (((method)::text = ANY ((ARRAY['SOSPD'::character varying, 'CAPD'::character varying])::text[])))
 );
 
 
@@ -332,7 +332,7 @@ CREATE TABLE public.picu (
     delirium_positive_patients numeric,
     picu_role character varying DEFAULT 'picu'::character varying NOT NULL,
     overall_compliance numeric,
-    CONSTRAINT picu_picu_role_check CHECK (((picu_role)::text = ANY (ARRAY[('picu'::character varying)::text, ('admin'::character varying)::text, ('field_engineer'::character varying)::text])))
+    CONSTRAINT picu_picu_role_check CHECK (((picu_role)::text = ANY ((ARRAY['picu'::character varying, 'admin'::character varying, 'field_engineer'::character varying])::text[])))
 );
 
 
@@ -387,12 +387,12 @@ COPY public.api_log (date, "time", method, url, status, userip, useragent, usern
 --
 
 COPY public.compliance_data (comp_id, entry_date, method, bed_number, correct_details, comfort_recorded, comfort_above, all_params_scored, totalled_correctly, in_score_range, observer_name, score, picu_id) FROM stdin;
-1	2023-11-19	SOSPD	1	t	t	t	t	t	t	t	100.00000000000000000000	2
-2	2023-11-19	SOSPD	1	f	t	t	t	t	t	t	80.00000000000000000000	2
-3	2023-11-19	CAPD	1	f	t	t	t	t	t	t	80.00000000000000000000	2
-4	2023-11-19	SOSPD	1	f	t	t	t	t	t	t	80.00000000000000000000	1
-5	2023-11-19	SOSPD	1	f	t	f	t	t	t	f	60.00000000000000000000	22
-6	2023-11-19	SOSPD	1	f	t	t	f	t	f	t	60.00000000000000000000	1
+1	2023-12-05	SOSPD	1	t	t	t	t	t	t	t	100.00000000000000000000	2
+2	2023-12-05	SOSPD	1	f	t	t	t	t	t	t	80.00000000000000000000	2
+3	2023-12-05	CAPD	1	f	t	t	t	t	t	t	80.00000000000000000000	2
+4	2023-12-05	SOSPD	1	f	t	t	t	t	t	t	80.00000000000000000000	1
+5	2023-12-05	SOSPD	1	f	t	f	t	t	t	f	60.00000000000000000000	22
+6	2023-12-05	SOSPD	1	f	t	t	f	t	f	t	60.00000000000000000000	1
 7	1985-06-12	CAPD	361	f	t	f	t	t	f	t	80.00000000000000000000	1
 8	2005-11-26	CAPD	365	t	f	f	t	t	f	t	0.00000000000000000000	1
 9	1980-12-30	CAPD	166	t	f	t	f	f	f	t	0.00000000000000000000	1
@@ -599,192 +599,6 @@ SET check_function_bodies = false;
 SET xmloption = content;
 SET client_min_messages = warning;
 SET row_security = off;
-
-SET default_tablespace = '';
-
-SET default_table_access_method = heap;
-
---
--- Name: api_log_backup; Type: TABLE; Schema: public; Owner: postgres
---
-
-CREATE TABLE public.api_log_backup (
-    date date,
-    "time" time without time zone,
-    method character varying(10),
-    url character varying(255),
-    status integer,
-    userip character varying(50),
-    useragent character varying(255),
-    username character varying(50),
-    userrole character varying(50)
-);
-
-
-ALTER TABLE public.api_log_backup OWNER TO postgres;
-
---
--- Name: compliance_data_backup; Type: TABLE; Schema: public; Owner: postgres
---
-
-CREATE TABLE public.compliance_data_backup (
-    comp_id integer NOT NULL,
-    entry_date date NOT NULL,
-    method character varying(5) NOT NULL,
-    bed_number integer NOT NULL,
-    correct_details boolean NOT NULL,
-    comfort_recorded boolean NOT NULL,
-    comfort_above boolean NOT NULL,
-    all_params_scored boolean NOT NULL,
-    totalled_correctly boolean NOT NULL,
-    in_score_range boolean NOT NULL,
-    observer_name boolean NOT NULL,
-    score numeric,
-    picu_id integer NOT NULL,
-    CONSTRAINT compliance_data_backup_method_check CHECK (((method)::text = ANY (ARRAY[('SOSPD'::character varying)::text, ('CAPD'::character varying)::text])))
-);
-
-
-ALTER TABLE public.compliance_data_backup OWNER TO postgres;
-
---
--- Name: compliance_data_backup_comp_id_seq; Type: SEQUENCE; Schema: public; Owner: postgres
---
-
-CREATE SEQUENCE public.compliance_data_backup_comp_id_seq
-    AS integer
-    START WITH 1
-    INCREMENT BY 1
-    NO MINVALUE
-    NO MAXVALUE
-    CACHE 1;
-
-
-ALTER SEQUENCE public.compliance_data_backup_comp_id_seq OWNER TO postgres;
-
---
--- Name: compliance_data_backup_comp_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: postgres
---
-
-ALTER SEQUENCE public.compliance_data_backup_comp_id_seq OWNED BY public.compliance_data_backup.comp_id;
-
-
---
--- Name: picu_backup; Type: TABLE; Schema: public; Owner: postgres
---
-
-CREATE TABLE public.picu_backup (
-    picu_id integer NOT NULL,
-    password character(60) NOT NULL,
-    ward_name character varying NOT NULL,
-    hospital_name character varying NOT NULL,
-    auditor character varying NOT NULL,
-    delirium_positive_patients numeric,
-    picu_role character varying DEFAULT 'picu'::character varying NOT NULL,
-    overall_compliance numeric,
-    CONSTRAINT picu_backup_picu_role_check CHECK (((picu_role)::text = ANY (ARRAY[('picu'::character varying)::text, ('admin'::character varying)::text, ('field_engineer'::character varying)::text])))
-);
-
-
-ALTER TABLE public.picu_backup OWNER TO postgres;
-
---
--- Name: picu_backup_picu_id_seq; Type: SEQUENCE; Schema: public; Owner: postgres
---
-
-CREATE SEQUENCE public.picu_backup_picu_id_seq
-    AS integer
-    START WITH 1
-    INCREMENT BY 1
-    NO MINVALUE
-    NO MAXVALUE
-    CACHE 1;
-
-
-ALTER SEQUENCE public.picu_backup_picu_id_seq OWNER TO postgres;
-
---
--- Name: picu_backup_picu_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: postgres
---
-
-ALTER SEQUENCE public.picu_backup_picu_id_seq OWNED BY public.picu_backup.picu_id;
-
-
---
--- Name: compliance_data_backup comp_id; Type: DEFAULT; Schema: public; Owner: postgres
---
-
-ALTER TABLE ONLY public.compliance_data_backup ALTER COLUMN comp_id SET DEFAULT nextval('public.compliance_data_backup_comp_id_seq'::regclass);
-
-
---
--- Name: picu_backup picu_id; Type: DEFAULT; Schema: public; Owner: postgres
---
-
-ALTER TABLE ONLY public.picu_backup ALTER COLUMN picu_id SET DEFAULT nextval('public.picu_backup_picu_id_seq'::regclass);
-
-
---
--- Data for Name: api_log_backup; Type: TABLE DATA; Schema: public; Owner: postgres
---
-
-COPY public.api_log_backup (date, "time", method, url, status, userip, useragent, username, userrole) FROM stdin;
-\.
-
-
---
--- Data for Name: compliance_data_backup; Type: TABLE DATA; Schema: public; Owner: postgres
---
-
-COPY public.compliance_data_backup (comp_id, entry_date, method, bed_number, correct_details, comfort_recorded, comfort_above, all_params_scored, totalled_correctly, in_score_range, observer_name, score, picu_id) FROM stdin;
-\.
-
-
---
--- Data for Name: picu_backup; Type: TABLE DATA; Schema: public; Owner: postgres
---
-
-COPY public.picu_backup (picu_id, password, ward_name, hospital_name, auditor, delirium_positive_patients, picu_role, overall_compliance) FROM stdin;
-\.
-
-
---
--- Name: compliance_data_backup_comp_id_seq; Type: SEQUENCE SET; Schema: public; Owner: postgres
---
-
-SELECT pg_catalog.setval('public.compliance_data_backup_comp_id_seq', 1, false);
-
-
---
--- Name: picu_backup_picu_id_seq; Type: SEQUENCE SET; Schema: public; Owner: postgres
---
-
-SELECT pg_catalog.setval('public.picu_backup_picu_id_seq', 1, false);
-
-
---
--- Name: compliance_data_backup compliance_data_backup_pkey; Type: CONSTRAINT; Schema: public; Owner: postgres
---
-
-ALTER TABLE ONLY public.compliance_data_backup
-    ADD CONSTRAINT compliance_data_backup_pkey PRIMARY KEY (comp_id);
-
-
---
--- Name: picu_backup picu_backup_pkey; Type: CONSTRAINT; Schema: public; Owner: postgres
---
-
-ALTER TABLE ONLY public.picu_backup
-    ADD CONSTRAINT picu_backup_pkey PRIMARY KEY (picu_id);
-
-
---
--- Name: compliance_data_backup fk_picu; Type: FK CONSTRAINT; Schema: public; Owner: postgres
---
-
-ALTER TABLE ONLY public.compliance_data_backup
-    ADD CONSTRAINT fk_picu FOREIGN KEY (picu_id) REFERENCES public.picu_backup(picu_id) ON DELETE CASCADE;
-
 
 --
 -- PostgreSQL database dump complete
@@ -997,7 +811,7 @@ CREATE TABLE public.users (
     profession character varying NOT NULL,
     country character varying NOT NULL,
     user_role character varying DEFAULT 'lerner'::character varying NOT NULL,
-    CONSTRAINT users_user_role_check CHECK (((user_role)::text = ANY (ARRAY[('learner'::character varying)::text, ('admin'::character varying)::text, ('field_engineer'::character varying)::text])))
+    CONSTRAINT users_user_role_check CHECK (((user_role)::text = ANY ((ARRAY['learner'::character varying, 'admin'::character varying, 'field_engineer'::character varying])::text[])))
 );
 
 

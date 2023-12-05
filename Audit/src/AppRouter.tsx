@@ -63,7 +63,7 @@ function AppRouter() {
 
         {(adminAccess || picuAccess) && (
           <>
-            <Route path="/auditGraphs" element={<AuditGraphs />} />
+            <Route path="/audit-graphs" element={<AuditGraphs />} />
             <Route path="/form" element={<ComplianceForm />} />
           </>
         )}

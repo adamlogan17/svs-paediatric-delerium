@@ -1,5 +1,6 @@
 import { Pool } from "pg";
 import errorCodeMessage from "./errorCodeMessage";
+import { types } from 'util';
 
 /**
  * Creates a pool object to connect to a database
@@ -264,8 +265,6 @@ export async function deleteData(database:string ,table:string, predicate:string
  * @param {string} [password="postgrespw"] Password for the database
  * @returns {Promise<string>} A Promise that resolves to a success message if the copy was successful, or an error message if it wasn't
  */
-import { types } from 'util';
-
 export async function copyTable(sourceDatabase: string, destinationDatabase: string, sourceTable: string, destinationTable: string, user: string = 'postgres', password: string = 'postgrespw'): Promise<string> {
   let role = user === "postgres" ? user : `${user}`;
   const sourceDb = createPool(sourceDatabase, role, password);

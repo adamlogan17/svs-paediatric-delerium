@@ -26,7 +26,7 @@ Chart.register(CategoryScale);
 function getPicuCompData(username:string|undefined, password:string|undefined):void {
     const configuration = {
         method: "get",
-        url: "https://localhost:8000/getPicuData", 
+        url: `${process.env.REACT_APP_API_URL}/get-all-picu`,
         headers: { 'Authorization': "bearer " + sessionStorage.getItem('TOKEN')}
     };
     
@@ -41,7 +41,7 @@ function getPicuCompData(username:string|undefined, password:string|undefined):v
     function getAllCompData(username:string|undefined, password:string|undefined):void {
     const configuration = {
         method: "get",
-        url: "https://localhost:8000/getAll", 
+        url: `${process.env.REACT_APP_API_URL}/get-all-compliance`, 
         headers: { 'Authorization': "bearer " + sessionStorage.getItem('TOKEN')}
     };
     

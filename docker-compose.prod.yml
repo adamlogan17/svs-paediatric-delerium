@@ -16,7 +16,7 @@ services:
       dockerfile: prod.Dockerfile
       # overwrites the environment variable within teh '.env', if adding more the Dockerfile needs to be updated
       args:
-        - REACT_APP_API_URL=http://143.117.69.4:48800
+        - REACT_APP_API_URL=http://143.117.69.4:48801
     ports:
       # The ports cannot be the same as the fist docker-compose file
       - "48301:80"    

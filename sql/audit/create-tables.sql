@@ -17,7 +17,7 @@ CREATE TABLE IF NOT EXISTS picu (
 CREATE TABLE IF NOT EXISTS api_log (
     log_id SERIAL PRIMARY KEY,
     datetime TIMESTAMP NOT NULL,
-    method VARCHAR(6) NOT NULL,
+    method VARCHAR(7) NOT NULL,
     endpoint VARCHAR(255) NOT NULL,
     status_code INT NOT NULL,
     user_ip VARCHAR(50) NOT NULL,

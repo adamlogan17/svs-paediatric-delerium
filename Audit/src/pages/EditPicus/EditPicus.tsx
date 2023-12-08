@@ -74,6 +74,7 @@ export default function EditPicus() {
   const [isLoading, setIsLoading] = useState<boolean>(true);
 
   useEffect(() => {
+    console.log(`${process.env.REACT_APP_API_URL}/get-all-picu`);
     axios.get(`${process.env.REACT_APP_API_URL}/get-all-picu`, { headers: { 'Authorization': `Bearer ${sessionStorage.getItem('TOKEN')}` } })
       .then((response:any) => {
         const picus:Picu[] = [];
@@ -91,6 +92,7 @@ export default function EditPicus() {
         setData(picus.sort((a, b) => Number(a.picu_id) - Number(b.picu_id)));
       })
       .catch((error:any) => {
+        console.log(error);
         enqueueSnackbar(error.message, { variant: "error" });
       });
       setIsLoading(false);

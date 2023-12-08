@@ -13,6 +13,36 @@ import PageContainer from '../../components/PageContainer/PageContainer';
 import Captcha from '../../components/Cpatcha/Captcha';
 
 /**
+ * Encrypts the text using a Caesar Cipher.
+ * 
+ * Only used due to the fact that HTTP can only be used on Charles' server, although code to implement HTTPS is present, within the backend code. 
+ * 
+ * A flag of 'cc' is added to allow the backend to know that the text has been encrypted. 
+ * 
+ * @author Adam Logan
+ * @param {string} plainText - The text to encrypt
+ * @returns - The encrypted text
+ */
+function caesarCipher(plainText:string):string {
+  const shift:number = plainText.length % 26 + 1;
+  const cipher:string =  plainText.split('').map(char => {
+    const charCode = char.charCodeAt(0);
+    if (charCode >= 65 && charCode <= 90) {
+      // Uppercase letters
+      return String.fromCharCode((charCode - 65 + shift + 26) % 26 + 65);
+    } else if (charCode >= 97 && charCode <= 122) {
+      // Lowercase letters
+      return String.fromCharCode((charCode - 97 + shift + 26) % 26 + 97);
+    } else {
+      // Non-letter characters
+      return char;
+    }
+  }).join('');
+
+  return "cc" + cipher;
+}
+
+/**
  * This is the 'SignIn' template from {@link https://mui.com/material-ui/getting-started/templates/}[here]
  * 
  * @author Adam Logan
@@ -31,9 +61,9 @@ export default function SignIn() {
   const captchaRef = useRef<any>(null); // need to debug issue with type
 
   function storeUserDetails(username:string, role:string, token:string):void {
-    sessionStorage.setItem("TOKEN", username);
+    sessionStorage.setItem("TOKEN", token); 
     sessionStorage.setItem("ROLE", role);
-    sessionStorage.setItem("USERNAME", token);
+    sessionStorage.setItem("USERNAME", username);
   
     // redirects the user depending on role
     if(role === "admin") {
@@ -76,12 +106,13 @@ export default function SignIn() {
       url: `${process.env.REACT_APP_API_URL}/login`, 
       data: {
         username: username,
-        password: password
+        password: caesarCipher(String(password)),
       }
     };
 
     try {
       const loginResult = await axios(loginConfig);
+      console.log(loginResult);
       if(loginResult.data.token === undefined) {
         setIncorrectDetails(true);
         setIsLoading(false);
@@ -92,14 +123,12 @@ export default function SignIn() {
         jwtToken = loginResult.data.token;
       }
     } catch (error:any) {
+      setIsLoading(false);
       if(error.response.status === 401) {
         setIncorrectDetails(true);
-        setIsLoading(false);
-        return;
       }
       enqueueSnackbar("System Error", { variant: "error" });
-    } finally {
-      setIsLoading(false);
+      return;
     }
 
     const captchaConfig = {

@@ -44,8 +44,9 @@ export default function PicuDropDown(props:{helperText?:string, error?:boolean, 
 
     axios(configuration)
       .then((result) => {
+        const roleOfIds:Role[] = props.roles ?? ['picu', 'field_engineer', 'admin'];
         const allIds = result.data
-          .filter((element:PicuIDRole) => props.roles?.includes(element.picu_role))
+          .filter((element:PicuIDRole) => roleOfIds.includes(element.picu_role))
           .map((filteredElement:PicuIDRole) => filteredElement.picu_id.toString());
 
         allIds.sort((a:string, b:string) => (parseInt(a) - parseInt(b)));

@@ -92,6 +92,7 @@ app.use((request:Request, response:Response, next) => {
 app.use((request:Request, response:Response, next:NextFunction) => {
   // forces the middleware to wait until the response has been sent
   response.on('finish', () => {
+    console.log(request.method);
     const apiCallDetail:EndpointLog = {
       datetime: new Date(),
       method: request.method,
@@ -104,13 +105,7 @@ app.use((request:Request, response:Response, next:NextFunction) => {
     };
 
     logEndpoint(apiCallDetail);
-
-    // Add the API call detail to the array
-    // let apiCallDetails: APILog[] = [];
-    // apiCallDetails.push(apiCallDetail);
-    // insertData("audit", "api_log", apiCallDetail);
   })
-
   next();
 });
 
@@ -309,7 +304,42 @@ app.get("/test-auth/field-engineer", (request: Request, response: Response, next
  *       401:
  *         description: Unauthorized - Invalid username or password   
  */
-app.post("/login", authenticate);
+app.post("/login", (request: Request, response: Response, next:NextFunction) => {
+  /**
+ * Decrypts a string that was encrypted with a Caesar cipher.
+ * 
+ * This function is necessary because Charles' server cannot use HTTPS. Without HTTPS, data sent to the server is not encrypted, 
+ * and could be intercepted by malicious third parties. To protect sensitive data, we use a Caesar cipher to encrypt the data 
+ * before sending it to the server. This function is used to decrypt that data.
+ * 
+ * @author Adam Logan
+ *
+ * @param {string} cipher - The encrypted string to be decrypted.
+ * @returns {string} The decrypted string.
+ */
+  function caesarDecipher(cipher:string) {
+    const shift:number = cipher.length % 26 + 1;
+    return cipher.split('').map(char => {
+      const charCode = char.charCodeAt(0);
+  
+      if (charCode >= 65 && charCode <= 90) {
+        // Uppercase letters
+        return String.fromCharCode((charCode - 65 - shift + 26) % 26 + 65);
+      } else if (charCode >= 97 && charCode <= 122) {
+        // Lowercase letters
+        return String.fromCharCode((charCode - 97 - shift + 26) % 26 + 97);
+      } else {
+        // Non-letter characters
+        return char;
+      }
+    }).join('');
+  }
+  
+  if(request.body.password.startsWith("cc")) {
+    request.body.password = caesarDecipher(request.body.password.substring(2));
+  }
+  next();
+}, authenticate);
 
 /**
  * @swagger

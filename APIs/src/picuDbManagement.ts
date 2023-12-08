@@ -159,6 +159,7 @@ export async function getAllIds(role:string): Promise<{picu_id:string, picu_role
  * @todo sort out the types for the data
  */
 export async function getPicuData(role:string): Promise<{allData:any[]}|string> {
+  console.log("role", role);
   let result:{allData:any[]}|string = await getAll(db, tableName, role, dbPassword);
   return result;
 }

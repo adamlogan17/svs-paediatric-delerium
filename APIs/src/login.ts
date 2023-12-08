@@ -85,7 +85,7 @@ export function authorise(request: Request, response: Response, next:NextFunctio
   try {
     // get the token from the authorization header
     const authHeader:string|undefined = request.headers.authorization === undefined ? "error" : request.headers.authorization;
-    const token:string = authHeader.includes("Bearer") ? authHeader.split(" ")[1] : authHeader;
+    const token:string = authHeader.includes("Bearer" || "bearer") ? authHeader.split(" ")[1] : authHeader;
 
     // retrieve the user details of the logged in user
     const user:JwtPayload|string = jwt.verify(token, jwtSecret);

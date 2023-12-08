@@ -62,7 +62,7 @@ function getPicuCompData(username:string|undefined, password:string|undefined):v
  */
 function AuditGraphs() {
   const [picuID, setPicuID]  = useState<string|null>(sessionStorage.getItem('ROLE') === 'picu' ? sessionStorage.getItem('SITE')!== null ? sessionStorage.getItem('SITE') : '0' : '0');
-  const [idOptions, setIdOptions] = useState<AutoCompleteValues[]>([]);
+  const [idOptions, setIdOptions] = useState<LabelValuePair[]>([]);
   const [chartType, setChartType] = useState<string>('Line Graph');
 
   // useEffect(() => {
@@ -81,7 +81,7 @@ function AuditGraphs() {
   //     .catch((error) => enqueueSnackbar(error.message, { variant: 'error' }));
   // }, []);
 
-  const [chartTypeOptions, setChartTypeOptions] = useState<AutoCompleteValues[]>([
+  const [chartTypeOptions, setChartTypeOptions] = useState<LabelValuePair[]>([
     { label: 'Line Graph', value: 'line' },
     { label: 'Pie Chart', value: 'pie' },
     { label: 'Bar Chart', value: 'bar' },
@@ -113,7 +113,7 @@ function AuditGraphs() {
                   id="chartType"
                   autoComplete
                   autoHighlight
-                  isOptionEqualToValue = {(option:AutoCompleteValues, value:AutoCompleteValues) => option.label === value.label}
+                  isOptionEqualToValue = {(option:LabelValuePair, value:LabelValuePair) => option.label === value.label}
                   options={chartTypeOptions}
                   onChange={(event: any, newValue: any) => setChartType(newValue.label)}
                   renderInput={(params:any) => <TextField {...params} required margin="normal" name="chartType" label="Chart Type" />}
@@ -125,7 +125,7 @@ function AuditGraphs() {
                 id="id"
                 autoComplete
                 autoHighlight
-                isOptionEqualToValue = {(option:AutoCompleteValues, value:AutoCompleteValues) => option.label === value.label}
+                isOptionEqualToValue = {(option:LabelValuePair, value:LabelValuePair) => option.label === value.label}
                 options={idOptions}
                 renderInput={(params:any) => <TextField {...params} required margin="normal" name="id" label="id" />}
               />

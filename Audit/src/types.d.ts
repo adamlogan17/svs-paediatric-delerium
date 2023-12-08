@@ -25,7 +25,19 @@ type RoleAutoComplete = {
  */
 type Role = 'picu'|'admin'|'field_engineer';
 
-type AutoCompleteValues = {
+/**
+ * Represents a key-value pair, where the key is a string label and the value can be of any type.
+ * 
+ * This type is used throughout the codebase in places where we need to associate a label (a string) with a value (of any type).
+ * This is a flexible type that can be used to represent a wide variety of data structures.
+ *
+ * @author Adam logan
+ * 
+ * @typedef {Object} LabelValuePair
+ * @property {string} label - The key of the pair, represented as a string.
+ * @property {any} value - The value of the pair, which can be of any type.
+ */
+type LabelValuePair = {
   label:string,
   value:any
 }

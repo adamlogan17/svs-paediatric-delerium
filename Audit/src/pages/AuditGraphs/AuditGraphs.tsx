@@ -1,7 +1,7 @@
 import './graphs.css';
 
 import PageContainer from '../../components/PageContainer/PageContainer';
-import { useState } from "react";
+import { useEffect, useState } from "react";
 
 import TimelineIcon from '@mui/icons-material/Timeline';
 import PicuDropDown from "../../components/PicuDropDown/PicuDropDown";
@@ -14,7 +14,7 @@ import PieChart from '../../components/PieChart/PieChart';
 async function getComplianceData(id:number):Promise<{xValues:string[],yValues:number[]}>{
   const configuration = {
     method: "get",
-    url: `${process.env.REACT_APP_API_URL}/chartData/singleSite/${id}`,
+    url: `${process.env.REACT_APP_API_URL}/chart-single-picu-compliance/${id}`,
     headers: { 'Authorization': "Bearer " + sessionStorage.getItem('TOKEN') }
         };
     try {
@@ -27,24 +27,6 @@ async function getComplianceData(id:number):Promise<{xValues:string[],yValues:nu
         return{xValues:[],yValues:[]};
     }
 }
-
-// function getOverallComplianceData():any{
-//   alert("Hello!");
-//   // const configuration = {
-//   //   method: "get",
-//   //   url: `${process.env.REACT_APP_API_URL}/chartData/overall`,
-//   //   headers: { 'Authorization': "Bearer " + sessionStorage.getItem('TOKEN') }
-//   //       };
-//   //   try {
-//   //       let response = await axios(configuration);
-//   //       const data = response.data;
-//   //       data.xValues = data.entryDates.map((date:string) => new Date(date).toLocaleDateString("en-GB"));
-//   //       data.yValues = data.complianceScore;
-//   //       return data;
-//   //   } catch (err:any) {
-//   //       return{xValues:[],yValues:[]};
-//   //   }
-// }
 
 const allChartTypes:LabelValuePair[] = [
   {
@@ -113,6 +95,10 @@ function AuditGraphs() {
     setChartData(newCompData);
     setIsLoading(false);
   }
+
+  useEffect(() => {
+    refreshChartData(allDataTypes[0].getData);
+  }, []);
 
   return (
     <PageContainer title="Visualisation" loading={isLoading} icon={<TimelineIcon />}>

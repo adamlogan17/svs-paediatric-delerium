@@ -28,6 +28,24 @@ async function getComplianceData(id:number):Promise<{xValues:string[],yValues:nu
     }
 }
 
+// function getOverallComplianceData():any{
+//   alert("Hello!");
+//   // const configuration = {
+//   //   method: "get",
+//   //   url: `${process.env.REACT_APP_API_URL}/chartData/overall`,
+//   //   headers: { 'Authorization': "Bearer " + sessionStorage.getItem('TOKEN') }
+//   //       };
+//   //   try {
+//   //       let response = await axios(configuration);
+//   //       const data = response.data;
+//   //       data.xValues = data.entryDates.map((date:string) => new Date(date).toLocaleDateString("en-GB"));
+//   //       data.yValues = data.complianceScore;
+//   //       return data;
+//   //   } catch (err:any) {
+//   //       return{xValues:[],yValues:[]};
+//   //   }
+// }
+
 const allChartTypes:LabelValuePair[] = [
   {
     label: "Line",
@@ -43,6 +61,28 @@ const allChartTypes:LabelValuePair[] = [
   }
 ];
 
+type ChartDataType = LabelValuePair & {
+  getData: (id:number) => Promise<{xValues:string[],yValues:number[]}>
+}
+
+const allDataTypes:ChartDataType[] = [
+  {
+    label: "Single PICU Compliance",
+    value: "picu",
+    getData: async (id:number) => await getComplianceData(sessionStorage.getItem("ROLE") === 'admin' ? id : Number(sessionStorage.getItem("USERNAME")))
+  },
+  {
+    label: "Overall Compliance",
+    value: "overall",
+    getData: async () => {return {xValues:["Hello"],yValues:[80]}}
+  },
+  {
+    label: "Total Delirium Positive Patients",
+    value: "delirium",
+    getData: async () => {return {xValues:["Hello"],yValues:[5]}}
+  }
+];
+
 /**
  * Displays a line chart of the compliance data for site 1
  * @author Adam Logan & Andrew Robb
@@ -53,45 +93,68 @@ const allChartTypes:LabelValuePair[] = [
 function AuditGraphs() {
   const [isLoading, setIsLoading] = useState<boolean>(false);
   const [chartData, setChartData] = useState<{xValues:string[],yValues:number[]}>({xValues:[],yValues:[]});
-  const [chartType, setChartType] = useState<any>(allChartTypes[0]);
+  const [chartType, setChartType] = useState<LabelValuePair>(allChartTypes[0]);
+  const [dataType, setDataType] = useState<ChartDataType>(allDataTypes[0]);
 
-  function handleSubmit(event:React.FormEvent<HTMLFormElement>) {
-    event.preventDefault();
+  const specificPicuNeeded:boolean = dataType.value === 'picu' && sessionStorage.getItem("ROLE") === 'admin';
+
+  const dropDownPadding:string = '10px';
+  const pageWidth:string = '95%';
+
+  const splitDropdownStyles = {
+    width: '50%',
+    padding: dropDownPadding
   }
 
-  const dropdownStyles = {
-    width: '50%',
-    padding: '10px'
+  async function refreshChartData(getData:(id:number) => Promise<{xValues:string[],yValues:number[]}>, newPicuId?:number):Promise<void> {
+    newPicuId = newPicuId ?? 1;
+    setIsLoading(true);
+    let newCompData = await getData(newPicuId);
+    setChartData(newCompData);
+    setIsLoading(false);
   }
 
   return (
     <PageContainer title="Visualisation" loading={isLoading} icon={<TimelineIcon />}>
+      {sessionStorage.getItem("ROLE") === 'admin' &&
+        <Autocomplete
+          sx={{width: pageWidth, padding: dropDownPadding}}
+          defaultValue={allDataTypes[0]}
+          onChange={async (e:any, newValue:any) => {
+            await setDataType(newValue);
+            refreshChartData(newValue.getData, 1);
+          }}
+          disablePortal
+          id="chartType"
+          autoComplete
+          autoHighlight
+          isOptionEqualToValue = {(option:LabelValuePair, value:LabelValuePair) => option.label === value.label}
+          options={allDataTypes}
+          renderInput={(params:any) => <TextField {...params} required margin="normal" name="chartType" label="Data to Display" />}
+        />
+      }
+
       <Box 
-        component="form" 
-        onSubmit={(event) => handleSubmit(event)} 
-        noValidate 
         sx={{
           mt: 1, 
-          width: '95%', 
+          width: pageWidth, 
           margin: 'auto', 
           display: 'flex'
         }}
       >
-        <PicuDropDown 
-          sx={dropdownStyles}
-          id="picuId" 
-          roles={["picu"]} 
-          required={true}
-          onChange={async (newPicuId) => {
-            setIsLoading(true);
-            let newCompData = await getComplianceData(newPicuId);
-            setChartData(newCompData);
-            setIsLoading(false);
-          }} 
-        />
+        {specificPicuNeeded &&
+          <PicuDropDown 
+            sx={splitDropdownStyles}
+            id="picuId" 
+            roles={["picu"]} 
+            required={true}
+            onChange={async (newPicuId) => refreshChartData(dataType.getData, newPicuId)} 
+          />
+        }
 
         <Autocomplete
-          sx={dropdownStyles}
+          sx={specificPicuNeeded ? splitDropdownStyles : {width: '100%', padding: dropDownPadding}}
+          defaultValue={allChartTypes[0]}
           onChange={(e:any, newValue:any) => setChartType(newValue)}
           disablePortal
           id="chartType"

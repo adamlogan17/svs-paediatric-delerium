@@ -50,6 +50,7 @@ export default function PicuDropDown(props:{helperText?:string, error?:boolean, 
       <PageLoad loading={isLoading} />
 
       <Autocomplete
+        defaultValue={idOptions[0]}
         sx={props.sx}
         disablePortal
         id={props.id}

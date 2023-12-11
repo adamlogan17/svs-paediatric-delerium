@@ -1,21 +1,8 @@
-import { Autocomplete, TextField } from '@mui/material';
+import { Autocomplete, SxProps, TextField } from '@mui/material';
 import axios from 'axios';
 import { enqueueSnackbar } from 'notistack';
 import { useState, useEffect } from 'react';
 import PageLoad from '../Loading/PageLoad';
-
-/**
- * @typedef PicuIDRole
- * 
- * Represents the combination of PICU ID and Role.
- * 
- * @property {string} picu_id - The identifier for a PICU.
- * @property {Role} picu_role - The role associated with the PICU.
- */
-type PicuIDRole = {
-  picu_id: string,
-  picu_role: Role
-}
 
 /**
  * @author Adam Logan
@@ -30,9 +17,11 @@ type PicuIDRole = {
  * @param {boolean} [props.error] - Indicates whether there is an error with the input (optional).
  * @param {Role[]} [props.roles] - An array of roles to filter the available PICU IDs (optional).
  * @param {boolean} [props.required] - Indicates whether the input is required (optional).
+ * 
+ * @todo Maybe make an 'didComponentMount' because it's called every time state is changed, which is not ideal
  */
-export default function PicuDropDown(props:{helperText?:string, error?:boolean, id:string, roles?:Role[], required?:boolean}) {
-  const [idOptions, setIdOptions] = useState<RoleAutoComplete[]>([]);
+export default function PicuDropDown(props:{helperText?:string, error?:boolean, id:string, roles?:Role[], required?:boolean, onChange?:(newPicuId:number) => void, sx?:SxProps}) {
+  const [idOptions, setIdOptions] = useState<LabelValuePair[]>([]);
   const [isLoading, setIsLoading] = useState<boolean>(true);
 
   useEffect(() => {
@@ -61,13 +50,15 @@ export default function PicuDropDown(props:{helperText?:string, error?:boolean, 
       <PageLoad loading={isLoading} />
 
       <Autocomplete
+        sx={props.sx}
         disablePortal
         id={props.id}
         autoComplete
         autoHighlight
-        isOptionEqualToValue = {(option:RoleAutoComplete, value:RoleAutoComplete) => option.label === value.label}
-        options={idOptions}
-        renderInput={(params:any) => <TextField {...params} required={props.required === undefined || props.required} label="PICU ID" margin="normal" name={props.id} error={props.error} helperText={props.helperText} />}
+        isOptionEqualToValue = {(option:LabelValuePair, value:LabelValuePair) => option.label === value.label}
+        options={idOptions}        
+        renderInput={(params:any) => <TextField {...params} required={props.required === undefined || props.required} label="PICU ID" margin="normal" name={props.id} error={props.error} helperText={props.helperText}  />}
+        onChange={(event:any, newValue:any) => { if(props.onChange !== undefined) props.onChange(newValue) }}
       />
     </>
   );

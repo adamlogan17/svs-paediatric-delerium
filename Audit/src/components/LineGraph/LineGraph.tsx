@@ -1,102 +1,63 @@
-import axios from "axios";
-import React, { useEffect, useState } from "react";
+import { useTheme } from "@mui/material";
 import { Line } from "react-chartjs-2";
+import GraphContainer from "../GraphContainer/GraphContainer";
 
 /**
- * Creates the object required to set the values for a Line Chart, an important note is that the parameters must be the same length
- * @author Adam Logan
- * @date 2023-04-28
- * @param { string[] } xValues The va
- * @param { number[] } yValues
- * @returns { any }
- */
-function getLineChartData(xValues: string[], yValues:number[]) : any {
-  return {
-    labels: xValues,
-    datasets: [{
-      pointRadius: 1,
-      borderColor: "rgba(255,255,255,1)",
-      data: yValues
-    }]
-  }
-}
-
-/**
+ * This component displays a line graph using the provided data and options.
  * 
- */
-async function getComplianceData(id:string):Promise<{entryDates:string[],complianceScore:number[]}>{
-      const configuration = {
-          method: "get",
-          url: `${process.env.REACT_APP_API_URL}/chartData/singleSite/${id}`,
-          headers: { 'Authorization': "Bearer " + sessionStorage.getItem('TOKEN') }
-              };
-          try {
-              let response = await axios(configuration);
-              console.log(response);
-              return response.data;
-          } catch (err:any) {
-              console.log(err);
-              return{entryDates:[],complianceScore:[]}
-          }
-}
-
-
-/**
- * Displays a line graph
  * @author Adam Logan & Andrew Robb
- * @date 2023-04-28
- * @param { { chartData?:any } } props
- * @prop { any } [props.chartData] The data, and configuration of the data, that is to be displayed
+ * 
+ * @param {ChartProps} props - The props that define the chart data and options.
+ * @returns {JSX.Element} The `LineGraph` component.
  */
-function LineGraph(props:{ id:string|null }) {
-// the below code is required to call the API when the page loads
-  const [chartData, setChartData] = useState({
-    entryDates: ['1970-01-01T00:00:00.000Z'], complianceScore:[0]
-  });
-
-  useEffect(() => {
-  async function fetchData(id:string) {
-    let data = await getComplianceData(id);
-    setChartData(data);
-  }
-  console.log("prop", props.id);
-  fetchData(props.id === null ? '0' : props.id);
-}, []); // Or [] if effect doesn't need props or state
-
-  console.log(chartData);
+function LineGraph(props:ChartProps) {
+  const theme = useTheme();
+  const lineColor = props.lineColor ?? theme.palette.primary.main;
+  const textColor = props.textColor ?? theme.palette.text.primary;
 
   return (
-    <div className="chart-container">
-      <h2 style={{ textAlign: "center" }}>Compliance Score</h2>
+    <GraphContainer title={props.title} chartData={props.chartData}>
       <Line
-        data={getLineChartData(chartData.entryDates.map((date:string) => new Date(date).toLocaleDateString("en-GB")), chartData.complianceScore)}
+        data={{
+          labels: props.chartData.xValues,
+          datasets: [{
+            pointRadius: 1,
+            borderColor: lineColor,
+            data: props.chartData.yValues
+          }]
+        }}
         options={{
           scales: {
             y: {
+              grid: {
+                color: props.gridColor,
+              },
               ticks: {
-                color:"#FFFFFF"
+                color:textColor
               }
             },
             x: {
+              grid: {
+                color: props.gridColor,
+              },
               ticks: {
-                color:"#FFFFFF"
+                color:textColor
               }
             }
           },
           plugins: {
             title: {
               display: false,
-              text: "Compliance Scores",
-              color:"#FFFFFF"
+              text: props.title,
+              color:textColor
             },
             legend: {
               display: false
             }
           }
-
         }}
       />
-    </div>
+    </GraphContainer>
   );
 }
 export default LineGraph;

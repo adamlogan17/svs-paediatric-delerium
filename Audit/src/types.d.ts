@@ -137,3 +137,43 @@ type BaseAlertProps = {
   severity?:any;
   icon?:React.ReactNode;
 }
+
+/**
+ * @typedef PicuIDRole
+ * 
+ * @author Adam Logan
+ * 
+ * Represents the combination of PICU ID and Role.
+ * 
+ * @property {string} picu_id - The identifier for a PICU.
+ * @property {Role} picu_role - The role associated with the PICU.
+ */
+type PicuIDRole = {
+  picu_id: string,
+  picu_role: Role
+}
+
+/**
+ * Properties for the Chart components.
+ * 
+ * @author Adam Logan
+ * 
+ * @typedef {Object} ChartProps
+ * @property {Object} chartData - The data for the chart.
+ * @property {string[]} chartData.xValues - The x-axis values for the chart.
+ * @property {number[]} chartData.yValues - The y-axis values for the chart.
+ * @property {string} [lineColor] - The color of the line in the chart.
+ * @property {string} [textColor] - The color of the text in the chart.
+ * @property {string} title - The title of the chart.
+ * @property {string} [gridColor] - The color of the grid in the chart.
+ */
+type ChartProps = {
+  chartData: {
+    xValues: string[],
+    yValues: number[]
+  },
+  lineColor?: string,
+  textColor?:string,
+  title: string,
+  gridColor?:string
+}

@@ -172,7 +172,7 @@ type ChartProps = {
     xValues: string[],
     yValues: number[]
   },
-  lineColor?: string,
+  chartColor?: string,
   textColor?:string,
   title: string,
   gridColor?:string

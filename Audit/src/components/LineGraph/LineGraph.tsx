@@ -12,7 +12,7 @@ import GraphContainer from "../GraphContainer/GraphContainer";
  */
 function LineGraph(props:ChartProps) {
   const theme = useTheme();
-  const lineColor = props.lineColor ?? theme.palette.primary.main;
+  const lineColor = props.chartColor ?? theme.palette.primary.main;
   const textColor = props.textColor ?? theme.palette.text.primary;
 
   return (

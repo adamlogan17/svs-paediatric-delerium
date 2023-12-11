@@ -8,7 +8,7 @@ import PicuDropDown from "../../components/PicuDropDown/PicuDropDown";
 import { Autocomplete, Box, TextField } from "@mui/material";
 import axios from "axios";
 import LineGraph from "../../components/LineGraph/LineGraph";
-
+import BarChart from '../../components/BarChart/BarChart';
 
 async function getComplianceData(id:number):Promise<{xValues:string[],yValues:number[]}>{
   const configuration = {
@@ -105,6 +105,8 @@ function AuditGraphs() {
 
       <div id='graphContainer'>
         {chartType.value === 'line' && (<LineGraph chartData={chartData} title="Compliance Score" />)}
+        {chartType.value === 'bar' && (<BarChart chartData={chartData} title="Compliance Score" />)}
+
       </div>
     </PageContainer>
   );

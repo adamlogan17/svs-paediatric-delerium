@@ -9,6 +9,7 @@ import { Autocomplete, Box, TextField } from "@mui/material";
 import axios from "axios";
 import LineGraph from "../../components/LineGraph/LineGraph";
 import BarChart from '../../components/BarChart/BarChart';
+import PieChart from '../../components/PieChart/PieChart';
 
 async function getComplianceData(id:number):Promise<{xValues:string[],yValues:number[]}>{
   const configuration = {
@@ -52,7 +53,6 @@ const allChartTypes:LabelValuePair[] = [
 function AuditGraphs() {
   const [isLoading, setIsLoading] = useState<boolean>(false);
   const [chartData, setChartData] = useState<{xValues:string[],yValues:number[]}>({xValues:[],yValues:[]});
-  console.log("start!", chartData);
   const [chartType, setChartType] = useState<any>(allChartTypes[0]);
 
   function handleSubmit(event:React.FormEvent<HTMLFormElement>) {
@@ -63,8 +63,6 @@ function AuditGraphs() {
     width: '50%',
     padding: '10px'
   }
-
-  console.log("second", chartData);
 
   return (
     <PageContainer title="Visualisation" loading={isLoading} icon={<TimelineIcon />}>
@@ -85,8 +83,10 @@ function AuditGraphs() {
           roles={["picu"]} 
           required={true}
           onChange={async (newPicuId) => {
-            setChartData(await getComplianceData(newPicuId))
-            console.log("testing!", chartData);
+            setIsLoading(true);
+            let newCompData = await getComplianceData(newPicuId);
+            setChartData(newCompData);
+            setIsLoading(false);
           }} 
         />
 
@@ -106,6 +106,7 @@ function AuditGraphs() {
       <div id='graphContainer'>
         {chartType.value === 'line' && (<LineGraph chartData={chartData} title="Compliance Score" />)}
         {chartType.value === 'bar' && (<BarChart chartData={chartData} title="Compliance Score" />)}
+        {chartType.value === 'pie' && (<PieChart chartData={chartData} title="Compliance Score" />)}
 
       </div>
     </PageContainer>

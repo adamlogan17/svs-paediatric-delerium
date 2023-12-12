@@ -1,6 +1,7 @@
 import { useTheme } from "@mui/material";
 import { Bar } from "react-chartjs-2";
 import GraphContainer from "../GraphContainer/GraphContainer";
+import { useRef } from "react";
 
 /**
  * This component displays a bar chart using the provided data and options.
@@ -13,9 +14,12 @@ function BarChart(props:ChartProps) {
   const barColor = props.chartColor ?? theme.palette.primary.main;
   const textColor = props.textColor ?? theme.palette.text.primary;
 
+  const barRef = useRef(null);
+
   return (
-    <GraphContainer title={props.title} chartData={props.chartData}>
+    <GraphContainer title={props.title} chartData={props.chartData} graphRef={barRef}>
       <Bar
+        ref={barRef}
         data={{
           labels: props.chartData.xValues,
           datasets: [{

@@ -47,15 +47,15 @@ async function getSinglePicu(endpoint:string, yValue:string):Promise<{xValues:st
 
 const allChartTypes:LabelValuePair[] = [
   {
-    label: "Line",
+    label: "Line Graph",
     value: "line"
   },
   {
-    label: "Bar",
+    label: "Bar Chart",
     value: "bar",
   },
   {
-    label: "Pie",
+    label: "Pie Chart",
     value: "pie",
   }
 ];
@@ -171,9 +171,9 @@ function AuditGraphs() {
       </Box>
 
       <div id='graphContainer'>
-        {chartType.value === 'line' && (<LineGraph chartData={chartData} title="Compliance Score" />)}
-        {chartType.value === 'bar' && (<BarChart chartData={chartData} title="Compliance Score" />)}
-        {chartType.value === 'pie' && (<PieChart chartData={chartData} title="Compliance Score" />)}
+        {chartType.value === 'line' && (<LineGraph chartData={chartData} title={dataType.label} />)}
+        {chartType.value === 'bar' && (<BarChart chartData={chartData} title={dataType.label} />)}
+        {chartType.value === 'pie' && (<PieChart chartData={chartData} title={dataType.label} />)}
 
       </div>
     </PageContainer>

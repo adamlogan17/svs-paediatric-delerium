@@ -1,6 +1,7 @@
 import { useTheme } from "@mui/material";
 import { Line } from "react-chartjs-2";
 import GraphContainer from "../GraphContainer/GraphContainer";
+import { useRef } from "react";
 
 /**
  * This component displays a line graph using the provided data and options.
@@ -15,9 +16,12 @@ function LineGraph(props:ChartProps) {
   const lineColor = props.chartColor ?? theme.palette.primary.main;
   const textColor = props.textColor ?? theme.palette.text.primary;
 
+  const lineRef = useRef(null);
+
   return (
-    <GraphContainer title={props.title} chartData={props.chartData}>
+    <GraphContainer title={props.title} chartData={props.chartData} graphRef={lineRef}>
       <Line
+        ref={lineRef}
         data={{
           labels: props.chartData.xValues,
           datasets: [{

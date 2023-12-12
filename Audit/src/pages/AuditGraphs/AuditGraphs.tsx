@@ -28,6 +28,23 @@ async function getComplianceData(id:number):Promise<{xValues:string[],yValues:nu
     }
 }
 
+async function getSinglePicu(endpoint:string, yValue:string):Promise<{xValues:string[],yValues:number[]}>{
+  const configuration = {
+    method: "get",
+    url: `${process.env.REACT_APP_API_URL}/${endpoint}`,
+    headers: { 'Authorization': "Bearer " + sessionStorage.getItem('TOKEN') }
+        };
+    try {
+        let response = await axios(configuration);
+        const data = response.data;
+        data.xValues = data.picuId;
+        data.yValues = data[yValue];
+        return data;
+    } catch (err:any) {
+        return{xValues:[],yValues:[]};
+    }
+}
+
 const allChartTypes:LabelValuePair[] = [
   {
     label: "Line",
@@ -56,12 +73,12 @@ const allDataTypes:ChartDataType[] = [
   {
     label: "Overall Compliance",
     value: "overall",
-    getData: async () => {return {xValues:["Hello"],yValues:[80]}}
+    getData: async () => await getSinglePicu("chart-all-picu-compliance", "complianceScore")
   },
   {
     label: "Total Delirium Positive Patients",
     value: "delirium",
-    getData: async () => {return {xValues:["Hello"],yValues:[5]}}
+    getData: async () => await getSinglePicu("chart-all-picu-delirium-positive", "totalPositiveDelirium")
   }
 ];
 
@@ -107,6 +124,7 @@ function AuditGraphs() {
           sx={{width: pageWidth, padding: dropDownPadding}}
           defaultValue={allDataTypes[0]}
           onChange={async (e:any, newValue:any) => {
+            newValue = newValue ?? allDataTypes[0];
             await setDataType(newValue);
             refreshChartData(newValue.getData, 1);
           }}
@@ -141,7 +159,7 @@ function AuditGraphs() {
         <Autocomplete
           sx={specificPicuNeeded ? splitDropdownStyles : {width: '100%', padding: dropDownPadding}}
           defaultValue={allChartTypes[0]}
-          onChange={(e:any, newValue:any) => setChartType(newValue)}
+          onChange={(e:any, newValue:any) => setChartType(newValue ?? allChartTypes[0])}
           disablePortal
           id="chartType"
           autoComplete

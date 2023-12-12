@@ -81,7 +81,7 @@ export function authenticate(request: Request, response: Response): void {
  * 
  * @todo check the role from the db is correct for the one embedded in the token
  */
-export function authorise(request: Request, response: Response, next:NextFunction, level:string = 'picu'):void {
+export function authorise(request: Request, response: Response, next:NextFunction, level:'admin'|'picu'|'field_engineer' = 'picu'):void {
   try {
     // get the token from the authorization header
     const authHeader:string|undefined = request.headers.authorization === undefined ? "error" : request.headers.authorization;

@@ -7,7 +7,9 @@ config();
 
 const db:string = process.env.DATABASE || "No database found";
 const dbPassword:string = process.env.DBPASSWORD || "No password found";
-const tableName = "compliance_data";
+const complianceTableName = "compliance_data";
+const picuTableName = "picu";
+type possibleDataPoints = "delirium_positive_patients"|"overall_compliance";
 
 export async function singlePicuCompliance(role:string, siteId:number):Promise<{entryDates:Date[], complianceScore:number[]}|string> {
   const POOL = createPool(db, role, dbPassword);
@@ -15,7 +17,7 @@ export async function singlePicuCompliance(role:string, siteId:number):Promise<{
   let condition:string = `picu_id=${siteId}`;
 
   try {
-    const dbResult = await POOL.query(createSelect(tableName, condition, ["entry_date", "AVG(score)"], "entry_date"));
+    const dbResult = await POOL.query(createSelect(complianceTableName, condition, ["entry_date", "AVG(score)"], "entry_date"));
     const data = dbResult.rows;
     data.sort((a:{entry_date:Date, avg:string},b:{entry_date:Date, avg:string})=>a.entry_date.getTime()-b.entry_date.getTime());
     return {
@@ -28,35 +30,24 @@ export async function singlePicuCompliance(role:string, siteId:number):Promise<{
   }
 }
 
-/**
- * Gets the anonymised overall compliance score for each PICU
- * @author Adam Logan
- * @date 2023-04-12
- * @param { Request } request
- * @param { Response } response An anonymised array of the overall compliance score along with suggested label
- * @returns { void }
- * TODO Retain the correct ID for the site which requested the data
- */
-export function allPicuCompliance(request: Request, response: Response): void {
-    const POOL = createPool("audit", "admin", "password");
+export async function sinlgeDataPointallPicu(role:string, dataPoint:possibleDataPoints):Promise<{dataPoint:number[], picuId:number[]}|string> {
+  const POOL = createPool(db, role, dbPassword);
 
-    POOL.query(createSelect("picu", undefined, ["overall_compliance"]), (error:any, results:any) => {
-        if (error) {
-            throw error;
-        }
+  try {
+    const dbResult = await POOL.query(createSelect(picuTableName, undefined, ["picu_id", dataPoint]));
+    const data = dbResult.rows;
+    console.log(data);
+    // data.sort((a:{picu_id:number},b:{picu_id:number, avg:string})=>a.picu_id-b.picu_id);
+    const sortedData = data.sort((a:{picu_id:number},b:{picu_id:number})=>a.picu_id-b.picu_id);
 
-        let data = results.rows;
+    return {
+      picuId: sortedData.map((singleEntry:{picu_id:number}) => singleEntry.picu_id),
+      dataPoint: sortedData.map((singleEntry:any) => singleEntry[dataPoint] === null ? 0 : Math.round(parseFloat(singleEntry[dataPoint]) * 1e2)/1e2)
+    };
 
-        // Shuffles the array of overall compliance scores and rounds these scores
-        let anonymised = shuffleArray(data.map((singleEntry:{overall_compliance:string}) => Math.round(parseFloat(singleEntry.overall_compliance) * 1e2)/1e2));
-
-        response.send({
-            // assigns a site number for the anonymised sites
-            siteNum: anonymised.map((score, i) => i+1),
-            complianceScore: anonymised
-        });
-        
-    });
+  } catch (error:any) {
+    return errorCodeMessage(error.code);
+  }
 }
 
 /**

@@ -11,7 +11,7 @@ import swaggerUi from 'swagger-ui-express';
 
 import { copyTable, deleteData, getAll, insertData, updateData } from './crud';
 import { authenticate, authorise, updatePicuPassword, verifyCaptcha } from './login';
-import { allPicuCompliance, singlePicuCompliance } from './auditCharts';
+import { singlePicuCompliance, sinlgeDataPointallPicu } from './auditCharts';
 import { addPicu, deletePicus, editPicu, getAllIds, nextPicu, getPicuData } from './picuDbManagement';
 import { deleteCompRecords, editCompliance, getComplianceData, insertCompData } from './complianceScores';
 import { EndpointLog, getLogData, logEndpoint } from './logging';
@@ -696,9 +696,91 @@ app.get("/chart-single-picu-compliance/:siteId", (request: Request, response: Re
 });
 
 /**
- * Retrieves the anonymised compliance data of all the sites
+ * @swagger
+ * /chart-all-picu-compliance:
+ *   get:
+ *     tags:
+ *       - Compliance
+ *       - PICU
+ *     summary: Get compliance data for all PICU sites
+ *     security:
+ *       - Bearer: []
+ *     responses:
+ *       '200':
+ *         description: Successful operation
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 picuId:
+ *                   type: array
+ *                   items:
+ *                     type: integer
+ *                 complianceScore:
+ *                   type: array
+ *                   items:
+ *                     type: number
+ *                     format: float
+ *       '400':
+ *         description: Invalid site ID supplied
+ *       '401':
+ *         description: Permission Denied
  */
-app.get("/chartData/allSites", allPicuCompliance);
+app.get("/chart-all-picu-compliance", (request: Request, response: Response, next:NextFunction) => authorise(request, response, next, "admin"), async (req: Request, res: Response) => {
+  let result:any = await sinlgeDataPointallPicu(req.params.role, 'overall_compliance');
+  let status:number = 201;
+  if(typeof result === 'string') {
+    status = 400 ;
+  } else {
+    result.complianceScore = result.dataPoint;
+    delete result.dataPoint;
+  }
+  res.status(status).send(result);
+});
+
+/**
+ * @swagger
+ * /chart-all-picu-delirium-positive:
+ *   get:
+ *     tags:
+ *       - PICU
+ *     summary: Get the number of patients with positive delirium for all PICU sites
+ *     security:
+ *       - Bearer: []
+ *     responses:
+ *       '200':
+ *         description: Successful operation
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 picuId:
+ *                   type: array
+ *                   items:
+ *                     type: integer
+ *                 totalPositiveDelirium:
+ *                   type: array
+ *                   items:
+ *                     type: number
+ *                     format: float
+ *       '400':
+ *         description: Invalid site ID supplied
+ *       '401':
+ *         description: Permission Denied
+ */
+app.get("/chart-all-picu-delirium-positive", (request: Request, response: Response, next:NextFunction) => authorise(request, response, next, "admin"), async (req: Request, res: Response) => {
+  let result:any = await sinlgeDataPointallPicu(req.params.role, 'delirium_positive_patients');
+  let status:number = 201;
+  if(typeof result === 'string') {
+    status = 400 ;
+  } else {
+    result.totalPositiveDelirium = result.dataPoint;
+    delete result.dataPoint;
+  }
+  res.status(status).send(result);
+});
 
 /**
  * @swagger
@@ -718,7 +800,7 @@ app.get("/chartData/allSites", allPicuCompliance);
  *           $ref: '#/definitions/ComplianceData'
  *     responses:
  *       '200':
- *         description: Picu successfully added.
+ *         description: PICU successfully added.
  *       '400':
  *         description: Error occurred.
  */
@@ -738,8 +820,8 @@ app.post("/add-compliance", (request: Request, response: Response, next:NextFunc
  * /addPicu:
  *   post:
  *     tags:
- *       - Picu
- *     summary: Adds a new Picu to the database
+ *       - PICU
+ *     summary: Adds a new PICU to the database
  *     security:
  *       - Bearer: []
  *     consumes:
@@ -757,7 +839,7 @@ app.post("/add-compliance", (request: Request, response: Response, next:NextFunc
  *           - ward_name
  *     responses:
  *       '200':
- *         description: Picu successfully added.
+ *         description: PICU successfully added.
  *       '400':
  *         description: Error occurred.
  */
@@ -772,7 +854,7 @@ app.post("/addPicu", (request: Request, response: Response, next:NextFunction) =
  * /getNextPicu:
  *   get:
  *     tags:
- *       - Picu
+ *       - PICU
  *     summary: Gets the next PICU ID, used when adding a new PICU to the database
  *     security:
  *       - Bearer: []
@@ -792,7 +874,7 @@ app.get("/getNextPicu", (request: Request, response: Response, next:NextFunction
  * /getPicuIds:
  *   get:
  *     tags:
- *       - Picu
+ *       - PICU
  *     summary: Gets all PICU IDs, along with their roles
  *     security:
  *       - Bearer: []
@@ -849,7 +931,7 @@ app.put("/updatePicuPassword", (request: Request, response: Response, next:NextF
  * /deletePicu:
  *   delete:
  *     tags:
- *       - Picu
+ *       - PICU
  *     summary: Delete multiple PICUs based on provided PICU IDs.
  *     security:
  *       - Bearer: []
@@ -884,7 +966,7 @@ app.delete("/deletePicu", (request: Request, response: Response, next:NextFuncti
  * /updatePicu:
  *   put:
  *     tags:
- *       - Picu
+ *       - PICU
  *     summary: Update a PICU's details based on the provided data.
  *     security:
  *       - Bearer: []
@@ -918,7 +1000,7 @@ app.put("/updatePicu", (request: Request, response: Response, next:NextFunction)
  * /get-all-picu:
  *   get:
  *     tags:
- *       - Picu
+ *       - PICU
  *     summary: Get all compliance data
  *     security:
  *       - Bearer: []

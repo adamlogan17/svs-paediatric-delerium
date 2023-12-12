@@ -137,22 +137,6 @@ export async function getAll(database:string, table:string, userForDb:string, pa
   return results;
 }
 
-export async function getSelectedRecords(database:string, table:string, userForDb:string, passForDb:string): Promise<{allData:any[]}|string> {
-  // const POOL = createPool(database, userForDb, passForDb);
-
-  // let results:any;
-
-  // try {
-  //   results = await POOL.query(createSelect(table));
-  //   results = {
-  //     allData: results.rows
-  //   };
-  // } catch (e:any) {
-  //   results = errorCodeMessage(e.code);
-  // }
-  return "results";
-}
-
 /**
  * Inserts data into the specified table of the database.
  * 

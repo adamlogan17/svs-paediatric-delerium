@@ -649,11 +649,51 @@ app.delete("/:database/deletedata/:table/:predicate", async (req: Request,res: R
 });
 
 /**
- * Retrieves the compliance data of the site requested
- * TODO If the user has a picu role make sure that their ID matches that of the one they are requesting
- * @author Adam Logan
+ * @swagger
+ * /chart-single-picu-compliance/{siteId}:
+ *   get:
+ *     tags:
+ *       - Compliance
+ *     summary: Get compliance data for a single PICU site
+ *     security:
+ *       - Bearer: []
+ *     parameters:
+ *       - name: siteId
+ *         in: path
+ *         description: ID of the PICU site
+ *         required: true
+ *         schema:
+ *           type: integer
+ *     responses:
+ *       '200':
+ *         description: Successful operation
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 entryDates:
+ *                   type: array
+ *                   items:
+ *                     type: string
+ *                     format: date-time
+ *                 complianceScore:
+ *                   type: array
+ *                   items:
+ *                     type: number
+ *                     format: float
+ *       '400':
+ *         description: Invalid site ID supplied
  */
-app.get("/chartData/singleSite/:siteId", (request: Request, response: Response, next:NextFunction) => authorise(request, response, next), singlePicuCompliance);
+app.get("/chart-single-picu-compliance/:siteId", (request: Request, response: Response, next:NextFunction) => authorise(request, response, next), async (req: Request, res: Response) => {
+  if(req.params.role === "picu" && Number(req.params.siteId) !== Number(req.params.username)) {
+    res.status(401).send("ERROR: Permission Denied");
+  } else {
+    let result = await singlePicuCompliance(req.params.role, Number(req.params.siteId));
+    let status:number = typeof result === 'string' ? 400 : 201;
+    res.status(status).send(result);
+  }
+});
 
 /**
  * Retrieves the anonymised compliance data of all the sites

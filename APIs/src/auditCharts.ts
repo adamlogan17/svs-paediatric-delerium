@@ -1,37 +1,31 @@
 import { Request, Response } from "express";
 import { createPool, createSelect } from "./crud";
+import { config } from 'dotenv';
+import errorCodeMessage from "./errorCodeMessage";
 
-/**
- * Gets the entry dates and compliance score in the correct format to be displayed on a chart.js graph
- * @author Adam Logan
- * @date 2023-04-12
- * @param { Request } request The site number of the PICU 
- * @param { Response } response Contains 2 arrays both linked by their order
- * @returns { void }
- */
-export function singlePicuCompliance(request: Request, response: Response): void {
-    const POOL = createPool("audit", "admin", "password");
+config();
 
-    let condition:string = "picu_id=" + request.params.siteId;
+const db:string = process.env.DATABASE || "No database found";
+const dbPassword:string = process.env.DBPASSWORD || "No password found";
+const tableName = "compliance_data";
 
-    // createSelect("compliance_data", condition,  ["entry_date", "score"]
+export async function singlePicuCompliance(role:string, siteId:number):Promise<{entryDates:Date[], complianceScore:number[]}|string> {
+  const POOL = createPool(db, role, dbPassword);
 
-    POOL.query(createSelect("compliance_data", condition, ["entry_date", "AVG(score)"], "entry_date"), (error:any, results:any) => {
-        if (error) {
-            throw error;
-        }
+  let condition:string = `picu_id=${siteId}`;
 
-        let data = results.rows;
+  try {
+    const dbResult = await POOL.query(createSelect(tableName, condition, ["entry_date", "AVG(score)"], "entry_date"));
+    const data = dbResult.rows;
+    data.sort((a:{entry_date:Date, avg:string},b:{entry_date:Date, avg:string})=>a.entry_date.getTime()-b.entry_date.getTime());
+    return {
+      entryDates: data.map((singleEntry:{entry_date:Date}) => singleEntry.entry_date),
+      complianceScore: data.map((singleEntry:{avg:string}) => Math.round(parseFloat(singleEntry.avg) * 1e2)/1e2)
+    };
 
-        // sorts the data in ascending order by date
-        data.sort((a:{entry_date:Date, avg:string},b:{entry_date:Date, avg:string})=>a.entry_date.getTime()-b.entry_date.getTime());
-
-        response.send({
-            entryDates: data.map((singleEntry:{entry_date:Date}) => singleEntry.entry_date),
-            complianceScore: data.map((singleEntry:{avg:string}) => Math.round(parseFloat(singleEntry.avg) * 1e2)/1e2)
-        });
-        
-    });
+  } catch (error:any) {
+    return errorCodeMessage(error.code);
+  }
 }
 
 /**

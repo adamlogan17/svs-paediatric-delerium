@@ -19,6 +19,7 @@ import PageLoad from '../Loading/PageLoad';
  * @param {boolean} [props.required] - Indicates whether the input is required (optional).
  * 
  * @todo Maybe make an 'didComponentMount' because it's called every time state is changed, which is not ideal
+ * @todo Always keeps the value of the first element in the array, even if the array changes
  */
 export default function PicuDropDown(props:{helperText?:string, error?:boolean, id:string, roles?:Role[], required?:boolean, onChange?:(newPicuId:number) => void, sx?:SxProps}) {
   const [idOptions, setIdOptions] = useState<LabelValuePair[]>([]);

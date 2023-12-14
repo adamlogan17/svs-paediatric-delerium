@@ -11,6 +11,17 @@ import LineGraph from "../../components/LineGraph/LineGraph";
 import BarChart from '../../components/BarChart/BarChart';
 import PieChart from '../../components/PieChart/PieChart';
 
+import dayjs from 'dayjs';
+import isSameOrBefore from 'dayjs/plugin/isSameOrBefore';
+import isSameOrAfter from 'dayjs/plugin/isSameOrAfter';
+
+import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
+import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
+import { DatePicker } from '@mui/x-date-pickers/DatePicker';
+
+dayjs.extend(isSameOrBefore);
+dayjs.extend(isSameOrAfter);
+
 /**
  * Retrieves compliance data for a given ID.
  * 
@@ -131,6 +142,8 @@ function AuditGraphs() {
   const [chartData, setChartData] = useState<{xValues:string[],yValues:number[]}>({xValues:[],yValues:[]});
   const [chartType, setChartType] = useState<LabelValuePair>(allChartTypes[0]);
   const [dataType, setDataType] = useState<ChartDataType>(allDataTypes[0]);
+  const [startDate, setStartDate] = useState<Date>(new Date(Date.UTC(1970, 0, 1)));
+  const [endDate, setEndDate] = useState<Date>(new Date());
 
   const specificPicuNeeded:boolean = dataType.value === 'picu' && sessionStorage.getItem("ROLE") === 'admin';
 
@@ -145,14 +158,31 @@ function AuditGraphs() {
   async function refreshChartData(getData:(id:number) => Promise<{xValues:string[],yValues:number[]}>, newPicuId?:number):Promise<void> {
     newPicuId = newPicuId ?? 1;
     setIsLoading(true);
+
+    // Convert startDate and endDate to 'DD/MM/YYYY' format for comparison
+    const start = dayjs(startDate);
+    const end = dayjs(endDate);
+    console.log(start, end);
     let newCompData = await getData(newPicuId);
+
+    newCompData = {
+      xValues: newCompData.xValues.filter((dateStr) => {
+        const date = dayjs(dateStr, 'DD/MM/YYYY');
+        return date.isSameOrAfter(start) && date.isSameOrBefore(end);
+      }),
+      yValues: newCompData.yValues.filter((_, index) => {
+        const dateStr = newCompData.xValues[index];
+        const date = dayjs(dateStr, 'DD/MM/YYYY');
+        return date.isSameOrAfter(start) && date.isSameOrBefore(end);
+      })
+    };
     setChartData(newCompData);
     setIsLoading(false);
   }
 
   useEffect(() => {
     refreshChartData(allDataTypes[0].getData);
-  }, []);
+  }, [startDate, endDate]);
 
   return (
     <PageContainer title="Visualisation" loading={isLoading} icon={<TimelineIcon />}>
@@ -163,7 +193,7 @@ function AuditGraphs() {
           onChange={async (e:any, newValue:any) => {
             newValue = newValue ?? allDataTypes[0];
             await setDataType(newValue);
-            refreshChartData(newValue.getData, 1);
+            refreshChartData(newValue.getData);
           }}
           disablePortal
           id="chartType"
@@ -206,6 +236,21 @@ function AuditGraphs() {
           renderInput={(params:any) => <TextField {...params} required margin="normal" name="chartType" label="Chart Type" />}
         />
       </Box>
+
+        {specificPicuNeeded && 
+          <Box sx= {{
+            mt: 1, 
+            width: pageWidth, 
+            margin: 'auto', 
+            display: 'flex'
+          }}>
+            <LocalizationProvider dateAdapter={AdapterDayjs}>
+              <DatePicker sx={splitDropdownStyles} value={dayjs(new Date(Date.UTC(1970, 0, 1)))} format='DD/MM/YYYY' onChange={(newDate) => {setStartDate(newDate !== null ? newDate.toDate() : new Date())}} />
+              <DatePicker  sx={splitDropdownStyles} defaultValue={dayjs(new Date())} format='DD/MM/YYYY' onChange={(newDate) =>  {setEndDate(newDate !== null ? newDate.toDate() : new Date())}}/>
+            </LocalizationProvider>
+
+          </Box>
+        }
 
       <div id='graphContainer'>
         {chartType.value === 'line' && (<LineGraph chartData={chartData} title={dataType.label} convertXToNumber={dataType.convertXToNums} />)}

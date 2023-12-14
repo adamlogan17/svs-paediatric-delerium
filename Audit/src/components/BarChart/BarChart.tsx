@@ -1,6 +1,4 @@
-import { useTheme } from "@mui/material";
-import { Bar } from "react-chartjs-2";
-import GraphContainer from "../GraphContainer/GraphContainer";
+import { useTheme } from "@mui/material";import GraphContainer from "../GraphContainer/GraphContainer";
 import { useRef } from "react";
 import * as ss from 'simple-statistics';
 import { alpha } from '@mui/system';

@@ -1,7 +1,9 @@
 import { useTheme } from "@mui/material";
 import { Line } from "react-chartjs-2";
+import { alpha } from '@mui/system';
 import GraphContainer from "../GraphContainer/GraphContainer";
 import { useRef } from "react";
+import * as ss from 'simple-statistics';
 
 /**
  * This component displays a line graph using the provided data and options.
@@ -15,8 +17,21 @@ function LineGraph(props:ChartProps) {
   const theme = useTheme();
   const lineColor = props.chartColor ?? theme.palette.primary.main;
   const textColor = props.textColor ?? theme.palette.text.primary;
+  const gridColor = props.gridColor ?? theme.palette.divider;
 
   const lineRef = useRef(null);
+
+  let trendline:{m:number, b:number} = {m:0, b:0};
+
+  const xValuesAsNum = props.chartData.xValues.map(x => props.convertXToNumber?.(x));
+
+  if(xValuesAsNum[0] !== undefined) {
+    try {
+      trendline = ss.linearRegression(xValuesAsNum.filter(x => x !== undefined).map((x, i) => [x!, props.chartData.yValues[i]]));
+    } catch (err) {
+      xValuesAsNum[0] = undefined;
+    }
+  }
 
   return (
     <GraphContainer title={props.title} chartData={props.chartData} graphRef={lineRef}>
@@ -24,17 +39,25 @@ function LineGraph(props:ChartProps) {
         ref={lineRef}
         data={{
           labels: props.chartData.xValues,
-          datasets: [{
-            pointRadius: 1,
-            borderColor: lineColor,
-            data: props.chartData.yValues
-          }]
+          datasets: [
+            {
+              pointRadius: 5,
+              borderColor: lineColor,
+              pointBackgroundColor: lineColor,
+              data: props.chartData.yValues
+            },
+            {
+              pointRadius: 1,
+              borderColor: xValuesAsNum[0] !== undefined ? alpha(lineColor, 0.5) : alpha(lineColor, 0.0),
+              data: xValuesAsNum.map(x => trendline.m * (x ?? -1) + trendline.b)
+            }
+          ]
         }}
         options={{
           scales: {
             y: {
               grid: {
-                color: props.gridColor,
+                color: gridColor,
               },
               ticks: {
                 color:textColor
@@ -42,7 +65,7 @@ function LineGraph(props:ChartProps) {
             },
             x: {
               grid: {
-                color: props.gridColor,
+                color: gridColor,
               },
               ticks: {
                 color:textColor

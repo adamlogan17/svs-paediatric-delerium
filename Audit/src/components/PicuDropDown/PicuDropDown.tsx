@@ -23,6 +23,7 @@ import PageLoad from '../Loading/PageLoad';
 export default function PicuDropDown(props:{helperText?:string, error?:boolean, id:string, roles?:Role[], required?:boolean, onChange?:(newPicuId:number) => void, sx?:SxProps}) {
   const [idOptions, setIdOptions] = useState<LabelValuePair[]>([]);
   const [isLoading, setIsLoading] = useState<boolean>(true);
+  const [picuId, setPicuId] = useState<LabelValuePair>();
 
   useEffect(() => {
     const configuration = {
@@ -40,6 +41,7 @@ export default function PicuDropDown(props:{helperText?:string, error?:boolean, 
 
         allIds.sort((a:string, b:string) => (parseInt(a) - parseInt(b)));
         setIdOptions(allIds);
+        setPicuId(allIds[0]);
       })
       .catch((error) => enqueueSnackbar(error.message, { variant: 'error' }))
       .finally(() => setIsLoading(false));
@@ -50,7 +52,7 @@ export default function PicuDropDown(props:{helperText?:string, error?:boolean, 
       <PageLoad loading={isLoading} />
 
       <Autocomplete
-        defaultValue={idOptions[0]}
+        value={picuId || null}
         sx={props.sx}
         disablePortal
         id={props.id}
@@ -59,7 +61,7 @@ export default function PicuDropDown(props:{helperText?:string, error?:boolean, 
         isOptionEqualToValue = {(option:LabelValuePair, value:LabelValuePair) => option.label === value.label}
         options={idOptions}        
         renderInput={(params:any) => <TextField {...params} required={props.required === undefined || props.required} label="PICU ID" margin="normal" name={props.id} error={props.error} helperText={props.helperText}  />}
-        onChange={(event:any, newValue:any) => { if(props.onChange !== undefined) props.onChange(newValue) }}
+        onChange={(event:any, newValue:any) => { setPicuId(newValue); if(props.onChange !== undefined) props.onChange(newValue) }}
       />
     </>
   );

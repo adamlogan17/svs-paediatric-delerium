@@ -166,6 +166,7 @@ type PicuIDRole = {
  * @property {string} [textColor] - The color of the text in the chart.
  * @property {string} title - The title of the chart.
  * @property {string} [gridColor] - The color of the grid in the chart.
+ * @property {(x:string) => number|undefined} [convertXToNumber] - Optional function to convert x-axis values to numbers, which adds a trendline to the chart.
  */
 type ChartProps = {
   chartData: {
@@ -175,5 +176,6 @@ type ChartProps = {
   chartColor?: string,
   textColor?:string,
   title: string,
-  gridColor?:string
+  gridColor?:string,
+  convertXToNumber?:(x:string) => number|undefined
 }

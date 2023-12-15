@@ -21,17 +21,17 @@ function BasicNavBar(props:{theme:string, toggleMode:Function, backgroundColor:s
   }
 
   return (
-    <Container>
+    <Container sx={{ display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
       <ConfirmDialog open={showDialog} title={'Sign Out'} description={<>Would you like to sign out?</>} handleConfirm={signOut} handleClose={() => null}/>
-      <Navbar expand="lg" style={{ backgroundColor:props.backgroundColor, color:props.textColor}}>
+      <Navbar expand="lg" style={{ backgroundColor:props.backgroundColor, color:props.textColor, margin:'auto'}}>
         <Navbar.Brand>
             <img 
               onClick={() => window.location.href="/"}
               src={PDLongLogo}  
               alt="logo"
-              width="25"
+              width="35"
               height="50"
-              className="d-inline-block align-top" 
+              className="d-inline-block align-top"
             />
           <Select
             sx={{marginLeft:'25px'}}

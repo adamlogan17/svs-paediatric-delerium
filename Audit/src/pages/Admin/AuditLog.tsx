@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import axios from 'axios';
-import BaseTable from '../../components/EditTable/BaseTable';
+import BaseTable from '../../components/Tables/BaseTable';
 import PreviewIcon from '@mui/icons-material/Preview';
 import PageContainer from '../../components/PageContainer/PageContainer';
 import { enqueueSnackbar } from 'notistack';

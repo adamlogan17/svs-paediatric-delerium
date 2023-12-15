@@ -179,3 +179,20 @@ type ChartProps = {
   gridColor?:string,
   convertXToNumber?:(x:string) => number|undefined
 }
+
+/**
+ * Represents the data type for a chart.
+ * 
+ * @author Adam Logan
+ * 
+ * @typedef {Object} ChartDataType
+ * @property {LabelValuePair} - The label-value pair for the chart.
+ * @property {(id:number) => Promise<{xValues:string[],yValues:number[]}>} getData - A function that retrieves the data for the chart based on an ID.
+ * @property {(date:string) => number|undefined} [convertXToNums] - An optional function that converts the X-axis values to numbers.
+ * @property {Function} [filter] - An optional function used to filter the chart data.
+ */
+type ChartDataType = LabelValuePair & {
+  getData: (id:number) => Promise<{xValues:string[],yValues:number[]}>,
+  convertXToNums?: (date:string) => number|undefined,
+  filter?: Function
+}

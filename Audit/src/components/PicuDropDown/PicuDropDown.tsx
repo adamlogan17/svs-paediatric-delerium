@@ -21,7 +21,7 @@ import PageLoad from '../Loading/PageLoad';
  * @todo Maybe make an 'didComponentMount' because it's called every time state is changed, which is not ideal
  * @todo Always keeps the value of the first element in the array, even if the array changes
  */
-export default function PicuDropDown(props:{helperText?:string, error?:boolean, id:string, roles?:Role[], required?:boolean, onChange?:(newPicuId:number) => void, sx?:SxProps}) {
+export default function PicuDropDown(props:{helperText?:string, error?:boolean, id:string, roles?:Role[], required?:boolean, onChange?:(newPicuId:number) => void, sx?:SxProps, defaultValue?:boolean}) {
   const [idOptions, setIdOptions] = useState<LabelValuePair[]>([]);
   const [isLoading, setIsLoading] = useState<boolean>(true);
   const [picuId, setPicuId] = useState<LabelValuePair>();
@@ -42,18 +42,21 @@ export default function PicuDropDown(props:{helperText?:string, error?:boolean, 
 
         allIds.sort((a:string, b:string) => (parseInt(a) - parseInt(b)));
         setIdOptions(allIds);
-        setPicuId(allIds[0]);
+        // Only set picuId if it has not been set yet
+        if (!picuId) {
+          setPicuId(allIds[0]);
+        }
       })
       .catch((error) => enqueueSnackbar(error.message, { variant: 'error' }))
       .finally(() => setIsLoading(false));
-  }, [props.roles]);
+  }, [props.roles, picuId]);
 
   return (
     <>
       <PageLoad loading={isLoading} />
 
       <Autocomplete
-        value={picuId || null}
+        value={props.defaultValue ? picuId || null : null}
         sx={props.sx}
         disablePortal
         id={props.id}

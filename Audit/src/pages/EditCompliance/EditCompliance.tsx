@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import EditTable from '../../components/EditTable/EditTable';
+import EditTable from '../../components/Tables/EditTable';
 import axios from 'axios';
 import { enqueueSnackbar } from 'notistack';
 import BorderColorIcon from '@mui/icons-material/BorderColor';

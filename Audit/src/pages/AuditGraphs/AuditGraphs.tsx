@@ -11,13 +11,13 @@ import LineGraph from "../../components/LineGraph/LineGraph";
 import BarChart from '../../components/BarChart/BarChart';
 import PieChart from '../../components/PieChart/PieChart';
 
-import dayjs from 'dayjs';
+import dayjs, { Dayjs } from 'dayjs';
 import isSameOrBefore from 'dayjs/plugin/isSameOrBefore';
 import isSameOrAfter from 'dayjs/plugin/isSameOrAfter';
 
-import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
-import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
-import { DatePicker } from '@mui/x-date-pickers/DatePicker';
+import { enqueueSnackbar } from 'notistack';
+import ValidaterDatePicker from '../../components/ValidaterDatePicker/ValidaterDatePicker';
+
 
 dayjs.extend(isSameOrBefore);
 dayjs.extend(isSameOrAfter);
@@ -90,6 +90,32 @@ function convertDatesToNums(date:string):number|undefined {
   }
 }
 
+/**
+ * Filters the data based on a date range.
+ *
+ * @param {{xValues:string[],yValues:number[]}} oldData - The original data to be filtered. It filters on xValues (an array of strings representing dates in 'DD/MM/YYYY' format) 
+ * @param {Dayjs} start - The start date of the range as a Dayjs object.
+ * @param {Dayjs} end - The end date of the range as a Dayjs object.
+ *
+ * @returns {Object} An object with the same structure as oldData, but filtered such that only the data 
+ *                   where the date falls within the start and end date range is included.
+ *
+ * @author Adam Logan
+ */
+function filterDates(oldData:{xValues:string[],yValues:number[]}, start:Dayjs, end:Dayjs):{xValues:string[],yValues:number[]} {
+  return {
+    xValues: oldData.xValues.filter((dateStr) => {
+      const date = dayjs(dateStr, 'DD/MM/YYYY');
+      return date.isSameOrAfter(start) && date.isSameOrBefore(end);
+    }),
+    yValues: oldData.yValues.filter((_, index) => {
+      const dateStr = oldData.xValues[index];
+      const date = dayjs(dateStr, 'DD/MM/YYYY');
+      return date.isSameOrAfter(start) && date.isSameOrBefore(end);
+    })
+  };
+}
+
 const allChartTypes:LabelValuePair[] = [
   {
     label: "Line Graph",
@@ -105,17 +131,13 @@ const allChartTypes:LabelValuePair[] = [
   }
 ];
 
-type ChartDataType = LabelValuePair & {
-  getData: (id:number) => Promise<{xValues:string[],yValues:number[]}>,
-  convertXToNums?: (date:string) => number|undefined
-}
-
 const allDataTypes:ChartDataType[] = [
   {
     label: "Single PICU Compliance",
     value: "picu",
     getData: async (id:number) => await getComplianceData(sessionStorage.getItem("ROLE") === 'admin' ? id : Number(sessionStorage.getItem("USERNAME"))),
-    convertXToNums: convertDatesToNums
+    convertXToNums: convertDatesToNums,
+    filter: filterDates
   },
   {
     label: "Overall Compliance",
@@ -131,11 +153,9 @@ const allDataTypes:ChartDataType[] = [
 
 /**
  * Displays a variety of graphs to analyse audit data.
- * @author Adam Logan & Andrew Robb
- * @date 2023-04-28
+ * @author Adam Logan
  * 
  * @todo maybe add a gauge chart for individual PICU compliance https://www.npmjs.com/package/react-gauge-chart
- * @todo trendline messes up whenever the dataType changes, I think it is still passing in the old chartData (maybe just add a try catch? does not work need to remove this from line graph)
  */
 function AuditGraphs() {
   const [isLoading, setIsLoading] = useState<boolean>(false);
@@ -144,8 +164,11 @@ function AuditGraphs() {
   const [dataType, setDataType] = useState<ChartDataType>(allDataTypes[0]);
   const [startDate, setStartDate] = useState<Date>(new Date(Date.UTC(1970, 0, 1)));
   const [endDate, setEndDate] = useState<Date>(new Date());
+  const [picuId, setPicuId] = useState<number>(1);
 
   const specificPicuNeeded:boolean = dataType.value === 'picu' && sessionStorage.getItem("ROLE") === 'admin';
+
+  const dateFormat:string = 'DD/MM/YYYY';
 
   const dropDownPadding:string = '10px';
   const pageWidth:string = '95%';
@@ -155,34 +178,26 @@ function AuditGraphs() {
     padding: dropDownPadding
   }
 
-  async function refreshChartData(getData:(id:number) => Promise<{xValues:string[],yValues:number[]}>, newPicuId?:number):Promise<void> {
-    newPicuId = newPicuId ?? 1;
-    setIsLoading(true);
-
-    // Convert startDate and endDate to 'DD/MM/YYYY' format for comparison
-    const start = dayjs(startDate);
-    const end = dayjs(endDate);
-    console.log(start, end);
-    let newCompData = await getData(newPicuId);
-
-    newCompData = {
-      xValues: newCompData.xValues.filter((dateStr) => {
-        const date = dayjs(dateStr, 'DD/MM/YYYY');
-        return date.isSameOrAfter(start) && date.isSameOrBefore(end);
-      }),
-      yValues: newCompData.yValues.filter((_, index) => {
-        const dateStr = newCompData.xValues[index];
-        const date = dayjs(dateStr, 'DD/MM/YYYY');
-        return date.isSameOrAfter(start) && date.isSameOrBefore(end);
-      })
-    };
-    setChartData(newCompData);
-    setIsLoading(false);
-  }
-
   useEffect(() => {
-    refreshChartData(allDataTypes[0].getData);
-  }, [startDate, endDate]);
+    setIsLoading(true);
+  
+    // Create an asynchronous function inside the hook
+    async function refreshChartData() {
+      // Convert startDate and endDate to 'DD/MM/YYYY' format for comparison
+      const start = dayjs(startDate);
+      const end = dayjs(endDate);
+      try {
+        let newCompData = await dataType.getData(picuId);
+        newCompData = dataType.filter ? dataType.filter(newCompData, start, end) : newCompData;
+        setChartData(newCompData);
+      } catch (error) {
+        enqueueSnackbar("System Error", { variant: 'error' });
+      } finally {
+        setIsLoading(false);
+      }
+    };
+    refreshChartData();
+  }, [startDate, endDate, picuId, dataType]);
 
   return (
     <PageContainer title="Visualisation" loading={isLoading} icon={<TimelineIcon />}>
@@ -192,8 +207,7 @@ function AuditGraphs() {
           defaultValue={allDataTypes[0]}
           onChange={async (e:any, newValue:any) => {
             newValue = newValue ?? allDataTypes[0];
-            await setDataType(newValue);
-            refreshChartData(newValue.getData);
+            setDataType(newValue);
           }}
           disablePortal
           id="chartType"
@@ -214,12 +228,13 @@ function AuditGraphs() {
         }}
       >
         {specificPicuNeeded &&
-          <PicuDropDown 
+          <PicuDropDown
+            defaultValue
             sx={splitDropdownStyles}
             id="picuId" 
             roles={["picu"]} 
             required={true}
-            onChange={async (newPicuId) => refreshChartData(dataType.getData, newPicuId)} 
+            onChange={async (newPicuId) => setPicuId(newPicuId)} 
           />
         }
 
@@ -244,11 +259,27 @@ function AuditGraphs() {
             margin: 'auto', 
             display: 'flex'
           }}>
-            <LocalizationProvider dateAdapter={AdapterDayjs}>
-              <DatePicker sx={splitDropdownStyles} value={dayjs(new Date(Date.UTC(1970, 0, 1)))} format='DD/MM/YYYY' onChange={(newDate) => {setStartDate(newDate !== null ? newDate.toDate() : new Date())}} />
-              <DatePicker  sx={splitDropdownStyles} defaultValue={dayjs(new Date())} format='DD/MM/YYYY' onChange={(newDate) =>  {setEndDate(newDate !== null ? newDate.toDate() : new Date())}}/>
-            </LocalizationProvider>
+            <ValidaterDatePicker 
+              dateFormat={dateFormat} 
+              startDate={new Date(Date.UTC(1970, 0, 1))}
+              sx={splitDropdownStyles}
+              onChange={(newDate) => {
+                const valid:boolean = dayjs(newDate).isSameOrBefore(endDate);
+                setStartDate((prevDate) => valid ? newDate : prevDate);
+                return valid;
+              }}
+            />
 
+            <ValidaterDatePicker 
+              dateFormat={dateFormat} 
+              startDate={new Date()}
+              sx={splitDropdownStyles}
+              onChange={(newDate) => {
+                const valid:boolean = dayjs(newDate).isSameOrAfter(startDate) && dayjs(newDate).isSameOrBefore(chartData.xValues[chartData.xValues.length]);
+                setEndDate((prevDate) => valid ? newDate : prevDate);
+                return valid;
+              }}
+            />
           </Box>
         }
 
@@ -256,7 +287,6 @@ function AuditGraphs() {
         {chartType.value === 'line' && (<LineGraph chartData={chartData} title={dataType.label} convertXToNumber={dataType.convertXToNums} />)}
         {chartType.value === 'bar' && (<BarChart chartData={chartData} title={dataType.label} convertXToNumber={dataType.convertXToNums} />)}
         {chartType.value === 'pie' && (<PieChart chartData={chartData} title={dataType.label} />)}
-
       </div>
     </PageContainer>
   );

@@ -11,7 +11,7 @@ import swaggerUi from 'swagger-ui-express';
 
 import { copyTable, deleteData, getAll, insertData, updateData } from './crud';
 import { authenticate, authorise, updatePicuPassword, verifyCaptcha } from './login';
-import { singlePicuCompliance, sinlgeDataPointallPicu } from './auditCharts';
+import { singlePicuCompliance, sinlgeDataPointAllPicu } from './auditCharts';
 import { addPicu, deletePicus, editPicu, getAllIds, nextPicu, getPicuData } from './picuDbManagement';
 import { deleteCompRecords, editCompliance, getComplianceData, insertCompData } from './complianceScores';
 import { EndpointLog, getLogData, logEndpoint } from './logging';
@@ -728,7 +728,7 @@ app.get("/chart-single-picu-compliance/:siteId", (request: Request, response: Re
  *         description: Permission Denied
  */
 app.get("/chart-all-picu-compliance", (request: Request, response: Response, next:NextFunction) => authorise(request, response, next, "admin"), async (req: Request, res: Response) => {
-  let result:any = await sinlgeDataPointallPicu(req.params.role, 'overall_compliance');
+  let result:any = await sinlgeDataPointAllPicu(req.params.role, 'overall_compliance');
   let status:number = 201;
   if(typeof result === 'string') {
     status = 400 ;
@@ -771,12 +771,12 @@ app.get("/chart-all-picu-compliance", (request: Request, response: Response, nex
  *         description: Permission Denied
  */
 app.get("/chart-all-picu-delirium-positive", (request: Request, response: Response, next:NextFunction) => authorise(request, response, next, "admin"), async (req: Request, res: Response) => {
-  let result:any = await sinlgeDataPointallPicu(req.params.role, 'delirium_positive_patients');
+  let result:any = await sinlgeDataPointAllPicu(req.params.role, 'delirium_positive_patients');
   let status:number = 201;
   if(typeof result === 'string') {
     status = 400 ;
   } else {
-    result.totalPositiveDelirium = result.dataPoint;
+    result.totalPositiveDelirium = result.dataPoint.map((element:number) => element * 100);
     delete result.dataPoint;
   }
   res.status(status).send(result);
@@ -1196,4 +1196,3 @@ app.listen(port,()=> {
 //   console.log(`listen port ${port}`);
 //   console.log(`Go to https://${baseIP}:${port}/swagger-docs for documentation`);
 // });
-

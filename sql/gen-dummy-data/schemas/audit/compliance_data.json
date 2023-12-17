@@ -3,7 +3,8 @@
     "rows":[
         {
             "name": "entry_date",
-            "dataType": "datetime"
+            "dataType": "datetime",
+            "valRange": ["2015-01-01", "2023-12-17"]
         },
         {
             "name": "method",
@@ -17,8 +18,7 @@
         {
             "name": "picu_id",
             "dataType": "integer",
-            "valRange": [1,23],
-            "forceVal": 1
+            "valRange": [1,24]
         },
         {
             "name": "correct_details",

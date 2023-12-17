@@ -1,4 +1,3 @@
-import { Request, Response } from "express";
 import { createPool, createSelect } from "./crud";
 import { config } from 'dotenv';
 import errorCodeMessage from "./errorCodeMessage";
@@ -30,11 +29,18 @@ export async function singlePicuCompliance(role:string, siteId:number):Promise<{
   }
 }
 
-export async function sinlgeDataPointallPicu(role:string, dataPoint:possibleDataPoints):Promise<{dataPoint:number[], picuId:number[]}|string> {
+/**
+ * Returns compliance data for a single PICU in a format that is friendly to 
+ */
+export async function sinlgeDataPointAllPicu(role:string, dataPoint:possibleDataPoints):Promise<{dataPoint:number[], picuId:number[]}|string> {
   const POOL = createPool(db, role, dbPassword);
 
+  let condition:string = "picu_role='picu'";
+
+  console.log(createSelect(picuTableName, condition, ["picu_id", dataPoint]));
+
   try {
-    const dbResult = await POOL.query(createSelect(picuTableName, undefined, ["picu_id", dataPoint]));
+    const dbResult = await POOL.query(createSelect(picuTableName, condition, ["picu_id", dataPoint]));
     const data = dbResult.rows;
     console.log(data);
     // data.sort((a:{picu_id:number},b:{picu_id:number, avg:string})=>a.picu_id-b.picu_id);
@@ -53,7 +59,6 @@ export async function sinlgeDataPointallPicu(role:string, dataPoint:possibleData
 /**
  * Shuffles an array using the Fisher–Yates algorithm
  * @author Adam Logan
- * @date 2023-04-12
  * @param { any[] } array The array to be shuffled
  * @returns { any[] } The shuffled array
  */

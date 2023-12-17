@@ -12,7 +12,7 @@ function PieChart(props:ChartProps) {
   const pieRef = useRef(null);
 
   return (
-    <GraphContainer title={props.title} chartData={props.chartData} graphRef={pieRef}>
+    <GraphContainer chartData={props.chartData} graphRef={pieRef}>
       <Pie
         ref={pieRef}
         data={{
@@ -25,9 +25,12 @@ function PieChart(props:ChartProps) {
         options={{
           plugins: {
             title: {
-              display: false,
+              display: true,
               text: props.title,
-              color:textColor
+              color:textColor,
+              font: {
+                size: 35
+              }
             },
             legend: {
               display: false

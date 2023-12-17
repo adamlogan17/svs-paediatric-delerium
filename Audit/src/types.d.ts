@@ -162,9 +162,11 @@ type PicuIDRole = {
  * @property {Object} chartData - The data for the chart.
  * @property {string[]} chartData.xValues - The x-axis values for the chart.
  * @property {number[]} chartData.yValues - The y-axis values for the chart.
- * @property {string} [lineColor] - The color of the line in the chart.
+ * @property {string} [chartColor] - The color of the chart.
  * @property {string} [textColor] - The color of the text in the chart.
  * @property {string} title - The title of the chart.
+ * @property {string} [xAxisLabel] - The label for the x-axis of the chart.
+ * @property {string} [yAxisLabel] - The label for the y-axis of the chart.
  * @property {string} [gridColor] - The color of the grid in the chart.
  * @property {(x:string) => number|undefined} [convertXToNumber] - Optional function to convert x-axis values to numbers, which adds a trendline to the chart.
  */
@@ -176,8 +178,10 @@ type ChartProps = {
   chartColor?: string,
   textColor?:string,
   title: string,
+  xAxisLabel?:string,
+  yAxisLabel?:string,
   gridColor?:string,
-  convertXToNumber?:(x:string) => number|undefined
+  convertXToNumber?:(x:string) => number|undefined,
 }
 
 /**
@@ -190,9 +194,13 @@ type ChartProps = {
  * @property {(id:number) => Promise<{xValues:string[],yValues:number[]}>} getData - A function that retrieves the data for the chart based on an ID.
  * @property {(date:string) => number|undefined} [convertXToNums] - An optional function that converts the X-axis values to numbers.
  * @property {Function} [filter] - An optional function used to filter the chart data.
+ * @property {string} [xAxisLabel] - The label for the x-axis of the chart.
+ * @property {string} [yAxisLabel] - The label for the y-axis of the chart.
  */
 type ChartDataType = LabelValuePair & {
   getData: (id:number) => Promise<{xValues:string[],yValues:number[]}>,
   convertXToNums?: (date:string) => number|undefined,
-  filter?: Function
+  filter?: Function,
+  xAxisLabel?:string,
+  yAxisLabel?:string
 }

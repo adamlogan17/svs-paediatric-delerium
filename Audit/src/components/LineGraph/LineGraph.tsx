@@ -44,7 +44,7 @@ function LineGraph(props:ChartProps) {
               pointRadius: 5,
               borderColor: lineColor,
               pointBackgroundColor: lineColor,
-              data: props.chartData.yValues
+              data: props.chartData.yValues,
             },
             {
               pointRadius: 1,
@@ -56,14 +56,24 @@ function LineGraph(props:ChartProps) {
         options={{
           scales: {
             y: {
+              title: {
+                display: true,
+                text: props.yAxisLabel,
+                color: textColor,
+              },
               grid: {
                 color: gridColor,
               },
               ticks: {
-                color:textColor
+                color:textColor,
               }
             },
             x: {
+              title: {
+                display: true,
+                text: props.xAxisLabel,
+                color: textColor,
+              },
               grid: {
                 color: gridColor,
               },
@@ -76,7 +86,10 @@ function LineGraph(props:ChartProps) {
             title: {
               display: false,
               text: props.title,
-              color:textColor
+              color:textColor,
+              font: {
+                size: 35
+              }
             },
             legend: {
               display: false

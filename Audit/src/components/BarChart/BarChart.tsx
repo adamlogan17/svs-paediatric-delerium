@@ -35,6 +35,7 @@ function BarChart(props:ChartProps) {
           labels: props.chartData.xValues,
           datasets: [
             {
+              type:'bar',
               backgroundColor: barColor,
               data: props.chartData.yValues
             },
@@ -48,6 +49,11 @@ function BarChart(props:ChartProps) {
         options={{
           scales: {
             y: {
+              title: {
+                display: true,
+                text: props.yAxisLabel,
+                color: textColor,
+              },
               grid: {
                 color: gridColor,
               },
@@ -56,6 +62,11 @@ function BarChart(props:ChartProps) {
               }
             },
             x: {
+              title: {
+                display: true,
+                text: props.xAxisLabel,
+                color: textColor,
+              },
               grid: {
                 color: gridColor,
               },
@@ -68,7 +79,10 @@ function BarChart(props:ChartProps) {
             title: {
               display: false,
               text: props.title,
-              color:textColor
+              color:textColor,
+              font: {
+                size: 35
+              }
             },
             legend: {
               display: false

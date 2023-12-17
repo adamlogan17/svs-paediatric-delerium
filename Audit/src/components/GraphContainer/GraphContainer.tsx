@@ -17,7 +17,7 @@ Chart.register(CategoryScale);
  * - xValues: An array of strings representing the x-values.
  * - yValues: An array of numbers representing the y-values.
  * 
- * @property {string} title - The title of the chart.
+ * @property {string} [title] - The title of the chart.
  * 
  * @property {ReactNode} children - The child components to be rendered within the GraphContainer component.
  * 
@@ -28,7 +28,7 @@ type GraphContainerProps = {
     xValues: string[],
     yValues: number[]
   },
-  title: string,
+  title?: string,
   children:ReactNode,
   graphRef: any
 }
@@ -56,7 +56,7 @@ function GraphContainer(props:GraphContainerProps) {
 
   return (
     <Paper sx={{padding: '10px'}}>
-      <Box display="flex" justifyContent="space-between" alignItems="center">
+      <Box display="flex" justifyContent="flex-end" alignItems="center">
         <Typography align="center" variant="h4" sx={{margin:'auto'}}>{props.title}</Typography>
         <Tooltip title="Download">
           <IconButton onClick={handleDownload}>

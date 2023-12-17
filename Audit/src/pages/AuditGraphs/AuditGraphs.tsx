@@ -133,21 +133,27 @@ const allChartTypes:LabelValuePair[] = [
 
 const allDataTypes:ChartDataType[] = [
   {
-    label: "Single PICU Compliance",
+    label: "Single PICU Compliance Data",
     value: "picu",
     getData: async (id:number) => await getComplianceData(sessionStorage.getItem("ROLE") === 'admin' ? id : Number(sessionStorage.getItem("USERNAME"))),
     convertXToNums: convertDatesToNums,
-    filter: filterDates
+    filter: filterDates,
+    xAxisLabel:"Date of Score",
+    yAxisLabel:"Compliance Score"
   },
   {
     label: "Overall Compliance",
     value: "overall",
-    getData: async () => await getSinglePicu("chart-all-picu-compliance", "complianceScore")
+    getData: async () => await getSinglePicu("chart-all-picu-compliance", "complianceScore"),
+    xAxisLabel:"PICU ID",
+    yAxisLabel:"Overall Score"
   },
   {
     label: "Total Delirium Positive Patients",
     value: "delirium",
-    getData: async () => await getSinglePicu("chart-all-picu-delirium-positive", "totalPositiveDelirium")
+    getData: async () => await getSinglePicu("chart-all-picu-delirium-positive", "totalPositiveDelirium"),
+    xAxisLabel:"PICU ID",
+    yAxisLabel:"% Positive Patients"
   }
 ];
 
@@ -161,10 +167,10 @@ function AuditGraphs() {
   const [isLoading, setIsLoading] = useState<boolean>(false);
   const [chartData, setChartData] = useState<{xValues:string[],yValues:number[]}>({xValues:[],yValues:[]});
   const [chartType, setChartType] = useState<LabelValuePair>(allChartTypes[0]);
-  const [dataType, setDataType] = useState<ChartDataType>(allDataTypes[0]);
   const [startDate, setStartDate] = useState<Date>(new Date(Date.UTC(1970, 0, 1)));
   const [endDate, setEndDate] = useState<Date>(new Date());
   const [picuId, setPicuId] = useState<number>(1);
+  const [dataType, setDataType] = useState<ChartDataType>(allDataTypes[0]);
 
   const specificPicuNeeded:boolean = dataType.value === 'picu' && sessionStorage.getItem("ROLE") === 'admin';
 
@@ -284,8 +290,8 @@ function AuditGraphs() {
         }
 
       <div id='graphContainer'>
-        {chartType.value === 'line' && (<LineGraph chartData={chartData} title={dataType.label} convertXToNumber={dataType.convertXToNums} />)}
-        {chartType.value === 'bar' && (<BarChart chartData={chartData} title={dataType.label} convertXToNumber={dataType.convertXToNums} />)}
+        {chartType.value === 'line' && (<LineGraph chartData={chartData} title={dataType.label} convertXToNumber={dataType.convertXToNums} xAxisLabel={dataType.xAxisLabel} yAxisLabel={dataType.yAxisLabel} />)}
+        {chartType.value === 'bar' && (<BarChart chartData={chartData} title={dataType.label} convertXToNumber={dataType.convertXToNums} xAxisLabel={dataType.xAxisLabel} yAxisLabel={dataType.yAxisLabel} />)}
         {chartType.value === 'pie' && (<PieChart chartData={chartData} title={dataType.label} />)}
       </div>
     </PageContainer>

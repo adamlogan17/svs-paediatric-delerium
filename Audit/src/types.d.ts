@@ -202,5 +202,6 @@ type ChartDataType = LabelValuePair & {
   convertXToNums?: (date:string) => number|undefined,
   filter?: Function,
   xAxisLabel?:string,
-  yAxisLabel?:string
+  yAxisLabel?:string,
+  downSample?:Function<{xValues:string[], yValues:number[]}>
 }

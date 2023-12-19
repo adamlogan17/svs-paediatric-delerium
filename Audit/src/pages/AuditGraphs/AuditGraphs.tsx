@@ -116,6 +116,34 @@ function filterDates(oldData:{xValues:string[],yValues:number[]}, start:Dayjs, e
   };
 }
 
+/**
+ * Down samples an array of date-score pairs.
+ *
+ * The function works by dividing the data into windows of a certain size (determined by the `windowSize` parameter),
+ * calculating the average score for each window, and associating this average score with the middle date of the window.
+ * The result is a new array of date-score pairs that has been down sampled by a factor of `windowSize`.
+ *
+ * @author Adam Logan
+ *
+ * @param {Object} data - The original data to be down sampled. It should have `xValues` and `yValues` properties which are arrays.
+ * @param {string[]} data.xValues - The array of dates in the format 'DD/MM/YYYY'.
+ * @param {number[]} data.yValues - The array of scores.
+ * @param {number} windowSize - The number of data points to average together to create each down sampled data point.
+ *
+ * @returns {Object} The down sampled data. It has the same structure as the input data.
+ */
+function downSampleDates(data: {xValues: string[], yValues: number[]}, windowSize: number):  {xValues: string[], yValues: number[]} {
+  const downSample:{xValues: string[], yValues: number[]} = {xValues: [], yValues: []};
+  for (let i = 0; i < data.xValues.length; i += windowSize) {
+    const window = data.yValues.slice(i, i + windowSize);
+    const averageScore = window.reduce((a, b) => a + b, 0) / window.length;
+    const middleDate = data.xValues[i + Math.floor(windowSize / 2)];
+    downSample.xValues.push(middleDate);
+    downSample.yValues.push(averageScore);
+  }
+  return downSample;
+}
+
 const allChartTypes:LabelValuePair[] = [
   {
     label: "Line Graph",
@@ -139,7 +167,8 @@ const allDataTypes:ChartDataType[] = [
     convertXToNums: convertDatesToNums,
     filter: filterDates,
     xAxisLabel:"Date of Score",
-    yAxisLabel:"Compliance Score"
+    yAxisLabel:"Compliance Score",
+    downSample: downSampleDates
   },
   {
     label: "Overall Compliance",
@@ -195,6 +224,11 @@ function AuditGraphs() {
       try {
         let newCompData = await dataType.getData(picuId);
         newCompData = dataType.filter ? dataType.filter(newCompData, start, end) : newCompData;
+        const dataFitValue = Math.floor(newCompData.xValues.length / 30);
+        if(dataFitValue >= 0) {
+          newCompData = dataType.downSample ? dataType.downSample(newCompData, 5) : newCompData;
+        }
+
         setChartData(newCompData);
       } catch (error) {
         enqueueSnackbar("System Error", { variant: 'error' });
@@ -294,6 +328,8 @@ function AuditGraphs() {
         {chartType.value === 'bar' && (<BarChart chartData={chartData} title={dataType.label} convertXToNumber={dataType.convertXToNums} xAxisLabel={dataType.xAxisLabel} yAxisLabel={dataType.yAxisLabel} />)}
         {chartType.value === 'pie' && (<PieChart chartData={chartData} title={dataType.label} />)}
       </div>
+
+      <br />
     </PageContainer>
   );
 }

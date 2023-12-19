@@ -6,14 +6,38 @@
  * a user-friendly label and a system-recognized role identifier.
  * 
  * @property {('PICU'|'Admin'|'Field Engineer')} label - The user-friendly display name of the role.
- * @property {('picu'|'admin'|'field_engineer')} role - The internal system identifier for the role.
+ * @property {Role} role - The internal system identifier for the role.
  */
 type RoleAutoComplete = {
   label: 'PICU'|'Admin'|'Field Engineer';
-  role: 'picu'|'admin'|'field_engineer';
+  role: Role;
 }
 
-type AutoCompleteValues = {
+/**
+ * Defines the various levels of severity.for the 'Alert' MUI component.
+ * 
+ * @author Adam Logan
+ * 
+ * @typedef {object} Role
+ * @property {"picu"} - Represents a PICU role.
+ * @property {"admin"} - Represents an admin role.
+ * @property {"field_engineer"} - Represents a field engineer role.
+ */
+type Role = 'picu'|'admin'|'field_engineer';
+
+/**
+ * Represents a key-value pair, where the key is a string label and the value can be of any type.
+ * 
+ * This type is used throughout the codebase in places where we need to associate a label (a string) with a value (of any type).
+ * This is a flexible type that can be used to represent a wide variety of data structures.
+ *
+ * @author Adam logan
+ * 
+ * @typedef {Object} LabelValuePair
+ * @property {string} label - The key of the pair, represented as a string.
+ * @property {any} value - The value of the pair, which can be of any type.
+ */
+type LabelValuePair = {
   label:string,
   value:any
 }
@@ -31,16 +55,18 @@ type AutoCompleteValues = {
  * @property {string} password - Password associated with the PICU, possibly for access control.
  * @property {string|number} [picu_id] - Optional unique identifier for the PICU.
  * @property {number|null} [overall_compliance] - Optional overall compliance score for the PICU, which is calculated within the database.
+ * @property {number|null} [delirium_positive_patients] - Optional average of the number of patients that are delirium positive
  */
 type Picu = {
   [key: string]: string|number|null|undefined, // allows the Picu['key'] syntax to work
   hospital_name:string, 
   ward_name:string, 
-  picu_role:string, 
+  picu_role:Role, 
   auditor:string, 
   password?:string, 
   picu_id?:string|number,
   overall_compliance?:number|null,
+  delirium_positive_patients?:number|null
 }
 
 /**
@@ -66,7 +92,7 @@ type Picu = {
 type ComplianceData = {
   [key: string]: string|number|null|undefined|boolean|Date,
   comp_id?: number,
-  entry_date: Date,
+  entry_date?: Date,
   method: 'SOSPD' | 'CAPD',
   bed_number: number,
   correct_details: boolean,
@@ -110,4 +136,71 @@ type BaseAlertProps = {
   closeAction:Function;
   severity?:any;
   icon?:React.ReactNode;
+}
+
+/**
+ * @typedef PicuIDRole
+ * 
+ * @author Adam Logan
+ * 
+ * Represents the combination of PICU ID and Role.
+ * 
+ * @property {string} picu_id - The identifier for a PICU.
+ * @property {Role} picu_role - The role associated with the PICU.
+ */
+type PicuIDRole = {
+  picu_id: string,
+  picu_role: Role
+}
+
+/**
+ * Properties for the Chart components.
+ * 
+ * @author Adam Logan
+ * 
+ * @typedef {Object} ChartProps
+ * @property {Object} chartData - The data for the chart.
+ * @property {string[]} chartData.xValues - The x-axis values for the chart.
+ * @property {number[]} chartData.yValues - The y-axis values for the chart.
+ * @property {string} [chartColor] - The color of the chart.
+ * @property {string} [textColor] - The color of the text in the chart.
+ * @property {string} title - The title of the chart.
+ * @property {string} [xAxisLabel] - The label for the x-axis of the chart.
+ * @property {string} [yAxisLabel] - The label for the y-axis of the chart.
+ * @property {string} [gridColor] - The color of the grid in the chart.
+ * @property {(x:string) => number|undefined} [convertXToNumber] - Optional function to convert x-axis values to numbers, which adds a trendline to the chart.
+ */
+type ChartProps = {
+  chartData: {
+    xValues: string[],
+    yValues: number[]
+  },
+  chartColor?: string,
+  textColor?:string,
+  title: string,
+  xAxisLabel?:string,
+  yAxisLabel?:string,
+  gridColor?:string,
+  convertXToNumber?:(x:string) => number|undefined,
+}
+
+/**
+ * Represents the data type for a chart.
+ * 
+ * @author Adam Logan
+ * 
+ * @typedef {Object} ChartDataType
+ * @property {LabelValuePair} - The label-value pair for the chart.
+ * @property {(id:number) => Promise<{xValues:string[],yValues:number[]}>} getData - A function that retrieves the data for the chart based on an ID.
+ * @property {(date:string) => number|undefined} [convertXToNums] - An optional function that converts the X-axis values to numbers.
+ * @property {Function} [filter] - An optional function used to filter the chart data.
+ * @property {string} [xAxisLabel] - The label for the x-axis of the chart.
+ * @property {string} [yAxisLabel] - The label for the y-axis of the chart.
+ */
+type ChartDataType = LabelValuePair & {
+  getData: (id:number) => Promise<{xValues:string[],yValues:number[]}>,
+  convertXToNums?: (date:string) => number|undefined,
+  filter?: Function,
+  xAxisLabel?:string,
+  yAxisLabel?:string
 }

@@ -1,5 +1,6 @@
 - [useful-resources](#useful-resources)
   - [Useful links](#useful-links)
+    - [Date picker](#date-picker)
     - [Swagger](#swagger)
     - [Setting up project](#setting-up-project)
     - [Database Set Up](#database-set-up)
@@ -26,6 +27,10 @@
 # useful-resources
 
 ## Useful links
+
+### Date picker
+
+- <https://mui.com/x/react-date-pickers/date-picker/>
 
 ### Swagger
 

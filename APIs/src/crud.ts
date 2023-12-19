@@ -1,5 +1,6 @@
 import { Pool } from "pg";
 import errorCodeMessage from "./errorCodeMessage";
+import { types } from 'util';
 
 /**
  * Creates a pool object to connect to a database
@@ -136,51 +137,6 @@ export async function getAll(database:string, table:string, userForDb:string, pa
   return results;
 }
 
-export async function getSelectedRecords(database:string, table:string, userForDb:string, passForDb:string): Promise<{allData:any[]}|string> {
-  // const POOL = createPool(database, userForDb, passForDb);
-
-  // let results:any;
-
-  // try {
-  //   results = await POOL.query(createSelect(table));
-  //   results = {
-  //     allData: results.rows
-  //   };
-  // } catch (e:any) {
-  //   results = errorCodeMessage(e.code);
-  // }
-  return "results";
-}
-
-/**
- * Fetches all records from a specified table in a database.
- * 
- * @author Andrew Robb
- * @function getPICUData
- * @param {string} database - The name of the database.
- * @param {string} table - The name of the table from which to fetch the records.
- * @param {string} userForDb - The username for the database connection.
- * @param {string} passForDb - The password for the database connection.
- * 
- * @returns {Promise<{allData:any[]}|string>} A promise that resolves with all records from the specified table or an error message.
- */
-export async function getPicuData(database:string, table:string, userForDb:string, passForDb:string, picuID:string): Promise<{allData:any[]}|string> {
-  const POOL = createPool(database, userForDb, passForDb);
-
-  let condition:string = `picu_id=${picuID}`;
-  let results:any;
-
-  try {
-    results = await POOL.query(createSelect(table, condition));
-    results = {
-      specificData: results.rows
-    };
-  } catch (e:any) {
-    results = errorCodeMessage(e.code);
-  }
-  return results;
-}
-
 /**
  * Inserts data into the specified table of the database.
  * 
@@ -281,32 +237,51 @@ export async function deleteData(database:string ,table:string, predicate:string
 }
 
 /**
+ * Copies a table to a table in another database
+ * @param {string} sourceDatabase The name of the database to copy the table from
+ * @param {string} destinationDatabase The name of the database to copy the table to
  * Copies a table to an existing table with a different name
+ * @author Ewan Forsythe
  * @param {string} database The name of the database to copy the table from
  * @param {string} sourceTable The name of the table to copy
- * @param {string} destinationTable The name of the existing table to insert the data into
+ * @param {string} destinationTable The name of the table to insert the data into
  * @param {string} [user="postgres"] Username for the database
  * @param {string} [password="postgrespw"] Password for the database
  * @returns {Promise<string>} A Promise that resolves to a success message if the copy was successful, or an error message if it wasn't
  */
-export async function copyTable(database: string, sourceTable: string, destinationTable: string, user = 'postgres', password = 'postgrespw'): Promise<string> {
-  const role = user === 'postgres' ? user : `${user}`;
-
-  const pool = createPool(database, role, password);
-
-  const sqlStatement = `INSERT INTO ${destinationTable} SELECT * FROM ${sourceTable}`;
-
-  let results: string;
+export async function copyTable(sourceDatabase: string, destinationDatabase: string, sourceTable: string, destinationTable: string, user: string = 'postgres', password: string = 'postgrespw'): Promise<string> {
+  let role = user === "postgres" ? user : `${user}`;
+  const sourceDb = createPool(sourceDatabase, role, password);
+  const destinationDb = createPool(destinationDatabase, role, password);
 
   try {
-    await pool.query(sqlStatement);
-    results = 'Table copied successfully';
-  } catch (error) {
-    console.error(error);
-    results = 'Error copying table';
-  } finally {
-    pool.end();
-  }
+    // Delete the content of the destination table and any tables that reference it
+    await destinationDb.query(`TRUNCATE TABLE ${destinationTable} CASCADE`);
 
-  return results;
+    // Fetch all records from the source table
+    const sourceData = await sourceDb.query(`SELECT * FROM ${sourceTable}`);
+    
+    // Iterate over the fetched records
+    for (let record of sourceData.rows) {
+      // Prepare an insert query
+      const columns = Object.keys(record).join(', ');
+      const values = Object.values(record).map(value => {
+        if (value === null) {
+          return 'NULL';
+        } else if (types.isDate(value)) {
+          return `'${value.toISOString().split('T')[0]}'`; // format date as 'YYYY-MM-DD'
+        } else {
+          return `'${value}'`;
+        }
+      }).join(', ');
+      const insertQuery = `INSERT INTO ${destinationTable} (${columns}) VALUES (${values})`;
+
+      // Execute the insert query on the destination database
+      await destinationDb.query(insertQuery);
+    }
+
+    return "Successfully copied the table 😊";
+  } catch (e:any) {
+    return errorCodeMessage(e.code);
+  }
 }

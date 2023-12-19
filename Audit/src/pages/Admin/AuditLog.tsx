@@ -1,59 +1,86 @@
 import { useState, useEffect } from 'react';
 import axios from 'axios';
-import { Box, Avatar, Typography } from '@mui/material';
-import PageLoad from '../../components/Loading/PageLoad';
-import BaseTable from '../../components/EditTable/BaseTable';
+import BaseTable from '../../components/Tables/BaseTable';
 import PreviewIcon from '@mui/icons-material/Preview';
+import PageContainer from '../../components/PageContainer/PageContainer';
+import { enqueueSnackbar } from 'notistack';
 
-interface AuditLogData {
-  date: string;
-  time: string;
+type APILog = {
+  datetime?: string;
   method: string;
-  url: string;
-  status: number;
-  userip: string;
-  useragent: string;
+  endpoint: string;
+  status_code: number;
+  user_ip: string;
+  user_agent: string;
+  user_role: string;
   username: string;
-  userrole: string;
 }
 
+/**
+ * @todo make the date, time and datetime more specific types (if possible)
+ */
+type ModifiedAPILog = APILog & {
+  [key: string]: string|number|null
+  date: string,
+  time: string
+}
+
+/**
+ * 
+ * @todo set isLoading to false when there is an error
+ */
 function getAPIData() {
-    return axios.get(`${process.env.REACT_APP_API_URL}/audit/getall/api_log`, {
-        headers: { 'Authorization': "bearer " + sessionStorage.getItem('TOKEN') } 
+    return axios.get(`${process.env.REACT_APP_API_URL}/get-all-logs`, {
+      headers: { 'Authorization': "Bearer " + sessionStorage.getItem('TOKEN') } 
     })
-    .then((response) => {
-        return response.data.allData;
+    .then((response) => {      
+      console.log("Response: ", response.data.allData)
+      return response.data.allData;
     })
     .catch((error) => {
-        return [];
+      enqueueSnackbar("System Error", { variant: 'error' });
     });
 }
 
 const auditColumnNameMap = {
   date: "Date",
-  time: "Time",
+  time:"Time",
   method: "Method",
-  url: "URL",
-  status: "Status",
-  userip: "User IP",
-  useragent: "User Agent",
+  endpoint: "URL",
+  status_code: "Status",
+  user_ip: "User IP",
+  user_agent: "User Agent",
   username: "Username",
-  userrole: "User Role"
+  user_role: "User Role"
 };
 
-function AuditLog() {
-    const [auditLogData, setAuditLogData] = useState<AuditLogData[]>([]);
+export default function AuditLog() {
+    const [auditLogData, setAuditLogData] = useState<ModifiedAPILog[]>([]);
     const [isLoading, setIsLoading] = useState(true);
 
     useEffect(() => {
         const fetchAuditLogData = async () => {
             const data = await getAPIData();
-            const processedData = data.map((item:AuditLogData) => {
-              const newItem: { [key: string]: string } = {};
-              for (const [key, value] of Object.entries(item)) {
-                newItem[key] = value === null ? "NULL" : String(value);
+            console.log(data);
+            const processedData = data.map((item:APILog) => {
+              let processingLog:ModifiedAPILog = {
+                ...item,
+                date: '',
+                time: ''
+              };
+              if (item.datetime !== undefined) {
+                const date = new Date(item.datetime);
+                processingLog.date = date.toLocaleDateString('en-GB');
+                processingLog.time = date.toLocaleTimeString('en-GB', { hour: '2-digit', minute: '2-digit', second: '2-digit' });
               }
-              return newItem;
+              delete processingLog.datetime;
+
+              for (let key in processingLog) {
+                if (processingLog[key] === null) {
+                  processingLog[key] = "NULL";
+                }
+              }
+              return processingLog;
             });
             setAuditLogData(processedData);
             setIsLoading(false);
@@ -61,29 +88,11 @@ function AuditLog() {
         fetchAuditLogData();
     }, []);
 
+    console.log(auditLogData);
 
     return (
-      <Box
-        sx={{
-          marginTop: 8,
-          display: 'flex',
-          flexDirection: 'column',
-          alignItems: 'center',
-        }}
-      >
-        <PageLoad loading={isLoading} />
-
-        <Avatar sx={{ m: 1, bgcolor: 'primary.main' }}>
-          <PreviewIcon />
-        </Avatar>
-
-        <Typography component="h1" variant="h5">
-          Audit Log Display
-        </Typography>
-
-        <br />
-
-        <div style={{width:'90%', margin:'auto'}}>
+      <PageContainer title="Audit Log" icon={<PreviewIcon />} loading={isLoading}>
+        <div style={{width:'90%', margin:'auto', marginTop:'25px'}}>
           {auditLogData.length > 0 && 
           <BaseTable
             title='Audit Log'
@@ -92,9 +101,6 @@ function AuditLog() {
             columnNameMap={auditColumnNameMap}
           />}
         </div>
-
-      </Box>
+      </PageContainer>
     );
 }
-
-export default AuditLog;

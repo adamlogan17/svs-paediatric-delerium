@@ -1,5 +1,4 @@
-import { Request, Response } from "express";
-import { createInsert, createPool, deleteData, insertData, updateData } from "./crud";
+import { getAll, deleteData, insertData, updateData } from "./crud";
 import { config } from 'dotenv';
 
 config();
@@ -50,7 +49,8 @@ export type ComplianceData = {
  * @todo make sure that the data is being added to an actual PICU, so need to check the role to be PICU
  */
 export async function insertCompData(dataToAdd:ComplianceData, role:string): Promise<{comp_id:number}|string> {
-  const columnsToReturn = ['comp_id'];
+  const columnsToReturn = ['comp_id']; 
+  dataToAdd.entry_date = new Date();
 
   // The db does not allow for null values and therefore will throw an error if the data is not provided, so no need to check here
   return await insertData(db, tableName, dataToAdd, columnsToReturn, role, dbPassword);
@@ -86,4 +86,20 @@ export async function editCompliance(dataToEdit:ComplianceData, role:string): Pr
  */
 export async function deleteCompRecords(ids:number[], role:string): Promise<string> {
   return await deleteData(db, tableName, `comp_id IN (${ids.join()})`, role, dbPassword);
+}
+
+/**
+ * Gets all the information stored within the compliance table
+ * 
+ * @author Adam Logan
+ * @function getComplianceData
+ * @param role The role which will be accessing the data
+ * 
+ * @returns The data within the compliance table
+ * 
+ * @todo sort out the types for the data
+ */
+export async function getComplianceData(role:string): Promise<{allData:any[]}|string> {
+  let result:{allData:any[]}|string = await getAll(db, tableName, role, dbPassword);
+  return result;
 }

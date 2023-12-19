@@ -37,6 +37,24 @@ The following arguments can be supplied to each script
 - ```-n```
   - Deletes all project images (will delete an image named 'postgres' even if it is not related to the project)
 
+### Backup (only on linux)
+
+- ```-d```
+  - Creates a dump of the database
+- ```-startcron```
+  - Begins a crontab daemon that will dump the database at midnight everyday.
+- ```-stopcron```
+  - Stops the crontab daemon.
+
+### Restore (only on linux)
+
+- ```-r c```
+  - Restores the child dump.
+- ```-r f```
+  - Restores the father dump.
+- ```-r g```
+  - Restores the grandfather dump.
+
 #### **Windows**
 
 ```powershell

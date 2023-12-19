@@ -1,4 +1,4 @@
-import { ChangeEvent, useMemo, useState } from 'react';
+import { ChangeEvent, useMemo, useState, Fragment } from 'react';
 import { Paper, Table, TableBody, TableCell, TableHead, TableRow, TextField, IconButton, SxProps, Theme, Autocomplete, Checkbox, TablePagination, TableContainer } from '@mui/material';
 import { alpha } from '@mui/material/styles';
 
@@ -79,6 +79,9 @@ export default function EditTable(props: EditTableProps) {
   const [page, setPage] = useState(0);
   const [rowsPerPage, setRowsPerPage] = useState(5);
   const [editOpen, setEditOpen] = useState(false);
+
+    // ensures that the columns and data are always in sync
+    const dataKeys = Object.keys(data[0]);
 
   // Avoid a layout jump when reaching the last page with empty rows.
   const emptyRows = page > 0 ? Math.max(0, (1 + page) * rowsPerPage - filteredData.length) : 0;
@@ -167,7 +170,7 @@ export default function EditTable(props: EditTableProps) {
         dataToFilter={data}
         downloadData={filteredData}
         filterData={setFilteredData}
-        header={Object.keys(props.columnNameMap ?? data[0]).map((key:string) => ({label: props.columnNameMap?.[key] ?? key, key: key}))}
+        header={dataKeys.map((key:string) => ({label: props.columnNameMap?.[key] ?? key, key: key}))}
       />
       <TableContainer>
         <Table>
@@ -184,7 +187,7 @@ export default function EditTable(props: EditTableProps) {
               </TableCell>
 
               {/* If the user provides a columnNameMap, use that, otherwise use the keys from the first object in the data array */}
-              {Object.keys(props.columnNameMap ?? data[0]).map((key:string, index:number) => (
+              {dataKeys.map((key:string, index:number) => (
                 <TableCell sx={cellStyle} key={index}>{props.columnNameMap?.[key] ?? key}</TableCell>
               ))}
 
@@ -216,40 +219,40 @@ export default function EditTable(props: EditTableProps) {
                 
                 {editId === row[props.uniqueIdName] ? (
                   <>
-                    {Object.keys(row).map((key:string, index:number) => (
+                    {dataKeys.map((key:string, index:number) => (
                       props.noEditFields?.includes(key) ? 
-                        (
-                          <TableCell key={index}>{row[key]}</TableCell>
-                        ) : (
-                          <>
-                            {props.customInputFields?.some((obj:any) => obj.key === key && obj.type === "autocomplete") && 
-                            (
-                              <TableCell key={index}>
-                                <Autocomplete
-                                  options={props.customInputFields.filter(obj => obj.key === key)[0].options ?? []} 
-                                  onChange={(e, newValue:any) => {
-                                    if(newValue === null) {
-                                      newValue = { value: ""}
-                                    }
-                                    setTempData((prev:any) => ({ ...prev!, [key]: newValue.value }));
-                                  }}
-                                  value={(props.customInputFields.filter(obj => obj.key === key)[0].options ?? []).find((option:any) => option.value === tempData?.[key])}
-                                  renderInput={(params) => <TextField {...params} error={error?.includes(key)} />}
-                                />
-                              </TableCell>
-                            )}
+                      (
+                        <TableCell key={index}>{row[key]}</TableCell>
+                      ) : (
+                        <>
+                          {props.customInputFields?.some((obj:any) => obj.key === key && obj.type === "autocomplete") && 
+                          (
+                            <TableCell key={index}>
+                              <Autocomplete
+                                options={props.customInputFields.filter(obj => obj.key === key)[0].options ?? []} 
+                                onChange={(e, newValue:any) => {
+                                  if(newValue === null) {
+                                    newValue = { value: ""}
+                                  }
+                                  setTempData((prev:any) => ({ ...prev!, [key]: newValue.value }));
+                                }}
+                                value={(props.customInputFields.filter(obj => obj.key === key)[0].options ?? []).find((option:any) => option.value === tempData?.[key])}
+                                renderInput={(params) => <TextField {...params} error={error?.includes(key)} />}
+                              />
+                            </TableCell>
+                          )}
 
-                            {(props.customInputFields === undefined || !props.customInputFields?.some((obj:any) => obj.key === key)) && (
-                              <TableCell key={index}>
-                                <TextField
-                                  value={tempData?.[key]}
-                                  onChange={e => setTempData((prev:any) => ({ ...prev!, [key]: e.target.value }))}
-                                  error={error?.includes(key)}
-                                />
-                              </TableCell>
-                            )}
-                          </>
-                        )
+                          {(props.customInputFields === undefined || !props.customInputFields?.some((obj:any) => obj.key === key)) && (
+                            <TableCell key={index}>
+                              <TextField
+                                value={tempData?.[key]}
+                                onChange={e => setTempData((prev:any) => ({ ...prev!, [key]: e.target.value }))}
+                                error={error?.includes(key)}
+                              />
+                            </TableCell>
+                          )}
+                        </>
+                      )
                     ))}
 
                     <TableCell>
@@ -269,8 +272,8 @@ export default function EditTable(props: EditTableProps) {
                 // below occurs when the data is NOT being edited
                 (
                   <>
-                    {Object.keys(row).map((key, index) => (
-                      <>
+                    {dataKeys.map((key, index) => (
+                      <Fragment key={index}>
                         {props.customInputFields?.some((obj:any) => obj.key === key && obj.type === "autocomplete") && 
                         (
                           <TableCell>
@@ -283,7 +286,7 @@ export default function EditTable(props: EditTableProps) {
                             {row[key].toString()}
                           </TableCell>
                         )}
-                      </>
+                      </Fragment>
                     ))}
                     <TableCell>
                       <IconButton onClick={() => startEdit(row[props.uniqueIdName] !== undefined ? Number(row[props.uniqueIdName]) : 0, row)}>

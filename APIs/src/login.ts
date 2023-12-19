@@ -27,6 +27,9 @@ export function authenticate(request: Request, response: Response): void {
 
     const { username, password } = request.body;
 
+    // this is for logging purposes
+    request.params.username = username;
+
     let condition:string = "picu_id=" + username;
 
     POOL.query(createSelect("picu", condition, ["picu_role", "password"]), async (error:any, results:any) => {
@@ -35,11 +38,12 @@ export function authenticate(request: Request, response: Response): void {
       }
       else {
         // compares the hashed password with the plaintext one which is provided
-        console.log(results);
         bcrypt
         .compare(password, results.rows[0].password)
         .then(res => {
           if(res) {
+            request.params.role = results.rows[0].picu_role;
+
             // adds the userID and role to the JWT token
             const userToken = jwt.sign(
               {
@@ -49,14 +53,14 @@ export function authenticate(request: Request, response: Response): void {
               jwtSecret,
               {expiresIn: "1d"}
             );
-            response.send({
+            response.status(201).send({
               token: userToken,
               role: results.rows[0].picu_role,
               username: username
             });
 
           } else {
-            response.send("ERROR: Permission Denied");
+            response.status(401).send("ERROR: Permission Denied");
           }
         })
         .catch(err => response.send(err))
@@ -72,15 +76,16 @@ export function authenticate(request: Request, response: Response): void {
  * @param { any } request
  * @param { Response } response
  * @param { NextFunction } next
+ * @param { string } [level] - The role required to access the endpoint
  * @returns { void }
  * 
  * @todo check the role from the db is correct for the one embedded in the token
  */
-export function authorise(request: Request, response: Response, next:NextFunction, level:string = 'picu'):void {
+export function authorise(request: Request, response: Response, next:NextFunction, level:'admin'|'picu'|'field_engineer' = 'picu'):void {
   try {
     // get the token from the authorization header
     const authHeader:string|undefined = request.headers.authorization === undefined ? "error" : request.headers.authorization;
-    const token:string = authHeader.includes("Bearer") ? authHeader.split(" ")[1] : authHeader;
+    const token:string = authHeader.includes("Bearer" || "bearer") ? authHeader.split(" ")[1] : authHeader;
 
     // retrieve the user details of the logged in user
     const user:JwtPayload|string = jwt.verify(token, jwtSecret);
@@ -183,42 +188,4 @@ export async function verifyCaptcha(token:string):Promise<boolean> {
   const captchaValidation = verifyResponse.data;
 
   return captchaValidation.success;
-}
-
-interface APICallDetail {
-  date: string;
-  time: string;
-  method: string;
-  url: string;
-  status: number;
-  userIP: string;
-  userAgent: string;
-  userRole: string;
-  username: string;
-}
-
-const apiCallDetails: APICallDetail[] = [];
-
-export async function logData (request: Request, response: Response) {
-  const now = new Date();
-  console.log(request.params.username);
-  console.log(request.params.role);
-
-  const apiCallDetail: APICallDetail = {
-    date: now.toISOString().split('T')[0], // Separate date
-    time: now.toISOString().split('T')[1].split('.')[0], // Separate time
-    method: request.method,
-    url: request.originalUrl,
-    status: response.statusCode,
-    userIP: request.ip,
-    userAgent: request.headers['user-agent'] || '',
-    username: request.params.username,
-    userRole: request.params.role,
-  };
-
-  // Add the API call detail to the array
-  apiCallDetails.push(apiCallDetail);
-  insertData("audit", "api_log", apiCallDetail);
-  response.status(200).send(request.body);
-  // Continue with the request handling
 }

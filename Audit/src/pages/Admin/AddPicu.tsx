@@ -1,13 +1,13 @@
 import AddIcon from '@mui/icons-material/Add';
 
 import axios, { AxiosResponse } from 'axios';
-import { Autocomplete, Avatar, Box, Button, Container, TextField, Typography } from '@mui/material';
-import PageLoad from '../../components/Loading/PageLoad';
+import { Autocomplete, Box, Button, TextField } from '@mui/material';
 import { useState } from 'react';
 import { enqueueSnackbar } from 'notistack';
 import { getStringValue, checkAndSetError } from '../../utility/form';
 import ConfirmDialog from '../../components/ConfirmDialog/ConfirmDialog';
 import PasswordTextField from '../../components/PasswordTextField/PasswordTextField';
+import PageContainer from '../../components/PageContainer/PageContainer';
 
 /**
  * `AddPicu` is a React functional component responsible for rendering a form to add a new PICU (Paediatric Intensive Care Unit) user.
@@ -21,7 +21,7 @@ import PasswordTextField from '../../components/PasswordTextField/PasswordTextFi
  * 
  * @returns {JSX.Element} The rendered component
  * 
- * @todo Separate the avatar and title into its own component
+ * @todo Change error handling to that of 'ComplianceForm.tsx'
  * @todo Separate the form button into its own component
  * @todo Maybe separate the text-fields into their own component, but there may be no point in doing so
  */
@@ -40,7 +40,7 @@ export default function AddPicu() {
   
   // Confirm dialog
   const [isOpen, setIsOpen] = useState(false);
-  const [picuDetails, setPicuDetails] = useState<Picu>({hospital_name:"", ward_name:"", picu_role:"", auditor:"", password:"", picu_id:""});
+  const [picuDetails, setPicuDetails] = useState<Picu>({hospital_name:"", ward_name:"", picu_role:"picu", auditor:"", password:"", picu_id:""});
   const [dialogError, setDialogError] = useState("");
 
   const roleOptions:RoleAutoComplete[] = [{label:'PICU', role:'picu'}, {label:'Admin', role:'admin'}, {label:'Field Engineer', role:'field_engineer'}];
@@ -102,7 +102,7 @@ export default function AddPicu() {
         });
 
       setIsOpen(true);
-      const role:string = roleOptions.find((role) => role.label === roleLabel)?.role || "";
+      const role:Role = roleOptions.find((role:RoleAutoComplete) => role.label === roleLabel)?.role || "picu";
 
       setPicuDetails({hospital_name, ward_name, picu_role:role, auditor, password, picu_id:id ? id.data.toString() : '0'});
     }
@@ -143,96 +143,82 @@ export default function AddPicu() {
   const chosenRoleLabel = roleOptions.filter((role:RoleAutoComplete) => role.role === picuDetails.picu_role);
 
   return (
-    <Container  maxWidth="xl">
-      <PageLoad loading={isLoading} />
-      {/* <ConfirmAddPicuDialog open={isOpen} handleClose={() => { setIsOpen(false)}} picuDetails={picuDetails} roleOptions={roleOptions} handlePasswordError={setDialogError}/> */}
-      <ConfirmDialog open={isOpen} handleClose={() => { setIsOpen(false)}} handleConfirm={() => addPicu(picuDetails)} title='Confrim User Details' description={
-        <>
-          Would you like to and the user with the following details?
-          <br />
-          {/* <br /> */}
-          <ul>
-            {picuDetails.picu_id && (<li>Username: {picuDetails.picu_id}</li>)}
-            <li>Hospital Name: {picuDetails.hospital_name}</li>
-            <li>Ward Name: {picuDetails.ward_name}</li>
-            <li>Role: {chosenRoleLabel.length === 1 ? chosenRoleLabel[0].label : ""}</li>
-            <li>Auditor: {picuDetails.auditor}</li>
-          </ul>
-        </>} />
+    <PageContainer title="Add PICU" loading={isLoading} icon={<AddIcon />}>
+      <ConfirmDialog 
+        open={isOpen} 
+        handleClose={() => { setIsOpen(false)}} 
+        handleConfirm={() => addPicu(picuDetails)} 
+        title='Confrim User Details' 
+        description={
+          <>
+            Would you like to and the user with the following details?
+            <br />
+            <ul>
+              {picuDetails.picu_id && (<li>Username: {picuDetails.picu_id}</li>)}
+              <li>Hospital Name: {picuDetails.hospital_name}</li>
+              <li>Ward Name: {picuDetails.ward_name}</li>
+              <li>Role: {chosenRoleLabel.length === 1 ? chosenRoleLabel[0].label : ""}</li>
+              <li>Auditor: {picuDetails.auditor}</li>
+            </ul>
+          </>
+        } 
+      />
 
+      <Box component="form" onSubmit={(event) => handleSubmit(event)} noValidate sx={{ mt: 1 }}>
+        <TextField
+          margin="normal"
+          required
+          fullWidth
+          id="hospital_name"
+          label="Hospital Name"
+          name="hospital_name"
+          error = {hospitalError !== ""}
+          helperText = {hospitalError}
+        />
+        <TextField
+          margin="normal"
+          required
+          fullWidth
+          name="ward_name"
+          label="Ward Name"
+          id="ward_name"
+          error = {wardError !== ""}
+          helperText = {wardError}
+        />
+        <Autocomplete
+          disablePortal
+          id="role"
+          autoComplete
+          autoHighlight
+          isOptionEqualToValue = {(option:RoleAutoComplete, value:RoleAutoComplete) => option.label === value.label}
+          options={roleOptions}
+          renderInput={(params:any) => <TextField {...params} required margin="normal" name="role" label="Role" error={roleError !== ""} helperText={roleError} />}
+        />
+        <TextField
+          margin="normal"
+          required
+          fullWidth
+          name="auditor"
+          label="Auditor"
+          id="auditor"
+          error = {auditorError !== ""}
+          helperText = {auditorError}
+        />
 
-      <Box
-        sx={{
-          marginTop: 8,
-          display: 'flex',
-          flexDirection: 'column',
-          alignItems: 'center',
-        }}
-      >
+        <PasswordTextField id="password" error={passwordError !== ""} helperText={passwordError} label="Password" />
 
-        <Avatar sx={{ m: 1, bgcolor: error ? 'error.main' : 'primary.main' }}>
-          <AddIcon />
-        </Avatar>
+        <PasswordTextField id="check_password" error={checkPasswordError !== ""} helperText={checkPasswordError} label="Password" />
 
-        <Typography component="h1" variant="h5">
-          Add PICU
-        </Typography>
-        <Box component="form" onSubmit={(event) => handleSubmit(event)} noValidate sx={{ mt: 1 }}>
-          <TextField
-            margin="normal"
-            required
-            fullWidth
-            id="hospital_name"
-            label="Hospital Name"
-            name="hospital_name"
-            error = {hospitalError !== ""}
-            helperText = {hospitalError}
-          />
-          <TextField
-            margin="normal"
-            required
-            fullWidth
-            name="ward_name"
-            label="Ward Name"
-            id="ward_name"
-            error = {wardError !== ""}
-            helperText = {wardError}
-          />
-          <Autocomplete
-            disablePortal
-            id="role"
-            autoComplete
-            autoHighlight
-            isOptionEqualToValue = {(option:RoleAutoComplete, value:RoleAutoComplete) => option.label === value.label}
-            options={roleOptions}
-            renderInput={(params:any) => <TextField {...params} required margin="normal" name="role" label="Role" error={roleError !== ""} helperText={roleError} />}
-          />
-          <TextField
-            margin="normal"
-            required
-            fullWidth
-            name="auditor"
-            label="Auditor"
-            id="auditor"
-            error = {auditorError !== ""}
-            helperText = {auditorError}
-          />
-
-          <PasswordTextField id="password" error={passwordError !== ""} helperText={passwordError} label="Password" />
-
-          <PasswordTextField id="check_password" error={checkPasswordError !== ""} helperText={checkPasswordError} label="Password" />
-
-          <Button
-            type="submit"
-            fullWidth
-            variant="contained"
-            color = {error ? "error" : "primary"}
-            sx={{ mt: 3, mb: 2 }}
-          >
-            Submit
-          </Button>
-        </Box>
+        <Button
+          type="submit"
+          fullWidth
+          variant="contained"
+          color = {error ? "error" : "primary"}
+          sx={{ mt: 3, mb: 2 }}
+        >
+          Submit
+        </Button>
       </Box>
-    </Container>
+    </PageContainer>
   );
 }

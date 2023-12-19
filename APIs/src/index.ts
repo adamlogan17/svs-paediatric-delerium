@@ -9,11 +9,14 @@ import { config } from 'dotenv';
 import swaggerJsdoc from 'swagger-jsdoc';
 import swaggerUi from 'swagger-ui-express';
 
-import { copyTable, deleteData, getAll, getPicuData, insertData, updateData } from './crud';
-import { authenticate, authorise, logData, updatePicuPassword, verifyCaptcha } from './login';
-import { allPicuCompliance, singlePicuCompliance } from './auditCharts';
-import { addPicu, deletePicus, editPicu, getAllIds, nextPicu } from './picuDbManagement';
-import { deleteCompRecords, editCompliance, insertCompData } from './complianceScores';
+import { copyTable, deleteData, getAll, insertData, updateData } from './crud';
+import { authenticate, authorise, updatePicuPassword, verifyCaptcha } from './login';
+import { singlePicuCompliance, sinlgeDataPointAllPicu } from './auditCharts';
+import { addPicu, deletePicus, editPicu, getAllIds, nextPicu, getPicuData } from './picuDbManagement';
+import { deleteCompRecords, editCompliance, getComplianceData, insertCompData } from './complianceScores';
+import { EndpointLog, getLogData, logEndpoint } from './logging';
+import { request } from 'http';
+import { exec } from 'child_process';
 
 
 // initialise process.env
@@ -25,26 +28,11 @@ const app = express();
 const port: number = 8000;
 const baseIP:string = process.env.BASE_IP || "localhost";
 
-interface APICallDetail {
-  date: string;
-  time: string;
-  method: string;
-  url: string;
-  status: number;
-  userIP: string;
-  userAgent: string;
-  userRole: string;
-  username: string;
-}
-
-
 // apps certs for https
 const options = {
   key: fs.readFileSync("server.key"),
   cert: fs.readFileSync("server.cert"),
 };
-
-const apiCallDetails: APICallDetail[] = [];
 
 // swagger configuration
 const specs = swaggerJsdoc(
@@ -88,49 +76,38 @@ app.use(bp.json())
 app.use(bp.urlencoded({ extended: true }));
 
 // Disables CORS errors, for developments
-app.use((req:Request, res:Response, next) => {
-    res.setHeader("Access-Control-Allow-Origin", "*");
-    res.setHeader(
+app.use((request:Request, response:Response, next) => {
+    response.setHeader("Access-Control-Allow-Origin", "*");
+    response.setHeader(
         "Access-Control-Allow-Headers",
         "Origin, X-Requested-With, Content, Accept, Content-Type, Authorization"
     );
-    res.setHeader(
+    response.setHeader(
         "Access-Control-Allow-Methods",
         "GET, POST, PUT, DELETE, PATCH, OPTIONS"
     );
     next();
 });
 
+app.use((request:Request, response:Response, next:NextFunction) => {
+  // forces the middleware to wait until the response has been sent
+  response.on('finish', () => {
+    console.log(request.method);
+    const apiCallDetail:EndpointLog = {
+      datetime: new Date(),
+      method: request.method,
+      endpoint: request.originalUrl,
+      status_code: response.statusCode,
+      user_ip: request.ip,
+      user_agent: request.headers['user-agent'] || '',
+      username: request.params.username,
+      user_role: request.params.role
+    };
 
-
-app.use((req:Request, res:Response, next:NextFunction) => {
-
-  const now = new Date();
-  const apiCallDetail: APICallDetail = {
-    date: now.toISOString().split('T')[0], // Separate date
-    time: now.toISOString().split('T')[1].split('.')[0], // Separate time
-    method: req.method,
-    url: req.originalUrl,
-    status: res.statusCode,
-    userIP: req.ip,
-    userAgent: req.headers['user-agent'] || '',
-    username: req.params.username,
-    userRole: req.params.role,
-  };
-
-  // Add the API call detail to the array
-  apiCallDetails.push(apiCallDetail);
-  insertData("audit", "api_log", apiCallDetail);
-
-  // Continue with the request handling
+    logEndpoint(apiCallDetail);
+  })
   next();
 });
-
-// app.get("/test-auth", (request: Request, response: Response, next:NextFunction) => authorise(request, response, next), (request:any, response:Response, next:NextFunction) => {
-//   request.body = { message: "You are authorized to access me" , user: request.params.username, role: request.params.role};
-//   next();
-// }, (req: Request,res: Response) => logData(req, res));
-
 
 /**
  * @swagger
@@ -208,15 +185,88 @@ app.use((req:Request, res:Response, next:NextFunction) => {
  *      '200':
  *          description: OK
  */
-app.get("/test/:val", (request: Request, respond: Response, next:NextFunction) => {
-    request.body = {
-          hello:"world",
-          val: request.params.val
-      }
-    console.log("in", request.body);
+app.get("/test/:val", (request: Request, response: Response, next:NextFunction) => {
+    const body = { hello:"world", val: request.params.val };
+    response.status(201).send(body);
+});
 
-    next();
-}, (req: Request,res: Response) => logData(req, res));
+/**
+ * @swagger
+ * /test-auth:
+ *   get:
+ *     tags:
+ *       - Testing
+ *     summary: Tests authentication
+ *     description: Endpoint that requires authorisation.
+ *     security:
+ *       - Bearer: []
+ *     produces:
+ *       - application/json
+ *     responses:
+ *       200:
+ *         description: Message indicating the user is authorized and the user's details.
+ *         schema:
+ *           type: object
+ *           properties:
+ *             message:
+ *               type: string
+ *             user:
+ *               type: string
+ *             role:
+ *               type: string
+ *       401:
+ *         description: Unauthorized access.
+ */
+app.get("/test-auth", (request: Request, response: Response, next:NextFunction) => authorise(request, response, next), (request:any, response:Response) => {
+  const body = { message: "You are authorized to access me" , user: request.params.username, role: request.params.role};
+  response.status(201).send(body);
+});
+
+/**
+ * @swagger
+ * /test-auth/admin:
+ *   get:
+ *     tags:
+ *       - Testing
+ *     summary: Tests Admin authentication
+ *     description: Endpoint that requires authorisation.
+ *     security:
+ *       - Bearer: []
+ *     produces:
+ *       - application/json
+ *     responses:
+ *       200:
+ *         description: Message indicating the user is authorized and the user's details.
+ *       401:
+ *         description: Unauthorized access.
+ */
+app.get("/test-auth/admin", (request: Request, response: Response, next:NextFunction) => authorise(request, response, next, "admin"), (request:any, response:Response, next:NextFunction) => {
+  const body ={ message: "You are authorized to access me" , user: request.params.username, role: request.params.role};
+  response.status(201).send(body);
+});
+
+/**
+ * @swagger
+ * /test-auth/field-engineer:
+ *   get:
+ *     tags:
+ *       - Testing
+ *     summary: Tests field engineer authentication
+ *     description: Endpoint that requires authorisation.
+ *     security:
+ *       - Bearer: []
+ *     produces:
+ *       - application/json
+ *     responses:
+ *       200:
+ *         description: Message indicating the user is authorized and the user's details.
+ *       401:
+ *         description: Unauthorized access.
+ */
+app.get("/test-auth/field-engineer", (request: Request, response: Response, next:NextFunction) => authorise(request, response, next, "field_engineer"), (request:any, response:Response, next:NextFunction) => {
+  const body ={ message: "You are authorized to access me" , user: request.params.username, role: request.params.role};
+  response.status(201).send(body);
+});
 
 /**
  * @swagger
@@ -254,7 +304,42 @@ app.get("/test/:val", (request: Request, respond: Response, next:NextFunction) =
  *       401:
  *         description: Unauthorized - Invalid username or password   
  */
-app.post("/login", authenticate);
+app.post("/login", (request: Request, response: Response, next:NextFunction) => {
+  /**
+ * Decrypts a string that was encrypted with a Caesar cipher.
+ * 
+ * This function is necessary because Charles' server cannot use HTTPS. Without HTTPS, data sent to the server is not encrypted, 
+ * and could be intercepted by malicious third parties. To protect sensitive data, we use a Caesar cipher to encrypt the data 
+ * before sending it to the server. This function is used to decrypt that data.
+ * 
+ * @author Adam Logan
+ *
+ * @param {string} cipher - The encrypted string to be decrypted.
+ * @returns {string} The decrypted string.
+ */
+  function caesarDecipher(cipher:string) {
+    const shift:number = cipher.length % 26 + 1;
+    return cipher.split('').map(char => {
+      const charCode = char.charCodeAt(0);
+  
+      if (charCode >= 65 && charCode <= 90) {
+        // Uppercase letters
+        return String.fromCharCode((charCode - 65 - shift + 26) % 26 + 65);
+      } else if (charCode >= 97 && charCode <= 122) {
+        // Lowercase letters
+        return String.fromCharCode((charCode - 97 - shift + 26) % 26 + 97);
+      } else {
+        // Non-letter characters
+        return char;
+      }
+    }).join('');
+  }
+  
+  if(request.body.password.startsWith("cc")) {
+    request.body.password = caesarDecipher(request.body.password.substring(2));
+  }
+  next();
+}, authenticate);
 
 /**
  * @swagger
@@ -303,11 +388,10 @@ app.get("/:database/getall/:table", async (req: Request,res: Response) => {
  */
 app.post("/backupAllData", async (req, res) => {
   try {
+    await copyTable("audit","backup", "picu", "picu_backup");
+    await copyTable("audit","backup", "compliance_data", "compliance_data_backup");
+    await copyTable("audit","backup", "api_log", "api_log_backup");
 
-    copyTable("audit", "api_log", "api_log_backup");
-    copyTable("audit", "compliance_data", "compliance_data_backup");
-    copyTable("audit", "picu", "picu_backup");
-    
     res.status(200).send("Data successfully copied to api_log_backup.");
   } catch (error) {
     console.error(error);
@@ -330,7 +414,7 @@ app.post("/backupAllData", async (req, res) => {
  */
 app.post("/backupPicu", async (req, res) => {
   try {
-    copyTable("audit", "picu", "picu_backup");
+    copyTable("audit","backup", "picu", "picu_backup");
     res.status(200).send("Data successfully copied to picu_backup.");
   } catch (error) {
     console.error(error);
@@ -353,7 +437,7 @@ app.post("/backupPicu", async (req, res) => {
  */
 app.post("/backupComplianceData", async (req, res) => {
   try {
-    copyTable("audit", "compliance_data", "compliance_data_backup");
+    copyTable("audit","backup", "compliance_data", "compliance_data_backup");
     res.status(200).send("Data successfully copied to compliance_data_backup.");
   } catch (error) {
     console.error(error);
@@ -376,7 +460,7 @@ app.post("/backupComplianceData", async (req, res) => {
  */
 app.post("/backupApiLog", async (req, res) => {
   try {
-    copyTable("audit", "api_log", "api_log_backup");
+    copyTable("audit","backup", "api_log", "api_log_backup");
     res.status(200).send("Data successfully copied to api_log_backup.");
   } catch (error) {
     console.error(error);
@@ -386,12 +470,11 @@ app.post("/backupApiLog", async (req, res) => {
 
 
 
-
 /**
  * @swagger
- * /backupPicu:
+ * /backupPostgres:
  *   post:
- *     summary: Copy data from the picu table to picu_backup.
+ *     summary: makes a dump of postgres
  *     tags:
  *       - Backup
  *     responses:
@@ -400,96 +483,43 @@ app.post("/backupApiLog", async (req, res) => {
  *       400:
  *         description: There was an error copying the data.
  */
-app.post("/backupPicu", async (req, res) => {
-  try {
-    copyTable("audit", "picu", "picu_backup");
-    res.status(200).send("Data successfully copied to picu_backup.");
-  } catch (error) {
-    console.error(error);
-    res.status(400).send("Error copying data.");
-  }
+
+app.post('/backupPostgres', (req, res) => {
+  const command = '/bin/bash -c "docker exec -t dev_svs_postgres pg_dumpall -c -U postgres > dump_manual"';
+  exec(command, (error, stdout, stderr) => {
+    if (error) {
+      console.error(`exec error: ${error}`);
+      res.status(500).send('Error running backup command.');
+      return;
+    }
+    res.status(200).send('Backup command ran successfully.');
+  });
 });
 
 /**
  * @swagger
- * /backupComplianceData:
+ * /restorePostgres:
  *   post:
- *     summary: Copy data from the compliance_data table to compliance_data_backup.
+ *     summary: Restore a dump of PostgreSQL
  *     tags:
- *       - Backup
+ *       - Restore
  *     responses:
  *       200:
- *         description: Data successfully copied.
- *       400:
- *         description: There was an error copying the data.
+ *         description: Data successfully restored.
+ *       500:
+ *         description: There was an error restoring the data.
  */
-app.post("/backupComplianceData", async (req, res) => {
-  try {
-    copyTable("audit", "compliance_data", "compliance_data_backup");
-    res.status(200).send("Data successfully copied to compliance_data_backup.");
-  } catch (error) {
-    console.error(error);
-    res.status(400).send("Error copying data.");
-  }
-});
 
-/**
- * @swagger
- * /backupApiLog:
- *   post:
- *     summary: Copy data from the api_log table to api_log_backup.
- *     tags:
- *       - Backup
- *     responses:
- *       200:
- *         description: Data successfully copied.
- *       400:
- *         description: There was an error copying the data.
- */
-app.post("/backupApiLog", async (req, res) => {
-  try {
-    copyTable("audit", "api_log", "api_log_backup");
-    res.status(200).send("Data successfully copied to api_log_backup.");
-  } catch (error) {
-    console.error(error);
-    res.status(400).send("Error copying data.");
-  }
-});
-
-
-
-
-
-/**
- * @swagger
- * /{database}/getpicudata/{table}:
- *  get:
- *    tags:
- *      - CRUD
- *    summary: Gets specific picu data from table
- *    parameters:
- *      - name: database
- *        in: path
- *        description: The name of the selected database
- *        schema:
- *          type: "string"
- *        required: true
- *      - name: table
- *        in: path
- *        description: The name of the selected table
- *        required: true
- *        schema:
- *          type: "string"
- *    responses:
- *      '200':
- *          description: OK
- *      '400':
- *          description: Invalid parameters
- */
-app.get("/:database/getpicudata/:table", async (req: Request,res: Response) => {
-  let result:{allData:any[]}|string = await getPicuData(req.params.database, req.params.table, req.params.role === undefined ? "postgres" : `${req.params.role}_role`, req.params.role === undefined ? "postgrespw": "password", req.params.picuID);
-  let status:number = typeof result === 'string' ? 400 : 200;
-  res.status(status).send(result);
+app.post('/restorePostgres', (req, res) => {
+  const command = '/bin/bash -c "cat dump_manual | docker exec -i dev_svs_postgres psql -U postgres"';
+  exec(command, (error, stdout, stderr) => {
+    if (error) {
+      console.error(`exec error: ${error}`);
+      res.status(500).send('Error running restore command.');
+      return;
+    }
+    res.status(200).send('Restore command ran successfully.');
+  });
 });
 
 /**
@@ -620,93 +650,137 @@ app.delete("/:database/deletedata/:table/:predicate", async (req: Request,res: R
 
 /**
  * @swagger
- * /test-auth:
+ * /chart-single-picu-compliance/{siteId}:
  *   get:
  *     tags:
- *       - Testing
- *     summary: Tests authentication
- *     description: Endpoint that requires authorisation.
+ *       - Compliance
+ *     summary: Get compliance data for a single PICU site
  *     security:
  *       - Bearer: []
- *     produces:
- *       - application/json
- *     responses:
- *       200:
- *         description: Message indicating the user is authorized and the user's details.
+ *     parameters:
+ *       - name: siteId
+ *         in: path
+ *         description: ID of the PICU site
+ *         required: true
  *         schema:
- *           type: object
- *           properties:
- *             message:
- *               type: string
- *             user:
- *               type: string
- *             role:
- *               type: string
- *       401:
- *         description: Unauthorized access.
+ *           type: integer
+ *     responses:
+ *       '200':
+ *         description: Successful operation
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 entryDates:
+ *                   type: array
+ *                   items:
+ *                     type: string
+ *                     format: date-time
+ *                 complianceScore:
+ *                   type: array
+ *                   items:
+ *                     type: number
+ *                     format: float
+ *       '400':
+ *         description: Invalid site ID supplied
  */
-app.get("/test-auth", (request: Request, response: Response, next:NextFunction) => authorise(request, response, next), (request:any, response:Response, next:NextFunction) => {
-  request.body = { message: "You are authorized to access me" , user: request.params.username, role: request.params.role};
-  next();
-}, (req: Request,res: Response) => logData(req, res));
+app.get("/chart-single-picu-compliance/:siteId", (request: Request, response: Response, next:NextFunction) => authorise(request, response, next), async (req: Request, res: Response) => {
+  if(req.params.role === "picu" && Number(req.params.siteId) !== Number(req.params.username)) {
+    res.status(401).send("ERROR: Permission Denied");
+  } else {
+    let result = await singlePicuCompliance(req.params.role, Number(req.params.siteId));
+    let status:number = typeof result === 'string' ? 400 : 201;
+    res.status(status).send(result);
+  }
+});
 
 /**
  * @swagger
- * /test-auth/admin:
+ * /chart-all-picu-compliance:
  *   get:
  *     tags:
- *       - Testing
- *     summary: Tests Admin authentication
- *     description: Endpoint that requires authorisation.
+ *       - Compliance
+ *       - PICU
+ *     summary: Get compliance data for all PICU sites
  *     security:
  *       - Bearer: []
- *     produces:
- *       - application/json
  *     responses:
- *       200:
- *         description: Message indicating the user is authorized and the user's details.
- *       401:
- *         description: Unauthorized access.
+ *       '200':
+ *         description: Successful operation
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 picuId:
+ *                   type: array
+ *                   items:
+ *                     type: integer
+ *                 complianceScore:
+ *                   type: array
+ *                   items:
+ *                     type: number
+ *                     format: float
+ *       '400':
+ *         description: Invalid site ID supplied
+ *       '401':
+ *         description: Permission Denied
  */
-app.get("/test-auth/admin", (request: Request, response: Response, next:NextFunction) => authorise(request, response, next, "admin"), (request:any, response:Response, next:NextFunction) => {
-  request.body ={ message: "You are authorized to access me" , user: request.params.username, role: request.params.role};
-  next();
-}, (req: Request,res: Response) => logData(req, res));
+app.get("/chart-all-picu-compliance", (request: Request, response: Response, next:NextFunction) => authorise(request, response, next, "admin"), async (req: Request, res: Response) => {
+  let result:any = await sinlgeDataPointAllPicu(req.params.role, 'overall_compliance');
+  let status:number = 201;
+  if(typeof result === 'string') {
+    status = 400 ;
+  } else {
+    result.complianceScore = result.dataPoint;
+    delete result.dataPoint;
+  }
+  res.status(status).send(result);
+});
 
 /**
  * @swagger
- * /test-auth/field-engineer:
+ * /chart-all-picu-delirium-positive:
  *   get:
  *     tags:
- *       - Testing
- *     summary: Tests field engineer authentication
- *     description: Endpoint that requires authorisation.
+ *       - PICU
+ *     summary: Get the number of patients with positive delirium for all PICU sites
  *     security:
  *       - Bearer: []
- *     produces:
- *       - application/json
  *     responses:
- *       200:
- *         description: Message indicating the user is authorized and the user's details.
- *       401:
- *         description: Unauthorized access.
+ *       '200':
+ *         description: Successful operation
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 picuId:
+ *                   type: array
+ *                   items:
+ *                     type: integer
+ *                 totalPositiveDelirium:
+ *                   type: array
+ *                   items:
+ *                     type: number
+ *                     format: float
+ *       '400':
+ *         description: Invalid site ID supplied
+ *       '401':
+ *         description: Permission Denied
  */
-app.get("/test-auth/field-engineer", (request: Request, response: Response, next:NextFunction) => authorise(request, response, next, "field_engineer"), (request:any, response:Response, next:NextFunction) => {
-  request.body ={ message: "You are authorized to access me" , user: request.params.username, role: request.params.role};
-  next();
-}, (req: Request,res: Response) => logData(req, res));
-
-/**
- * Retrieves the compliance data of the site requested
- * TODO If the user has a picu role make sure that their ID matches that of the one they are requesting
- * @author Adam Logan
- */
-app.get("/chartData/singleSite/:siteId", (request: Request, response: Response, next:NextFunction) => authorise(request, response, next), singlePicuCompliance);
-
-/**
- * Retrieves the anonymised compliance data of all the sites
- */
-app.get("/chartData/allSites", allPicuCompliance);
+app.get("/chart-all-picu-delirium-positive", (request: Request, response: Response, next:NextFunction) => authorise(request, response, next, "admin"), async (req: Request, res: Response) => {
+  let result:any = await sinlgeDataPointAllPicu(req.params.role, 'delirium_positive_patients');
+  let status:number = 201;
+  if(typeof result === 'string') {
+    status = 400 ;
+  } else {
+    result.totalPositiveDelirium = result.dataPoint.map((element:number) => element * 100);
+    delete result.dataPoint;
+  }
+  res.status(status).send(result);
+});
 
 /**
  * @swagger
@@ -726,14 +800,15 @@ app.get("/chartData/allSites", allPicuCompliance);
  *           $ref: '#/definitions/ComplianceData'
  *     responses:
  *       '200':
- *         description: Picu successfully added.
+ *         description: PICU successfully added.
  *       '400':
  *         description: Error occurred.
  */
 app.post("/add-compliance", (request: Request, response: Response, next:NextFunction) => authorise(request, response, next), async (req: Request, res: Response) => {
-  if(req.params.role === "picu" && req.body.picu_id !== Number(req.params.username)) {
+  if(req.params.role === "picu" && (Number(req.body.picu_id) !== Number(req.params.username) && req.body.picu_id !== undefined)) {
     res.status(401).send("ERROR: Permission Denied");
   } else {
+    req.body.picu_id = req.body.picu_id ?? req.params.username;
     let result = await insertCompData(req.body, req.params.role);
     let status:number = result.toString().includes("Error") ? 400 : 201;
     res.status(status).send(result);
@@ -745,8 +820,8 @@ app.post("/add-compliance", (request: Request, response: Response, next:NextFunc
  * /addPicu:
  *   post:
  *     tags:
- *       - Picu
- *     summary: Adds a new Picu to the database
+ *       - PICU
+ *     summary: Adds a new PICU to the database
  *     security:
  *       - Bearer: []
  *     consumes:
@@ -764,7 +839,7 @@ app.post("/add-compliance", (request: Request, response: Response, next:NextFunc
  *           - ward_name
  *     responses:
  *       '200':
- *         description: Picu successfully added.
+ *         description: PICU successfully added.
  *       '400':
  *         description: Error occurred.
  */
@@ -779,7 +854,7 @@ app.post("/addPicu", (request: Request, response: Response, next:NextFunction) =
  * /getNextPicu:
  *   get:
  *     tags:
- *       - Picu
+ *       - PICU
  *     summary: Gets the next PICU ID, used when adding a new PICU to the database
  *     security:
  *       - Bearer: []
@@ -799,7 +874,7 @@ app.get("/getNextPicu", (request: Request, response: Response, next:NextFunction
  * /getPicuIds:
  *   get:
  *     tags:
- *       - Picu
+ *       - PICU
  *     summary: Gets all PICU IDs, along with their roles
  *     security:
  *       - Bearer: []
@@ -856,7 +931,7 @@ app.put("/updatePicuPassword", (request: Request, response: Response, next:NextF
  * /deletePicu:
  *   delete:
  *     tags:
- *       - Picu
+ *       - PICU
  *     summary: Delete multiple PICUs based on provided PICU IDs.
  *     security:
  *       - Bearer: []
@@ -891,7 +966,7 @@ app.delete("/deletePicu", (request: Request, response: Response, next:NextFuncti
  * /updatePicu:
  *   put:
  *     tags:
- *       - Picu
+ *       - PICU
  *     summary: Update a PICU's details based on the provided data.
  *     security:
  *       - Bearer: []
@@ -916,6 +991,36 @@ app.delete("/deletePicu", (request: Request, response: Response, next:NextFuncti
  */
 app.put("/updatePicu", (request: Request, response: Response, next:NextFunction) => authorise(request, response, next, 'admin'), async (req: Request, res: Response) => {
   let result = await editPicu(req.body, req.params.role);
+  let status:number = result.toString().includes("Error") ? 400 : 201;
+  res.status(status).send(result);
+});
+
+  /**
+ * @swagger
+ * /get-all-picu:
+ *   get:
+ *     tags:
+ *       - PICU
+ *     summary: Get all compliance data
+ *     security:
+ *       - Bearer: []
+ *     responses:
+ *       201:
+ *         description: PICU data retrieved successfully.
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 allData:
+ *                   type: array
+ *                   items:
+ *                     $ref: '#/definitions/Picu'
+ *       400:
+ *         description: An error occurred.
+ */
+app.get("/get-all-picu", (request: Request, response: Response, next:NextFunction) => authorise(request, response, next, 'admin'), async (req: Request, res: Response) => {
+  let result:{allData:any[]}|string = await getPicuData(req.params.role);
   let status:number = result.toString().includes("Error") ? 400 : 201;
   res.status(status).send(result);
 });
@@ -1016,12 +1121,68 @@ app.put("/update-compliance", (request: Request, response: Response, next:NextFu
  *         description: An error occurred.
  */
 app.delete("/delete-compliance", (request: Request, response: Response, next:NextFunction) => authorise(request, response, next, 'admin'), async (req: Request, res: Response, next:NextFunction) => {
-   let result = await deleteCompRecords(req.body.comp_ids, req.params.role);
+  let result:string = await deleteCompRecords(req.body.comp_ids, req.params.role);
   let status:number = result.toString().includes("Error") ? 400 : 201;
-  // next();
-   res.status(status).send(result);
-})
-//, (req: Request, res: Response) => log(req, res));
+  res.status(status).send(result);
+});
+
+/**
+ * @swagger
+ * /get-all-compliance:
+ *   get:
+ *     tags:
+ *       - Compliance
+ *     summary: Get all compliance data
+ *     security:
+ *       - Bearer: []
+ *     responses:
+ *       201:
+ *         description: Compliance data retrieved successfully.
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 allData:
+ *                   type: array
+ *                   items:
+ *                     $ref: '#/definitions/ComplianceData'
+ *       400:
+ *         description: An error occurred.
+ */
+app.get("/get-all-compliance", (request: Request, response: Response, next:NextFunction) => authorise(request, response, next, 'admin'), async (req: Request, res: Response) => {
+  let result:{allData:any[]}|string = await getComplianceData(req.params.role);
+  let status:number = result.toString().includes("Error") ? 400 : 201;
+  res.status(status).send(result);
+});
+
+  /**
+ * @swagger
+ * /get-all-logs:
+ *   get:
+ *     tags:
+ *       - Log
+ *     summary: Get all log data
+ *     security:
+ *       - Bearer: []
+ *     responses:
+ *       201:
+ *         description: Log data retrieved successfully.
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 allData:
+ *                   type: array
+ *       400:
+ *         description: An error occurred.
+ */
+  app.get("/get-all-logs", (request: Request, response: Response, next:NextFunction) => authorise(request, response, next, 'admin'), async (req: Request, res: Response) => {
+    let result:{allData:any[]}|string = await getLogData(req.params.role);
+    let status:number = result.toString().includes("Error") ? 400 : 201;
+    res.status(status).send(result);
+  });
 
 // Used to activate the endpoints through HTTP
 app.listen(port,()=> {
@@ -1035,4 +1196,3 @@ app.listen(port,()=> {
 //   console.log(`listen port ${port}`);
 //   console.log(`Go to https://${baseIP}:${port}/swagger-docs for documentation`);
 // });
-

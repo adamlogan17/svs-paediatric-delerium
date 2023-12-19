@@ -1,9 +1,8 @@
-import { BrowserRouter as Router, Route, Routes} from "react-router-dom";
+import { BrowserRouter as Router, Route, Routes } from "react-router-dom";
 
 import Home from './pages/Home/Home'; // example component being added
-import OtherPage from './pages/OtherPage/OtherPage'; // to demonstrate routing
 import NoPage from './pages/NoPage/NoPage'; // to demonstrate routing
-import Form from './pages/Form/Form';
+import ComplianceForm from './pages/ComplianceForm/ComplianceForm';
 import Admin from './pages/Admin/Admin';
 import AuditGraphs from './pages/AuditGraphs/AuditGraphs';
 import FieldEngineer from './pages/FieldEngineer/FieldEngineer';
@@ -14,6 +13,7 @@ import ForgottenPassword from "./pages/ForgottenPassword/ForgottenPassword";
 import Auditlog from "./pages/Admin/AuditLog";
 import EditPicus from "./pages/EditPicus/EditPicus";
 import EditCompliance from "./pages/EditCompliance/EditCompliance";
+import Redirect from "./components/Redirect/Redirect";
 
 const token:string|null = sessionStorage.getItem("TOKEN");
 const role:string|null = sessionStorage.getItem("ROLE");
@@ -27,20 +27,17 @@ function AppRouter() {
   return (
     <Router>
       <Routes>
-        <Route index path="/" element={<Home />}/>
+        <Route index path="/" element={
+          <Redirect to="/login" condition={token === (undefined || null)} >
+            <Home />
+          </Redirect>
+        }/>
+
         <Route path="*" element={<NoPage />} />
 
         <Route path="/login" element={<SignIn /> }/>
 
         <Route path="/sandbox" element={<Sandbox /> }/> 
-
-        {picuAccess && (
-          <>
-            <Route path="/form" element={<Form />} />
-            <Route path="/otherPage" element={<OtherPage />} />
-            <Route path="/audit-graphs" element={<AuditGraphs />} />
-          </>
-        )}
 
         {adminAccess && (
           <>
@@ -54,7 +51,7 @@ function AppRouter() {
 
         {fieldAccess && (
           <>
-            <Route path="/fieldengineer" element={<FieldEngineer />} />
+            <Route path="/field-engineer" element={<FieldEngineer />} />
           </>
         )}
 
@@ -64,9 +61,10 @@ function AppRouter() {
           </>
         )}
 
-        {(adminAccess || fieldAccess || picuAccess) && (
+        {(adminAccess || picuAccess) && (
           <>
-            <Route path="/auditGraphs" element={<AuditGraphs />} />
+            <Route path="/audit-graphs" element={<AuditGraphs />} />
+            <Route path="/form" element={<ComplianceForm />} />
           </>
         )}
       </Routes>

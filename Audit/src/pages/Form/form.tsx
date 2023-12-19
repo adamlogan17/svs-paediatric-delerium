@@ -26,7 +26,6 @@ function insertData(data: any[]): void {
 
   } catch (error) {
     console.log(error);
-    console.log(error);
     enqueueSnackbar("System Error", { variant: "error" });
     return;
   }

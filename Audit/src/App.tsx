@@ -2,8 +2,8 @@ import AppRouter from './AppRouter';
 
 import { createTheme, PaletteOptions, ThemeOptions, ThemeProvider } from '@mui/material/styles';
 import BasicNavBar from './components/NavBar/NavBar';
-import { CssBaseline, PaletteMode } from '@mui/material';
-import React, { createContext, useMemo, useState } from 'react';
+import { CssBaseline } from '@mui/material';
+import { useMemo, useState } from 'react';
 import { SnackbarProvider } from 'notistack';
 import BaseSnackBarElement from './components/SnackBarVarients/BaseSnackbarVarient';
 
@@ -40,6 +40,12 @@ const contrastTheme:PaletteOptions = {
 
   }
 }
+
+const options = [
+  { label: "Contrast", value: "contrast" },
+  { label: "Dark", value: "dark" },
+  { label: "Light", value: "light" },
+];
 
 function getDesignTokens(mode: string):ThemeOptions {
   let theme;
@@ -81,6 +87,59 @@ const customVarients = {
   default: BaseSnackBarElement,
 }
 
+const adminLinks:LabelValuePair[] = [
+  {
+    label:'Home',
+    value:'/'
+  },
+  {
+    value:'/admin',
+    label:'Menu'
+  }, 
+  {
+    value:'/forgot-password',
+    label:'Reset Password'
+  },
+  {
+    value:'/audit-graphs',
+    label:'Graphs'
+  },
+  {
+    label:"View Compliance",
+    value:'/edit-compliance'
+  },
+  {
+    label:"Log",
+    value:'/audit-log'
+  }
+]
+
+const fieldEngineer:LabelValuePair[] = [
+  {
+    label:'Home',
+    value:'/'
+  },
+  {
+    value:'/field-engineer',
+    label:'Menu'
+  }, 
+  {
+    value:'/forgot-password',
+    label:'Reset Password'
+  }
+]
+
+const picu:LabelValuePair[] = [
+  {
+    label:'Home',
+    value:'/'
+  },
+  {
+    value:'/audit-graphs',
+    label:'Graphs'
+  }
+]
+
 
 /**
  * The main component of the application.
@@ -112,11 +171,14 @@ export default function App() {
       <CssBaseline />
 
       <SnackbarProvider maxSnack={3} Components={customVarients}>
-        <BasicNavBar 
+        <BasicNavBar
+          links={sessionStorage.getItem('ROLE') === 'admin' ? adminLinks : sessionStorage.getItem('ROLE') === 'field_engineer' ? fieldEngineer : sessionStorage.getItem('ROLE') === 'picu' ? picu : []} 
+          modeOptions={options}
           toggleMode={colorMode.toggleColorMode} 
           theme={mode} 
           backgroundColor={theme.palette.background.paper} 
           textColor={theme.palette.text.primary}
+          buttonColor={theme.palette.primary.main}
         />
         
         <br />

@@ -13,10 +13,6 @@ jest.mock('../src/crud', () => ({
   updateData: jest.fn(),
   insertData: jest.fn(),
 }));
-// Mock the login functions
-// jest.mock('../src/login', () => ({
-//   hashPassword: jest.fn(),
-// }));
 // Mock the bcrypt function
 jest.mock('bcrypt', () => ({
   compare: jest.fn(),

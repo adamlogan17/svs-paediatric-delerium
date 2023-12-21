@@ -11,7 +11,7 @@ import swaggerUi from 'swagger-ui-express';
 
 import { copyTable, deleteData, getAll, insertData, updateData } from './crud';
 import { authenticate, authorise, updatePicuPassword, verifyCaptcha } from './login';
-import { singlePicuCompliance, sinlgeDataPointAllPicu } from './auditCharts';
+import { predictiveAnalysis, singlePicuCompliance, sinlgeDataPointAllPicu } from './auditCharts';
 import { addPicu, deletePicus, editPicu, getAllIds, nextPicu, getPicuData } from './picuDbManagement';
 import { deleteCompRecords, editCompliance, getComplianceData, insertCompData } from './complianceScores';
 import { EndpointLog, getLogData, logEndpoint } from './logging';
@@ -92,7 +92,6 @@ app.use((request:Request, response:Response, next) => {
 app.use((request:Request, response:Response, next:NextFunction) => {
   // forces the middleware to wait until the response has been sent
   response.on('finish', () => {
-    console.log(request.method);
     const apiCallDetail:EndpointLog = {
       datetime: new Date(),
       method: request.method,
@@ -192,7 +191,7 @@ app.get("/test/:val", (request: Request, response: Response, next:NextFunction) 
 
 /**
  * @swagger
- * /test-auth:
+ * /test-auth/picu:
  *   get:
  *     tags:
  *       - Testing
@@ -217,7 +216,7 @@ app.get("/test/:val", (request: Request, response: Response, next:NextFunction) 
  *       401:
  *         description: Unauthorized access.
  */
-app.get("/test-auth", (request: Request, response: Response, next:NextFunction) => authorise(request, response, next), (request:any, response:Response) => {
+app.get("/test-auth/picu", (request: Request, response: Response, next:NextFunction) => authorise(request, response, next, "picu"), (request:any, response:Response) => {
   const body = { message: "You are authorized to access me" , user: request.params.username, role: request.params.role};
   response.status(201).send(body);
 });
@@ -685,11 +684,65 @@ app.delete("/:database/deletedata/:table/:predicate", async (req: Request,res: R
  *       '400':
  *         description: Invalid site ID supplied
  */
-app.get("/chart-single-picu-compliance/:siteId", (request: Request, response: Response, next:NextFunction) => authorise(request, response, next), async (req: Request, res: Response) => {
+app.get("/chart-single-picu-compliance/:siteId", (request: Request, response: Response, next:NextFunction) => authorise(request, response, next, "picu"), async (req: Request, res: Response) => {
   if(req.params.role === "picu" && Number(req.params.siteId) !== Number(req.params.username)) {
     res.status(401).send("ERROR: Permission Denied");
   } else {
     let result = await singlePicuCompliance(req.params.role, Number(req.params.siteId));
+    let status:number = typeof result === 'string' ? 400 : 201;
+    res.status(status).send(result);
+  }
+});
+
+/**
+ * @swagger
+ * /chart-predict-picu-compliance/{siteId}/{endDate}:
+ *   get:
+ *     tags:
+ *       - Compliance
+ *     summary: Get compliance data for a single PICU site
+ *     security:
+ *       - Bearer: []
+ *     parameters:
+ *       - name: siteId
+ *         in: path
+ *         description: ID of the PICU site
+ *         required: true
+ *         schema:
+ *           type: integer
+ *       - name: endDate
+ *         in: path
+ *         description: The end date of the prediction
+ *         required: true
+ *         schema:
+ *           type: string
+ *     responses:
+ *       '200':
+ *         description: Successful operation
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 entryDates:
+ *                   type: array
+ *                   items:
+ *                     type: string
+ *                     format: date-time
+ *                 complianceScore:
+ *                   type: array
+ *                   items:
+ *                     type: number
+ *                     format: float
+ *       '400':
+ *         description: Invalid site ID supplied
+ */
+app.get("/chart-predict-picu-compliance/:siteId/:endDate", (request: Request, response: Response, next:NextFunction) => authorise(request, response, next, "picu"), async (req: Request, res: Response) => {
+  if(req.params.role === "picu" && Number(req.params.siteId) !== Number(req.params.username)) {
+    res.status(401).send("ERROR: Permission Denied");
+  } else {
+    const endDate:Date = new Date(req.params.endDate);
+    let result = await predictiveAnalysis(req.params.role, Number(req.params.siteId), endDate);
     let status:number = typeof result === 'string' ? 400 : 201;
     res.status(status).send(result);
   }
@@ -804,7 +857,7 @@ app.get("/chart-all-picu-delirium-positive", (request: Request, response: Respon
  *       '400':
  *         description: Error occurred.
  */
-app.post("/add-compliance", (request: Request, response: Response, next:NextFunction) => authorise(request, response, next), async (req: Request, res: Response) => {
+app.post("/add-compliance", (request: Request, response: Response, next:NextFunction) => authorise(request, response, next, "picu"), async (req: Request, res: Response) => {
   if(req.params.role === "picu" && (Number(req.body.picu_id) !== Number(req.params.username) && req.body.picu_id !== undefined)) {
     res.status(401).send("ERROR: Permission Denied");
   } else {

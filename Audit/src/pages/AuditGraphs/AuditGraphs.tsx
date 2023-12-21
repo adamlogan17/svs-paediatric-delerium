@@ -196,7 +196,7 @@ function AuditGraphs() {
   const [isLoading, setIsLoading] = useState<boolean>(false);
   const [chartData, setChartData] = useState<{xValues:string[],yValues:number[]}>({xValues:[],yValues:[]});
   const [chartType, setChartType] = useState<LabelValuePair>(allChartTypes[0]);
-  const [startDate, setStartDate] = useState<Date>(new Date(Date.UTC(1970, 0, 1)));
+  const [startDate, setStartDate] = useState<Date>(new Date(Date.UTC(2015, 0, 1)));
   const [endDate, setEndDate] = useState<Date>(new Date());
   const [picuId, setPicuId] = useState<number>(1);
   const [dataType, setDataType] = useState<ChartDataType>(allDataTypes[0]);
@@ -292,7 +292,7 @@ function AuditGraphs() {
         />
       </Box>
 
-        {specificPicuNeeded && 
+        {(specificPicuNeeded || sessionStorage.getItem('ROLE') === 'picu') && 
           <Box sx= {{
             mt: 1, 
             width: pageWidth, 
@@ -301,7 +301,7 @@ function AuditGraphs() {
           }}>
             <ValidaterDatePicker 
               dateFormat={dateFormat} 
-              startDate={new Date(Date.UTC(1970, 0, 1))}
+              startDate={new Date(Date.UTC(2015, 0, 1))}
               sx={splitDropdownStyles}
               onChange={(newDate) => {
                 const valid:boolean = dayjs(newDate).isSameOrBefore(endDate);

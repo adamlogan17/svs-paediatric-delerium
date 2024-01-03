@@ -12,7 +12,6 @@ const lightTheme:PaletteOptions = {
   primary: {
     main: '#009999'
   }
-
 }
 
 const darkTheme:PaletteOptions = {
@@ -41,7 +40,7 @@ const contrastTheme:PaletteOptions = {
   }
 }
 
-const options = [
+const options:LabelValuePair[] = [
   { label: "Contrast", value: "contrast" },
   { label: "Dark", value: "dark" },
   { label: "Light", value: "light" },
@@ -151,13 +150,14 @@ const picu:LabelValuePair[] = [
  * @returns {JSX.Element} - Rendered component.
  */
 export default function App() {
-  const [mode, setMode] = useState<'light' | 'dark' | 'contrast'>(sessionStorage.getItem("MODE") !== 'light' ? 'dark' : 'light');
+  const defaultTheme:Themes = sessionStorage.getItem('MODE') as Themes || 'light';
+  const [mode, setMode] = useState<Themes>(defaultTheme);
   const theme = useMemo(() => createTheme(getDesignTokens(mode)), [mode]);
 
   const colorMode = useMemo(
     () => ({
-      toggleColorMode: (newMode:'light' | 'dark' | 'contrast') => {
-        setMode((prevMode) => {
+      toggleColorMode: (newMode:Themes) => {
+        setMode(() => {
           sessionStorage.setItem("MODE", newMode);
           return newMode;
         });

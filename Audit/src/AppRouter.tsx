@@ -1,7 +1,7 @@
 import { BrowserRouter as Router, Route, Routes } from "react-router-dom";
 
-import Home from './pages/Home/Home'; // example component being added
-import NoPage from './pages/NoPage/NoPage'; // to demonstrate routing
+import Home from './pages/Home/Home';
+import NoPage from './pages/NoPage/NoPage';
 import ComplianceForm from './pages/ComplianceForm/ComplianceForm';
 import Admin from './pages/Admin/Admin';
 import AuditGraphs from './pages/AuditGraphs/AuditGraphs';

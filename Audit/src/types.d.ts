@@ -1,6 +1,8 @@
 /**
  * @typedef RoleAutoComplete
  * 
+ * @author Adam Logan
+ * 
  * Represents a selection for a role in the database. This can be used for
  * autocomplete components or any similar UI elements which need both
  * a user-friendly label and a system-recognized role identifier.
@@ -18,12 +20,24 @@ type RoleAutoComplete = {
  * 
  * @author Adam Logan
  * 
- * @typedef {object} Role
+ * @typedef Role
  * @property {"picu"} - Represents a PICU role.
  * @property {"admin"} - Represents an admin role.
  * @property {"field_engineer"} - Represents a field engineer role.
  */
 type Role = 'picu'|'admin'|'field_engineer';
+
+/**
+ * Represents the available themes in the application.
+ * 
+ * @author Adam Logan
+ * 
+ * @typedef Themes
+ * @property {"light"} - Represents a light theme.
+ * @property {"dark"} - Represents a dark theme.
+ * @property {"contrast"} - Represents a contrast theme.
+ */
+type Themes = 'light'|'dark'|'contrast' 
 
 /**
  * Represents a key-value pair, where the key is a string label and the value can be of any type.
@@ -33,7 +47,7 @@ type Role = 'picu'|'admin'|'field_engineer';
  *
  * @author Adam logan
  * 
- * @typedef {Object} LabelValuePair
+ * @typedef LabelValuePair
  * @property {string} label - The key of the pair, represented as a string.
  * @property {any} value - The value of the pair, which can be of any type.
  */
@@ -44,6 +58,8 @@ type LabelValuePair = {
 
 /**
  * @typedef Picu
+ * 
+ * @author Adam Logan
  * 
  * Represents a PICU (Paediatric Intensive Care Unit) entity in the system. This can be used for
  * storing information related to a particular PICU.
@@ -111,7 +127,7 @@ type ComplianceData = {
  * 
  * @author Adam Logan
  * 
- * @typedef {object} Severity
+ * @typedef Severity
  * @property {"error"} - Represents an error message.
  * @property {"success"} - Represents a success message.
  * @property {"info"} - Represents an informational message.
@@ -125,10 +141,10 @@ type Severity = "error" | "success" | "info" | "warning" | undefined;
  * 
  * @author Adam Logan
  * 
- * @typedef {object} BaseAlertProps
+ * @typedef BaseAlertProps
  * @property {string} message - The alert message to be displayed.
  * @property {Function} closeAction - Callback function to execute when the close button is clicked.
- * @property {any} [severity] - Represents the level of alert severity.
+ * @property {Severity} [severity] - Represents the level of alert severity.
  * @property {React.ReactNode} [icon] - Optional custom icon for the alert.
  */
 type BaseAlertProps = {
@@ -154,12 +170,26 @@ type PicuIDRole = {
 }
 
 /**
+ * Represents the data structure for a chart.
+ * 
+ * @author Adam Logan
+ * 
+ * @typedef ChartData
+ * @property {string[]} xValues - The x-axis values for the chart.
+ * @property {number[]} yValues - The y-axis values for the chart.
+ */
+type ChartData = {
+  xValues: string[],
+  yValues: number[]
+}
+
+/**
  * Properties for the Chart components.
  * 
  * @author Adam Logan
  * 
- * @typedef {Object} ChartProps
- * @property {Object} chartData - The data for the chart.
+ * @typedef ChartProps
+ * @property {ChartData} chartData - The data for the chart.
  * @property {string[]} chartData.xValues - The x-axis values for the chart.
  * @property {number[]} chartData.yValues - The y-axis values for the chart.
  * @property {string} [chartColor] - The color of the chart.
@@ -171,10 +201,7 @@ type PicuIDRole = {
  * @property {(x:string) => number|undefined} [convertXToNumber] - Optional function to convert x-axis values to numbers, which adds a trendline to the chart.
  */
 type ChartProps = {
-  chartData: {
-    xValues: string[],
-    yValues: number[]
-  },
+  chartData: ChartData,
   chartColor?: string,
   textColor?:string,
   title: string,
@@ -189,19 +216,20 @@ type ChartProps = {
  * 
  * @author Adam Logan
  * 
- * @typedef {Object} ChartDataType
+ * @typedef ChartDataType
  * @property {LabelValuePair} - The label-value pair for the chart.
- * @property {(id:number) => Promise<{xValues:string[],yValues:number[]}>} getData - A function that retrieves the data for the chart based on an ID.
+ * @property {(id:number) => Promise<ChartData>} getData - A function that retrieves the data for the chart based on an ID.
  * @property {(date:string) => number|undefined} [convertXToNums] - An optional function that converts the X-axis values to numbers.
  * @property {Function} [filter] - An optional function used to filter the chart data.
  * @property {string} [xAxisLabel] - The label for the x-axis of the chart.
  * @property {string} [yAxisLabel] - The label for the y-axis of the chart.
+ * @property {Function<ChartData>} [downSample] - A function which will down sample the data, to fit within a chart
  */
 type ChartDataType = LabelValuePair & {
-  getData: (id:number) => Promise<{xValues:string[],yValues:number[]}>,
+  getData: (id:number) => Promise<ChartData>,
   convertXToNums?: (date:string) => number|undefined,
   filter?: Function,
   xAxisLabel?:string,
   yAxisLabel?:string,
-  downSample?:Function<{xValues:string[], yValues:number[]}>
+  downSample?:Function<ChartData>
 }

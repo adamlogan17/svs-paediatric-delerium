@@ -22,6 +22,31 @@ export function createPool(database:string, user:string="postgres", password:str
 }
 
 /**
+ * Defines possible PostgreSQL comparisons for operations in predicates.
+ * 
+ * @author Adam Logan
+ * 
+ * @type PostgreSQLComparisons
+ */
+type PostgreSQLComparisons = '=' | '<' | '>' | '<=' | '>=' | '<>' | 'LIKE' | 'ILIKE' | 'BETWEEN' | 'IN' | 'IS NULL' | 'IS NOT NULL' | 'IS DISTINCT FROM' | 'IS NOT DISTINCT FROM' | 'NOT IN' | 'NOT LIKE' | 'NOT ILIKE' | 'NOT BETWEEN';
+
+/**
+ * Represents a predicate used for filtering data in SQL queries.
+ * 
+ * @author Adam Logan
+ * 
+ * @type Predicate
+ * @property {string} column - The name of the column to apply the predicate on.
+ * @property {string} value - The value to compare against in the predicate.
+ * @property {PostgreSQLComparisons} operation - The comparison operation to perform.
+ */
+type Predicate = {
+  column:string,
+  value:string,
+  operation:PostgreSQLComparisons
+}
+
+/**
  * Creates a simply SQL select query, only creates a query with valid syntax but does not check if the content of the query is correct
  * @author Adam Logan
  * @date 2023-03-23
@@ -31,16 +56,73 @@ export function createPool(database:string, user:string="postgres", password:str
  * @param { string } [groupBy] The name of the column which you would like to group by
  * @returns { string } A query that will return the required results
  */
-export function createSelect(table:string, condition?:string, columns?:string[], groupBy?:string) : string {
+export function createSelect(table:string, conditions?:Predicate[], columns?:string[], groupBy?:string) : string {
   let query:string = "SELECT ";
 
   query += columns == undefined ? "*" : columns.concat();
 
   query += " FROM " + table;
 
-  query += condition !== undefined ? condition.trim() !== "" ? " WHERE " + condition : "" : "";
+  if (conditions !== undefined && conditions.length > 0) {
+    const conditionStrs = conditions.map((condition, index) => `${condition.column} ${condition.operation} $${index + 1}`);
+    query += " WHERE " + conditionStrs.join(" AND ");
+  }
 
   query += groupBy !== undefined ? " GROUP BY " + groupBy : "";
+
+  console.log(query);
+
+  return query;
+}
+
+/**
+ * Retrieves data from a specified table in the database based on the provided conditions.
+ * @author Adam Logan
+ *
+ * @param {string} database - The name of the database.
+ * @param {string} table - The name of the table to retrieve data from.
+ * @param {string} userForDb - The username for accessing the database.
+ * @param {string} passForDb - The password for accessing the database.
+ * @param {Predicate[]} [condition] - An array of conditions to filter the data.
+ * @param {string[]} [columns] - An array of column names to retrieve. If not provided, all columns will be retrieved.
+ * @param {string} [groupBy] - The column by which to group the results.
+ *
+ * @returns {Promise<{ allData: any[] } | string>} - A promise that resolves to an object containing all the retrieved data or an error message.
+ */
+export async function retrieveData(database:string, table:string, userForDb:string, passForDb:string, condition?:Predicate[], columns?:string[], groupBy?:string): Promise<any[]|string> {
+  const POOL = createPool(database, userForDb, passForDb);
+
+  let results:any;
+
+  const data:string[]|undefined = condition?.map((element) => element.value);
+
+  try {
+    results = await POOL.query(createSelect(table, condition, columns, groupBy), data);
+    results = results.rows;
+  } catch (e:any) {
+    results = errorCodeMessage(e.code);
+  }
+  return results;
+}
+
+/**
+ * Creates a simple update SQL statement
+ * @author Adam Logan
+ * @date 2023-03-26
+ * @param { string } table The table to update the data in
+ * @param { string[] } columns The columns that are being changed
+ * @param { string[] } [data] The data to change to, must be the same length as the columns array
+ * @param { string } [predicate] The condition to decide which rows to update
+ * @returns { string } The update SQL statement
+ */
+export function createUpdate(table:string, columns:string[], predicate:string, data?:string[]) : string {
+  const FAILEDMSSG:string = "FAILED";
+  let query:string = ""
+
+  let updateVals:string[] = columns.map((element:string, index:number) => `${element} = ${data === undefined ? `$${index + 1}` : `'${data[index]}'`}`);
+
+  query = `UPDATE ${table} SET ${updateVals.concat()} WHERE ${predicate} ;`;
+  query = (data !== undefined && columns.length !== data.length) ? FAILEDMSSG : query;
 
   return query;
 }
@@ -69,28 +151,6 @@ export function createInsert(table:string, columns:string[], returnCols?:string[
   query = (data !== undefined && columns.length !== data.length) ? FAILEDMSSG : query;
 
   return query
-}
-
-/**
- * Creates a simple update SQL statement
- * @author Adam Logan
- * @date 2023-03-26
- * @param { string } table The table to update the data in
- * @param { string[] } columns The columns that are being changed
- * @param { string[] } [data] The data to change to, must be the same length as the columns array
- * @param { string } [predicate] The condition to decide which rows to update
- * @returns { string } The update SQL statement
- */
-export function createUpdate(table:string, columns:string[], predicate:string, data?:string[]) : string {
-  const FAILEDMSSG:string = "FAILED";
-  let query:string = ""
-
-  let updateVals:string[] = columns.map((element:string, index:number) => `${element} = ${data === undefined ? `$${index + 1}` : `'${data[index]}'`}`);
-
-  query = `UPDATE ${table} SET ${updateVals.concat()} WHERE ${predicate} ;`;
-  query = (data !== undefined && columns.length !== data.length) ? FAILEDMSSG : query;
-
-  return query;
 }
 
 /**

@@ -1,87 +1,84 @@
 import { NextFunction, Request, Response } from "express";
 import jwt, { JwtPayload } from 'jsonwebtoken';
-import {createPool, createSelect, insertData, updateData} from './crud';
+import { retrieveData, updateData } from './crud';
 import bcrypt from 'bcrypt';
 import axios from 'axios';
 import { config } from 'dotenv';
-import { log } from "console";
 
 config();
 
 // Sets the secret key for the JWT token, and provides a default value if the environment variable is not set
 const jwtSecret:string = process.env.JWT_SECRET || "034A55E873E4CCD1B601E08B2EC2EB9BF0A569CA8C87F1A572D0AF16C404C988";
+const db:string = process.env.DATABASE || "No database found";
+const dbPassword:string = process.env.DBPASSWORD || "No password found";
+const userTable:string = 'picu';
+
+const permissionDeniedResponse = "ERROR: Permission Denied";
 
 /**
  * Initial login function that creates a JWT token based on the userId and their role
  * @author Adam Logan
- * @date 2023-04-10
  * @param { Request } request Must contain 'username' and 'password' parameters within the body
  * @param { Response } response If valid, the token, the username and the role of the user, and a error message if not
  * @returns { void }
- * 
- * @todo Maybe create a function in crud.ts, to select a specific record rather than directly interacting with db
  */
-export function authenticate(request: Request, response: Response): void {
-    // the admin role is used to login in users
-    const POOL = createPool("audit", "admin", "password"); 
+export async function authenticate(request: Request, response: Response): Promise<void> {
+  const { username, password } = request.body;
 
-    const { username, password } = request.body;
+  // this is for logging purposes
+  request.params.username = username;
 
-    // this is for logging purposes
-    request.params.username = username;
+  const condition:any[] = [{
+    column: "picu_id",
+    operation: "=",
+    value: username
+  }];
 
-    let condition:string = "picu_id=" + username;
+  const results = await retrieveData(db, userTable, "admin", dbPassword, condition, ["picu_role", "password"]);
 
-    POOL.query(createSelect("picu", condition, ["picu_role", "password"]), async (error:any, results:any) => {
-      if (error || results.rows.length === 0) {
-        response.send("ERROR: Permission Denied");
+  if (results.length === 0 || typeof results === 'string') {
+    response.send(permissionDeniedResponse);
+  }
+  else {
+    // compares the hashed password with the plaintext one which is provided
+    bcrypt
+    .compare(password, results[0].password)
+    .then(res => {
+      if(res) {
+        request.params.role = results[0].picu_role;
+
+        // adds the userID and role to the JWT token
+        const userToken = jwt.sign(
+          {
+            userId: username,
+            role: results[0].picu_role
+          },
+          jwtSecret,
+          {expiresIn: "1d"}
+        );
+        response.status(201).send({
+          token: userToken,
+          role: results[0].picu_role,
+          username: username
+        });
+
+      } else {
+        response.status(401).send(permissionDeniedResponse);
       }
-      else {
-        // compares the hashed password with the plaintext one which is provided
-        bcrypt
-        .compare(password, results.rows[0].password)
-        .then(res => {
-          if(res) {
-            request.params.role = results.rows[0].picu_role;
-
-            // adds the userID and role to the JWT token
-            const userToken = jwt.sign(
-              {
-                userId: username,
-                role: results.rows[0].picu_role
-              },
-              jwtSecret,
-              {expiresIn: "1d"}
-            );
-            response.status(201).send({
-              token: userToken,
-              role: results.rows[0].picu_role,
-              username: username
-            });
-
-          } else {
-            response.status(401).send("ERROR: Permission Denied");
-          }
-        })
-        .catch(err => response.send(err))
-      }
-        
-    });
+    })
+    }
 }
 
 /**
  * Used to authorise a user for an endpoint, by checking the JWT 
  * @author Adam Logan
- * @date 2023-04-10
  * @param { any } request
  * @param { Response } response
  * @param { NextFunction } next
  * @param { string } [level] - The role required to access the endpoint
- * @returns { void }
- * 
- * @todo check the role from the db is correct for the one embedded in the token
+ * @returns { void } 
  */
-export function authorise(request: Request, response: Response, next:NextFunction, level:'admin'|'picu'|'field_engineer' = 'picu'):void {
+export async function authorise(request: Request, response: Response, next:NextFunction, level:'admin'|'picu'|'field_engineer' = 'picu'):Promise<void> {
   try {
     // get the token from the authorization header
     const authHeader:string|undefined = request.headers.authorization === undefined ? "error" : request.headers.authorization;
@@ -94,19 +91,30 @@ export function authorise(request: Request, response: Response, next:NextFunctio
     if(typeof user === 'string') {
       request.params.user = user;
       next();
-
       // As an admin can do everything 
-    } else if (user.role === level || user.role === "admin") { 
+    } else if (user.role === level || user.role === "admin") {
+      const condition:any[] = [{
+        column: "picu_id",
+        operation: "=",
+        value: user.userId
+      }];
+
+      const dbResult = await retrieveData(db, userTable, "admin", dbPassword, condition, ["picu_role"]);
+      
+      if(typeof dbResult === "string") response.status(401).json(permissionDeniedResponse);
+
+      if(dbResult[0].picu_role !== user.role) response.status(401).json(permissionDeniedResponse);
+
       request.params.username =  user.userId;
       request.params.role =  user.role;
       next();
     } else {
-      response.status(401).json("ERROR: Permission Denied");
+      response.status(401).json(permissionDeniedResponse);
     }
 
     
   } catch (err) {
-    response.status(401).json("ERROR: Permission Denied");
+    response.status(401).json(permissionDeniedResponse);
   }
 }
 
@@ -126,7 +134,7 @@ export function authorise(request: Request, response: Response, next:NextFunctio
  * @returns {Promise<string>} - The hashed password or an error message if the input password is not valid.
  */
 export async function hashPassword(password:string):Promise<string> {
-  const SALTROUNDS = 10;
+  const saltRounds = 10;
 
   // Checks the password is valid
   const passwordRegex = /^(?=.*[A-Z])(?=.*[a-z])(?=.*[!@#$%^&*()_+\-=\[\]{};':"\\|,.<>\/?]+)(?=.*\d).{8,}$/;
@@ -134,7 +142,7 @@ export async function hashPassword(password:string):Promise<string> {
     return "Error: Password must be at least 8 characters long and contain at least one uppercase letter, one lowercase letter and one number.";
   }
 
-  const hash = await bcrypt.hash(password , SALTROUNDS);
+  const hash = await bcrypt.hash(password , saltRounds);
 
   return hash;
 }
@@ -175,6 +183,8 @@ export async function updatePicuPassword(id:string, newPassword:string, role:str
  * The site key is then used in the client side code.
  * 
  * @function verifyCaptcha
+ * 
+ * @author Adam Logan
  * 
  * @param {string} token - The CAPTCHA token generated client-side after a user completes a CAPTCHA challenge.
  * @returns {Promise<boolean>} - A promise that resolves to true if the CAPTCHA token is valid and false otherwise.

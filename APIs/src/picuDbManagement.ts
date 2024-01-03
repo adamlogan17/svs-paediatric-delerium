@@ -1,4 +1,4 @@
-import { createPool, createSelect, deleteData, insertData, updateData, getAll } from './crud';
+import { createPool, deleteData, insertData, updateData, getAll, retrieveData } from './crud';
 import { hashPassword } from './login';
 
 const db:string = process.env.DATABASE || "No database found";
@@ -131,11 +131,9 @@ export async function nextPicu(role:string) {
  * @returns {Promise<{picu_id:string,picu_role:string}[]>} - An array of relevant PICU IDs.
  */
 export async function getAllIds(role:string): Promise<{picu_id:string, picu_role:string}[]> {
-  const POOL = createPool(db, role, dbPassword);
+  const allIds = await retrieveData(db, tableName, role, dbPassword, undefined, ["picu_id", "picu_role"]);
 
-  const sqlStatement = createSelect(tableName, "", ["picu_id", "picu_role"]);
-
-  const allIds = (await POOL.query(sqlStatement)).rows;
+  if(typeof allIds === "string") return [];
 
   return allIds.filter((id:any) => {
     if (role === "admin") {

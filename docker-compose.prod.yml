@@ -9,7 +9,7 @@ services:
         # This is the IP address of the server, which the docker container will be running on
         - BASE_IP=143.117.69.4
     ports:
-      - "48801:8000"
+      - "48800:8000"
   audit:
     container_name: prod_svs_audit
     build: 
@@ -19,7 +19,7 @@ services:
         - REACT_APP_API_URL=http://143.117.69.4:48801
     ports:
       # The ports cannot be the same as the fist docker-compose file
-      - "48301:80"    
+      - "48300:80"    
   postgres:
     container_name: prod_svs_postgres
     ports:

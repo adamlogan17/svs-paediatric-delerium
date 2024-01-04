@@ -2,6 +2,11 @@ import { Pool } from "pg";
 import errorCodeMessage from "./errorCodeMessage";
 import { types } from 'util';
 
+const dbPassword:string = process.env.DEFAULTDBUSERPASS || "postgrespw";
+const dbHost:string = process.env.DBHOST || "postgres";
+const defaultUsername:string = process.env.DEFAULTDBUSERNAME || "postgres";
+const dbPort:number = Number(process.env.DBPORT) || -1;
+
 /**
  * Creates a pool object to connect to a database
  * @author Adam Logan
@@ -11,13 +16,13 @@ import { types } from 'util';
  * @param { string } [password="postgrespw"] The password associated with the username
  * @returns { Pool } A pool object that allows queries to be ran on a database
  */
-export function createPool(database:string, user:string="postgres", password:string="postgrespw") : Pool {
+export function createPool(database:string, user:string=defaultUsername, password:string=dbPassword) : Pool {
   return new Pool({
-    host: "postgres",
+    host: dbHost,
     user: user,
     database: database, 
     password: password, 
-    port: 5432
+    port: dbPort
   });
 }
 
@@ -47,14 +52,17 @@ type Predicate = {
 }
 
 /**
- * Creates a simply SQL select query, only creates a query with valid syntax but does not check if the content of the query is correct
+ * Creates a simple SQL SELECT query. This function only ensures the syntax of the query is correct, 
+ * it does not validate the content of the query.
+ * 
  * @author Adam Logan
- * @date 2023-03-23
- * @param { string } table The table the data is to be selected from
- * @param { string } [condition] A condition to filter the data upon
- * @param { string[] } [data] The columns to be selected, including the function which you would like to perform
- * @param { string } [groupBy] The name of the column which you would like to group by
- * @returns { string } A query that will return the required results
+ * 
+ * @param {string} table - The name of the table from which data is to be selected.
+ * @param {Predicate[]} [conditions] - An array of conditions to filter the data. Each condition is an object with a column name, a value, and a comparison operator.
+ * @param {string[]} [columns] - An array of column names to be selected. If this parameter is not provided, the function selects all columns (*).
+ * @param {string} [groupBy] - The name of the column by which to group the results. This parameter is optional.
+ * 
+ * @returns {string} A SQL SELECT query that can be executed to get the required results.
  */
 export function createSelect(table:string, conditions?:Predicate[], columns?:string[], groupBy?:string) : string {
   let query:string = "SELECT ";
@@ -108,7 +116,6 @@ export async function retrieveData(database:string, table:string, userForDb:stri
 /**
  * Creates a simple update SQL statement
  * @author Adam Logan
- * @date 2023-03-26
  * @param { string } table The table to update the data in
  * @param { string[] } columns The columns that are being changed
  * @param { string[] } [data] The data to change to, must be the same length as the columns array
@@ -130,7 +137,6 @@ export function createUpdate(table:string, columns:string[], predicate:string, d
 /**
  * Creates a simple SQL insert query, only creates a query with valid syntax but does not check if the content of the query is correct
  * @author Adam Logan
- * @date 2023-03-23
  * @param { string } table The table where the data is required to be inserted
  * @param { string[] } columns The column names that are being inserted
  * @param { string[] } [returnCols] The columns that are returned when the data is inserted
@@ -156,7 +162,6 @@ export function createInsert(table:string, columns:string[], returnCols?:string[
 /**
  * Creates a simple delete SQL statement
  * @author Adam Logan
- * @date 2023-03-27
  * @param { string } table The table to delete the data from
  * @param { string } [predicate] The condition to delete the data for
  * @returns { string } The delete SQL statement
@@ -173,7 +178,6 @@ export function createDelete(table: string, predicate?:string) : string {
  * Fetches all records from a specified table in a database.
  * 
  * @author Adam Logan
- * @function getAll
  * @param {string} database - The name of the database.
  * @param {string} table - The name of the table from which to fetch the records.
  * @param {string} userForDb - The username for the database connection.
@@ -300,7 +304,6 @@ export async function deleteData(database:string ,table:string, predicate:string
  * Copies a table to a table in another database
  * @param {string} sourceDatabase The name of the database to copy the table from
  * @param {string} destinationDatabase The name of the database to copy the table to
- * Copies a table to an existing table with a different name
  * @author Ewan Forsythe
  * @param {string} database The name of the database to copy the table from
  * @param {string} sourceTable The name of the table to copy

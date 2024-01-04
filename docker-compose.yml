@@ -5,6 +5,11 @@ volumes:
 
 services:
   apis:
+    environment:
+      - DEFAULTDBUSERPASS=postgrespw
+      - DBPORT=5432
+      - DBHOST=postgres
+      - DEFAULTDBUSERNAME=postgres
     container_name: svs_apis
     build:
       context: ./APIs

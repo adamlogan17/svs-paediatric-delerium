@@ -1,8 +1,8 @@
 import { createPool, createSelect } from "./crud";
 import { config } from 'dotenv';
 import errorCodeMessage from "./errorCodeMessage";
-import { linearRegression, linearRegressionLine } from 'simple-statistics';
-import * as tf from '@tensorflow/tfjs';
+//import { linearRegression, linearRegressionLine } from 'simple-statistics';
+//import * as tf from '@tensorflow/tfjs';
 
 
 config();
@@ -145,23 +145,24 @@ export async function predictiveAnalysis(role:string, siteId:number, endDate:Dat
   }
 
   // Calculate the linear regression line
-  const test = linearRegression(currentScores.entryDates.map((element, index) => [element.getTime(), currentScores.complianceScore[index]]));
-  const regressionLine = linearRegressionLine(test);
+  //const test = linearRegression(currentScores.entryDates.map((element, index) => [element.getTime(), currentScores.complianceScore[index]]));
+  //const regressionLine = linearRegressionLine(test);
 
   // Calculate the predictions
   const predictions = currentScores;
   console.log(endDate);
   let currentDate = new Date();
   while (currentDate <= endDate) {
-    const prediction = regressionLine(currentDate.getTime());
-    console.log(prediction);
-    predictions.entryDates.push(new Date(currentDate));
-    predictions.complianceScore.push(Math.round(prediction * 1e2)/1e2);    
+    //const prediction = regressionLine(currentDate.getTime());
+    //console.log(prediction);
+   // predictions.entryDates.push(new Date(currentDate));
+   // predictions.complianceScore.push(Math.round(prediction * 1e2)/1e2);    
 
     // Increment the date by 7 days
     currentDate.setDate(currentDate.getDate() + 7);
   }
-  return predictions;
+  //return predictions;
+  return "Hello - Remove this, just changed it for the production server";
 }
 
 export async function singlePicuCompliance(role:string, siteId:number):Promise<{entryDates:Date[], complianceScore:number[]}|string> {

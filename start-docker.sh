@@ -6,14 +6,14 @@ dump_database() {
 
     # Check if the day is a multiple of 28
     if (( day % 28 == 0 )); then
-        docker exec -t dev_svs_postgres pg_dumpall -c -U postgres > dump_grandfather.sql
+        docker exec -t prod_svs_postgres pg_dumpall -c -U postgres > dump_grandfather.sql
         Echo "Dumping grandfather database..."
     # Check if the day is a multiple of 7 but not 28
     elif (( day % 7 == 0 )); then
-        docker exec -t dev_svs_postgres pg_dumpall -c -U postgres > dump_father.sql
+        docker exec -t prod_svs_postgres pg_dumpall -c -U postgres > dump_father.sql
         echo "Dumping father database..."
     else
-        docker exec -t dev_svs_postgres pg_dumpall -c -U postgres > dump_child.sql
+        docker exec -t prod_svs_postgres pg_dumpall -c -U postgres > dump_child.sql
         echo "Dumping child database..."
     fi
 }
@@ -23,15 +23,15 @@ restore_database() {
     case "$1" in
         c) #child dump
             echo "Restoring child database..."
-            /bin/bash -c "cat dump_child.sql | docker exec -i dev_svs_postgres psql -U postgres"
+            /bin/bash -c "cat dump_child.sql | docker exec -i prod_svs_postgres psql -U postgres"
             ;;
         f) #father dump
             echo "Restoring father database..."
-            /bin/bash -c "cat dump_father.sql | docker exec -i dev_svs_postgres psql -U postgres"
+            /bin/bash -c "cat dump_father.sql | docker exec -i prod_svs_postgres psql -U postgres"
             ;;
         g) #grandfather dump
             echo "Restoring grandfather database..."
-            /bin/bash -c "cat dump_grandfather.sql | docker exec -i dev_svs_postgres psql -U postgres"
+            /bin/bash -c "cat dump_grandfather.sql | docker exec -i prod_svs_postgres psql -U postgres"
             ;;
         *)
             echo "Invalid argument to -r: $1"

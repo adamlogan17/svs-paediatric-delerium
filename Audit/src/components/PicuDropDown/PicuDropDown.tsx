@@ -51,12 +51,14 @@ export default function PicuDropDown(props:{helperText?:string, error?:boolean, 
       .finally(() => setIsLoading(false));
   }, [props.roles, picuId]);
 
+  // console.log(props.defaultValue ? picuId || "no picu but default" : "no default");
+
   return (
     <>
       <PageLoad loading={isLoading} />
 
       <Autocomplete
-        value={props.defaultValue ? picuId || null : null}
+        value={props.defaultValue ? picuId || null : picuId}
         sx={props.sx}
         disablePortal
         id={props.id}

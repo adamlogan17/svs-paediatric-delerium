@@ -135,9 +135,13 @@ function filterDates(oldData:{xValues:string[],yValues:number[]}, start:Dayjs, e
 function downSampleDates(data: {xValues: string[], yValues: number[]}, windowSize: number):  {xValues: string[], yValues: number[]} {
   const downSample:{xValues: string[], yValues: number[]} = {xValues: [], yValues: []};
   for (let i = 0; i < data.xValues.length; i += windowSize) {
-    const window = data.yValues.slice(i, i + windowSize);
-    const averageScore = window.reduce((a, b) => a + b, 0) / window.length;
-    const middleDate = data.xValues[i + Math.floor(windowSize / 2)];
+    const window:number[] = data.yValues.slice(i, i + windowSize);
+    const averageScore:number = window.reduce((a, b) => a + b, 0) / window.length;
+    let middleWindowIndex:number = i + Math.floor(windowSize / 2);
+    if(middleWindowIndex > data.xValues.length) {
+      middleWindowIndex = data.xValues.length - 1;
+    }
+    const middleDate = data.xValues[middleWindowIndex];
     downSample.xValues.push(middleDate);
     downSample.yValues.push(averageScore);
   }
@@ -249,7 +253,7 @@ function AuditGraphs() {
         if(dataFitValue >= 0) {
           newCompData = dataType.downSample ? dataType.downSample(newCompData, windowSize) : newCompData;
         }
-
+        console.log(newCompData);
         setChartData(newCompData);
       } catch (error) {
         enqueueSnackbar("System Error", { variant: 'error' });

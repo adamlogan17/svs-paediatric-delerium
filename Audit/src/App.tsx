@@ -96,7 +96,7 @@ const adminLinks:LabelValuePair[] = [
     label:'Menu'
   }, 
   {
-    value:'/forgot-password',
+    value:'/reset-password',
     label:'Reset Password'
   },
   {
@@ -117,7 +117,7 @@ const adminLinks:LabelValuePair[] = [
   },
   {
     label:'Edit PICUs',
-    value:'/edit-picu'
+    value:'/edit-picus'
   }
 ]
 
@@ -131,7 +131,7 @@ const fieldEngineer:LabelValuePair[] = [
     label:'Menu'
   }, 
   {
-    value:'/forgot-password',
+    value:'/reset-password',
     label:'Reset Password'
   }
 ]

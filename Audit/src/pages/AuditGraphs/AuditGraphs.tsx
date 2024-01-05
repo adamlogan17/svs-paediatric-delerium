@@ -216,9 +216,8 @@ function AuditGraphs() {
   useEffect(() => {
     setIsLoading(true);
   
-    // Create an asynchronous function inside the hook
     async function refreshChartData() {
-      // Convert startDate and endDate to 'DD/MM/YYYY' format for comparison
+      // Converts startDate and endDate to 'DD/MM/YYYY' format for comparison
       const start = dayjs(startDate);
       const end = dayjs(endDate);
       try {

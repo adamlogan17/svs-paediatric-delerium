@@ -2,14 +2,40 @@ import { Component, RefObject } from 'react';
 import ReCAPTCHA from 'react-google-recaptcha';
 import PageLoad from '../Loading/PageLoad';
 
+/**
+ * Represents the props for the Captcha component.
+ * 
+ * @author Adam Logan
+ * 
+ * @typedef {Object} CaptchaProps
+ * @property {RefObject<ReCAPTCHA>} captchaRef - A reference to the ReCAPTCHA component.
+ */
 type CaptchaProps = {
   captchaRef: RefObject<ReCAPTCHA>;
 }
 
+/**
+ * Represents the state for the Captcha component.
+ * 
+ * @author Adam Logan
+ * 
+ * @typedef {Object} CaptchaState
+ * @property {boolean} isLoading - A boolean indicating whether the component is currently loading.
+ */
 type CaptchaState = {
   isLoading: boolean;
 }
 
+/**
+ * A React component that renders a Google reCAPTCHA widget.
+ * 
+ * The reason why this is a class is to ensure the loading animation only stops when the component has mounted
+ * 
+ * @author Adam Logan
+ * 
+ * @class Captcha
+ * @extends {Component<CaptchaProps, CaptchaState>}
+ */
 class Captcha extends Component<CaptchaProps, CaptchaState> {
   constructor(props:CaptchaProps) {
     super(props);

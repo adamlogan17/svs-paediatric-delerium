@@ -45,11 +45,13 @@ function LineGraph(props:ChartProps) {
               borderColor: lineColor,
               pointBackgroundColor: lineColor,
               data: props.chartData.yValues,
+              tension: 0.1
             },
             {
               pointRadius: 1,
               borderColor: xValuesAsNum[0] !== undefined ? alpha(lineColor, 0.5) : alpha(lineColor, 0.0),
-              data: xValuesAsNum.map(x => trendline.m * (x ?? -1) + trendline.b)
+              data: xValuesAsNum.map(x => trendline.m * (x ?? -1) + trendline.b),
+              tension: 0.5
             }
           ]
         }}

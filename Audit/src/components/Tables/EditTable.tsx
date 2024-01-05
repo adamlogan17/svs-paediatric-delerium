@@ -18,12 +18,9 @@ import ConfirmDialog from '../ConfirmDialog/ConfirmDialog';
  * @property {{ label: string, value: string }[]} [options] - Options for the "autocomplete" type (optional).
  */
 type CustomFields = {
-    key:string,
-    type:"autocomplete"|"boolean"
-    options?:{
-      label:string,
-      value:string
-    }[]
+  key:string,
+  type:"autocomplete"|"boolean"
+  options?:LabelValuePair[]
 }
 
 /**
@@ -37,7 +34,7 @@ type CustomFields = {
  * @property {any} [columnNameMap] - A map of column names (optional).
  * @property {CustomFields[]} [customInputFields] - Custom input fields (optional).
  * @property {string[]} [noEditFields] - Fields that cannot be edited (optional).
- * @property {(data: any) => string[]} [validateData] - A function for data validation (optional).
+ * @property {(data: any) => string[]} [validateData] - A function for data validation (optional), which returns the field names of invalid data.
  * @property {(ids: number[]) => void} deleteData - A function to delete data.
  * @property {(data: any) => void|any[]|Promise<any[]>} updateData - A function to update data.
  * @property {any[]} [disableDelete] - An array of IDs to disable delete functionality (optional).
@@ -128,8 +125,8 @@ export default function EditTable(props: EditTableProps) {
     props.deleteData(ids);
   };
 
-  function itemSelection(add: boolean, picuId: number) {
-    setSelected((prev) => add ? [...prev,  picuId] : prev.filter(id => id !== picuId));
+  function itemSelection(add: boolean, selectedId: number) {
+    setSelected((prev) => add ? [...prev,  selectedId] : prev.filter(id => id !== selectedId));
   }
 
   function handleChangePage(event: any, newPage: number) {

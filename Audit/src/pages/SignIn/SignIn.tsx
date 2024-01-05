@@ -126,8 +126,9 @@ export default function SignIn() {
       setIsLoading(false);
       if(error.response.status === 401) {
         setIncorrectDetails(true);
+      } else {
+        enqueueSnackbar("System Error", { variant: "error" });
       }
-      enqueueSnackbar("System Error", { variant: "error" });
       return;
     }
 

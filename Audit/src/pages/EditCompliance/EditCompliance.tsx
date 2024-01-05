@@ -77,10 +77,14 @@ const columnNameMap:any = {
  * @author Adam Logan
  * @function validateData
  * @param {ComplianceData} data - The compliance data to validate.
- * @returns {string[]} - An array of field names that have empty values.
+ * @returns {string[]} - An array of the field names that contain invalid data.
  */
-function validateData(data:ComplianceData) {
-  return Object.entries(data).filter(([key, value]) => value === "").map(([key]) => key);
+function validateData(data:ComplianceData):string[] {
+  const invalidFields:string[] = Object.entries(data).filter(([key, value]) => value === "").map(([key]) => key);
+  if(!invalidFields.includes("bed_number")) {
+    if(data.bed_number < 1) invalidFields.push("bed_number");
+  }
+  return invalidFields;
 }
 
 /**
@@ -121,7 +125,7 @@ async function updateCompliance(compToUpdate: ComplianceData): Promise<Complianc
       headers: { Authorization: `Bearer ${sessionStorage.getItem("TOKEN")}` },
     });
 
-    enqueueSnackbar(`PICU ${compToUpdate.comp_id} has been updated.`, {
+    enqueueSnackbar(`Compliance ID ${compToUpdate.comp_id} has been updated.`, {
       variant: "success",
     });
 

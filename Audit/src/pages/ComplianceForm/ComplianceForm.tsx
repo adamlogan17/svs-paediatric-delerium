@@ -111,7 +111,6 @@ export default function ComplianceForm() {
     };
 
     const picuId:number = sessionStorage.getItem('ROLE') === 'picu' ? Number(sessionStorage.getItem('USERNAME')) : Number(data.get("picu-id"));
-    console.log(data.get("picu-id"));
     if((data.get("picu-id") === "" || isNaN(picuId) || !Number.isInteger(picuId)) && sessionStorage.getItem('ROLE') !== 'picu') {
       setErrorFields((prevFields) => [...prevFields, "picu-id"]);
       error = true;
@@ -120,7 +119,7 @@ export default function ComplianceForm() {
     }
     // validates the bed number input
     const bedNumber:number = Number(data.get("bed-number"));
-    if(data.get("bed-number") === "" || isNaN(bedNumber) || bedNumber < 0 || !Number.isInteger(bedNumber)) {
+    if(data.get("bed-number") === "" || isNaN(bedNumber) || bedNumber < 1 || !Number.isInteger(bedNumber)) {
       setErrorFields((prevFields) => [...prevFields, "bed-number"]);
       error = true;
     } else {

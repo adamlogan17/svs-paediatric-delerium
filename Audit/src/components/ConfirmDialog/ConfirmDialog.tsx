@@ -5,22 +5,35 @@ import DialogContent from '@mui/material/DialogContent';
 import DialogTitle from '@mui/material/DialogTitle';
 
 /**
+ * Represents the props for the ConfirmDialog component.
+ * 
+ * @author Adam Logan
+ * 
+ * @typedef {Object} ConfirmDialogProps
+ * @property {boolean} open - Boolean determining if the dialog should be open or closed.
+ * @property {() => void} handleClose - Callback function to close the dialog.
+ * @property {string} title - The title of the dialog.
+ * @property {JSX.Element} description - The descriptive text or component to be displayed in the dialog.
+ * @property {Function} handleConfirm - Callback function executed when the "Confirm" button is clicked.
+ */
+type ConfirmDialogProps = {
+  open:boolean, 
+  handleClose:() => void, 
+  title:string, 
+  description:JSX.Element, 
+  handleConfirm:Function
+}
+
+/**
  * A functional component that renders a confirmation dialog using Material-UI's Dialog component.
  * The dialog displays a title, a description, and provides options to either confirm or cancel.
  * 
  * @author Adam Logan
- * @component
  * 
- * @param {boolean} props.open - Boolean determining if the dialog should be open or closed.
- * @param {() => void} props.handleClose - Callback function to close the dialog.
- * @param {string} props.title - The title of the dialog.
- * @param {JSX.Element} props.description - The descriptive text or component to be displayed in the dialog.
- * @param {() => void} props.handleConfirm - Callback function executed when the "Confirm" button is clicked.
- * @returns {JSX.Element} A Material-UI dialog component.
- * 
- * TODO Maybe change the type of the callback functions to Function
+ * @param {ConfirmDialogProps} props - The props for the ConfirmDialog component.
+ * @returns {JSX.Element} A Material-UI dialog component. 
  */
-export default function ConfirmDialog(props:{open:boolean, handleClose:() => void, title:string, description:JSX.Element, handleConfirm:Function}) {
+export default function ConfirmDialog(props:ConfirmDialogProps) {
   return (
     <Dialog
       open={props.open}

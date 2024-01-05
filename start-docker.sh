@@ -1,22 +1,19 @@
 #!/bin/bash
 
-SCRIPT_DIR=$(dirname "$(readlink -f "$0")")
-OUTPUT_DIR="$SCRIPT_DIR"
-
 dump_database() {
     # Get the current day of the month
     day=$(date +%d)
 
     # Check if the day is a multiple of 28
     if (( day % 28 == 0 )); then
-        docker exec -t prod_svs_postgres pg_dumpall -c -U postgres > "$OUTPUT_DIR/dump_grandfather.sql"
-        echo "Dumping grandfather database..."
+        docker exec -t prod_svs_postgres pg_dumpall -c -U postgres > dump_grandfather.sql
+        Echo "Dumping grandfather database..."
     # Check if the day is a multiple of 7 but not 28
     elif (( day % 7 == 0 )); then
-        docker exec -t prod_svs_postgres pg_dumpall -c -U postgres > "$OUTPUT_DIR/dump_father.sql"
+        docker exec -t prod_svs_postgres pg_dumpall -c -U postgres > dump_father.sql
         echo "Dumping father database..."
     else
-        docker exec -t prod_svs_postgres pg_dumpall -c -U postgres > "$OUTPUT_DIR/dump_child.sql"
+        docker exec -t prod_svs_postgres pg_dumpall -c -U postgres > dump_child.sql
         echo "Dumping child database..."
     fi
 }

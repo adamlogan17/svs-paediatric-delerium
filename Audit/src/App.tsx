@@ -78,7 +78,7 @@ function getDesignTokens(mode: string):ThemeOptions {
 //     varientName: true;
 //   }
 // 
-const customVarients = {
+const customVariants = {
   error: BaseSnackBarElement,
   info: BaseSnackBarElement,
   success: BaseSnackBarElement,
@@ -104,12 +104,20 @@ const adminLinks:LabelValuePair[] = [
     label:'Graphs'
   },
   {
-    label:"View Compliance",
+    label:"Edit Compliance",
     value:'/edit-compliance'
   },
   {
-    label:"Log",
+    label:'View Log',
     value:'/audit-log'
+  },
+  {
+    label:'Add PICU',
+    value:'/add-picu'
+  },
+  {
+    label:'Edit PICUs',
+    value:'/edit-picu'
   }
 ]
 
@@ -170,7 +178,7 @@ export default function App() {
     <ThemeProvider theme={createTheme(theme)} >
       <CssBaseline />
 
-      <SnackbarProvider maxSnack={3} Components={customVarients}>
+      <SnackbarProvider maxSnack={3} Components={customVariants}>
         <BasicNavBar
           links={sessionStorage.getItem('ROLE') === 'admin' ? adminLinks : sessionStorage.getItem('ROLE') === 'field_engineer' ? fieldEngineer : sessionStorage.getItem('ROLE') === 'picu' ? picu : []} 
           modeOptions={options}

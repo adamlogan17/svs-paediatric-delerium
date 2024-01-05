@@ -34,7 +34,7 @@ function Home() {
               variant="contained"
               onClick={() => navigate('/form', { state: { method: 'SOSPD' }})}
             >
-              SOSPD Audit Section
+              SOS-PD Audit Form
             </Button>
           </div>
 
@@ -43,7 +43,7 @@ function Home() {
               variant="contained"
               onClick={() => navigate('/form', { state: { method: 'CAPD' }})}
             >
-              CAPD Audit Section
+              CAPD Audit Form
             </Button>
           </div>
         </div>

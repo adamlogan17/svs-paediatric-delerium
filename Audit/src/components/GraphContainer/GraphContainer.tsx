@@ -57,7 +57,7 @@ function GraphContainer(props:GraphContainerProps) {
   return (
     <Paper sx={{padding: '10px'}}>
       <Box display="flex" justifyContent="flex-end" alignItems="center">
-        <Typography align="center" variant="h4" sx={{margin:'auto'}}>{props.title}</Typography>
+        <Typography align="center" variant="h5" sx={{margin:'auto'}}>{props.title}</Typography>
         <Tooltip title="Download">
           <IconButton onClick={handleDownload}>
             <FileDownloadIcon />

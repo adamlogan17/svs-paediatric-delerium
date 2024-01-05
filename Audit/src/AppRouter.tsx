@@ -8,9 +8,9 @@ import AuditGraphs from './pages/AuditGraphs/AuditGraphs';
 import FieldEngineer from './pages/FieldEngineer/FieldEngineer';
 import SignIn from "./pages/SignIn/SignIn";
 import Sandbox from "./pages/Sandbox/Sandbox";
-import AddPicu from "./pages/Admin/AddPicu";
+import AddPicu from "./pages/AddPicu/AddPicu";
 import ForgottenPassword from "./pages/ForgottenPassword/ForgottenPassword";
-import Auditlog from "./pages/Admin/AuditLog";
+import Auditlog from "./pages/AuditLog/AuditLog";
 import EditPicus from "./pages/EditPicus/EditPicus";
 import EditCompliance from "./pages/EditCompliance/EditCompliance";
 import Redirect from "./components/Redirect/Redirect";
@@ -57,7 +57,7 @@ function AppRouter() {
 
         {(adminAccess || fieldAccess) && (
           <>
-            <Route path="/forgot-password" element={<ForgottenPassword />} />
+            <Route path="/reset-password" element={<ForgottenPassword />} />
           </>
         )}
 

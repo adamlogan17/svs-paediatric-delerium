@@ -167,7 +167,7 @@ export default function ComplianceForm() {
       />
       
       <br />
-      <Box component="form" onSubmit={(event) => handleSubmit(event)} noValidate sx={{ width: '100%' }}>
+      <Box component="form" onSubmit={(event) => handleSubmit(event)} noValidate sx={{width:'70%'}}>
 
         {/* Only displays the PICU ID dropdown if their role is something other that a PICU */}
         {(sessionStorage.getItem('ROLE') !== 'picu' && <PicuDropDown roles={["picu"]} id="picu-id" helperText={errorFields.includes("picu-id") ? "This field is requires" : ""} error={errorFields.includes("picu-id")} />)}

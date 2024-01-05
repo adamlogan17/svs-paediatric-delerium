@@ -15,11 +15,11 @@ function FieldEngineer() {
   return (
     <PageContainer title="Field Engineer" icon={<EngineeringIcon />}>
       <Button 
-        onClick={() => navigate('/forgot-password')} 
+        onClick={() => navigate('/reset-password')} 
         sx={buttonStyle}
         variant="contained"
       >
-        Forgotten Password
+        Reset Password
       </Button>
     </PageContainer>
   );

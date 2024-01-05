@@ -3,8 +3,6 @@ import { useNavigate } from 'react-router-dom';
 import { Button } from '@mui/material';
 import AdminPanelSettingsIcon from '@mui/icons-material/AdminPanelSettings';
 
-import axios from 'axios';
-import { enqueueSnackbar } from 'notistack';
 import PageContainer from '../../components/PageContainer/PageContainer';
 
 /**
@@ -15,25 +13,6 @@ function Admin() {
   const buttonStyle = { mt: 3, mb: 2, width: '500px' };
 
   const navigate = useNavigate();
-
-  const handleBackup = () => {
-    axios.post(`${process.env.REACT_APP_API_URL}/backupPostgres`)
-      .then(response => console.log(response.data))
-      .catch(error => {
-        console.error('Error:', error);
-        enqueueSnackbar("System Error", { variant: "error" });
-      });
-  };
-
-  const handleRestore = () => {
-    axios.post(`${process.env.REACT_APP_API_URL}/restorePostgres`)
-      .then(response => console.log(response.data))
-      .catch(error => {
-        console.error('Error:', error);
-        enqueueSnackbar("System Error", { variant: "error" });
-      });
-  };
-
 
   return (
     <PageContainer title="Admin" icon={<AdminPanelSettingsIcon />}>
@@ -46,11 +25,11 @@ function Admin() {
       </Button>
 
       <Button
-        onClick={() => navigate('/forgot-password')}
+        onClick={() => navigate('/reset-password')}
         sx={buttonStyle}
         variant="contained"
       >
-        Forgotten Password
+        Reset Password
       </Button>
 
       <Button
@@ -85,6 +64,21 @@ function Admin() {
         View Graphs
       </Button>
 
+      <Button
+        onClick={() => navigate('/form', { state: { method: 'SOSPD' }})}
+        sx={buttonStyle}
+        variant="contained"
+      >
+        SOS-PD Form
+      </Button>
+      
+      <Button
+        onClick={() => navigate('/form', { state: { method: 'CAPD' }})}
+        sx={buttonStyle}
+        variant="contained"
+      >
+        CAPD Form
+      </Button>
 
     </PageContainer>
   );

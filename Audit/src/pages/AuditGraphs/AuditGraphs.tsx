@@ -200,8 +200,17 @@ function AuditGraphs() {
   const [endDate, setEndDate] = useState<Date>(new Date());
   const [picuId, setPicuId] = useState<number>(1);
   const [dataType, setDataType] = useState<ChartDataType>(allDataTypes[0]);
+  const [windowSize, setWindowSize] = useState(20);
 
   const specificPicuNeeded:boolean = dataType.value === 'picu' && sessionStorage.getItem("ROLE") === 'admin';
+
+  const downSampleLimit = 30;
+  
+  // Define the window size ranges and screen width ranges for down sampling window size
+  const minWindowSize = 40;
+  const maxWindowSize = 20;
+  const minScreenWidth = 480; // Minimum screen width (e.g., mobile)
+  const maxScreenWidth = 1920; // Maximum screen width (e.g., desktop)
 
   const dateFormat:string = 'DD/MM/YYYY';
 
@@ -213,19 +222,32 @@ function AuditGraphs() {
     padding: dropDownPadding
   }
 
+  // required to change the window size, for down sampling, when the screen is resized
+  useEffect(() => {
+    const handleResize = () => {
+      // Calculate windowSize based on screen width using linear interpolation
+      const newWindowSize = Math.floor(minWindowSize + (maxWindowSize - minWindowSize) * ((window.innerWidth - minScreenWidth) / (maxScreenWidth - minScreenWidth)));
+      setWindowSize(newWindowSize);
+    };
+    window.addEventListener('resize', handleResize);
+    return () => {
+      window.removeEventListener('resize', handleResize);
+    };
+  }, []);
+
   useEffect(() => {
     setIsLoading(true);
   
     async function refreshChartData() {
       // Converts startDate and endDate to 'DD/MM/YYYY' format for comparison
       const start = dayjs(startDate);
-      const end = dayjs(endDate);
+      const end = dayjs(endDate);   
       try {
         let newCompData = await dataType.getData(picuId);
         newCompData = dataType.filter ? dataType.filter(newCompData, start, end) : newCompData;
-        const dataFitValue = Math.floor(newCompData.xValues.length / 30);
+        const dataFitValue = Math.floor(newCompData.xValues.length / downSampleLimit);
         if(dataFitValue >= 0) {
-          newCompData = dataType.downSample ? dataType.downSample(newCompData, 5) : newCompData;
+          newCompData = dataType.downSample ? dataType.downSample(newCompData, windowSize) : newCompData;
         }
 
         setChartData(newCompData);
@@ -236,7 +258,7 @@ function AuditGraphs() {
       }
     };
     refreshChartData();
-  }, [startDate, endDate, picuId, dataType]);
+  }, [startDate, endDate, picuId, dataType, windowSize]);
 
   return (
     <PageContainer title="Visualisation" loading={isLoading} icon={<TimelineIcon />}>

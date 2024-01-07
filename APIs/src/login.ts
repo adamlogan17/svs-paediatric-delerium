@@ -169,7 +169,13 @@ export async function updatePicuPassword(id:string, newPassword:string, role:str
     return hashedPassword;
   }
 
-  const result = updateData("audit", "picu", {password: hashedPassword}, `picu_id=${id}`);
+  const condition:any[] = [{
+    column: "picu_id",
+    operation: "=",
+    value: id
+  }];
+
+  const result = updateData(db, userTable, {password: hashedPassword}, condition);
 
   return result;
 }

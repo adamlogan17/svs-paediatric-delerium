@@ -152,7 +152,7 @@ if [ "$b" ]; then
 elif [ "$p" ]; then
     echo "Removing PROD containers..."
     echo ""
-    docker rm -a -v -f $(docker ps -q -f name="prod_svs")
+    docker rm -v -f $(docker ps -q -a -f name="prod_svs")
     echo ""
     echo "Remove complete!"
     echo ""

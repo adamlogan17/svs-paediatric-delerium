@@ -72,7 +72,13 @@ export async function editCompliance(dataToEdit:ComplianceData, role:string): Pr
   delete dataToEdit.score; // the score is updated based on the trigger
   delete dataToEdit.entry_date; // the entry date should not change
 
-  return await updateData(db, tableName, dataToEdit, `comp_id = ${Number(id)}`, role, dbPassword);
+  const condition:any[] = [{
+    column: "comp_id",
+    operation: "=",
+    value: Number(id)
+  }];
+
+  return await updateData(db, tableName, dataToEdit, condition, role, dbPassword);
 }
 
 /**
@@ -85,7 +91,12 @@ export async function editCompliance(dataToEdit:ComplianceData, role:string): Pr
  * @returns {Promise<string>} A message indicating the success or failure of the deletion.
  */
 export async function deleteCompRecords(ids:number[], role:string): Promise<string> {
-  return await deleteData(db, tableName, `comp_id IN (${ids.join()})`, role, dbPassword);
+  const condition:any = {
+    column: "comp_id",
+    operation: "IN",
+    value: `(${ids.join()})`
+  };
+  return await deleteData(db, tableName, condition, role, dbPassword);
 }
 
 /**

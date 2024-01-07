@@ -56,7 +56,13 @@ export async function editPicu(dataToEdit:Picu, role:string): Promise<string> {
   delete dataToEdit.picu_id;
   delete dataToEdit.overall_compliance;
 
-  return await updateData(db, tableName, dataToEdit, `picu_id = ${Number(id)}`, role, dbPassword);
+  const condition:any[] = [{
+    column: "picu_id",
+    operation: "=",
+    value: Number(id)
+  }];
+
+  return await updateData(db, tableName, dataToEdit, condition, role, dbPassword);
 }
 
 /**
@@ -69,7 +75,12 @@ export async function editPicu(dataToEdit:Picu, role:string): Promise<string> {
  * @returns {Promise<string>} A message indicating the success or failure of the deletion.
  */
 export async function deletePicus(ids:number[], role:string): Promise<string> {
-  return await deleteData(db, tableName, `picu_id IN (${ids.join()})`, role, dbPassword);
+  const condition:any[] = [{
+    column: "picu_id",
+    operation: "IN",
+    value: ids
+  }];
+  return await deleteData(db, tableName, condition, role, dbPassword);
 }
 
 /**
@@ -157,7 +168,6 @@ export async function getAllIds(role:string): Promise<{picu_id:string, picu_role
  * @todo sort out the types for the data
  */
 export async function getPicuData(role:string): Promise<{allData:any[]}|string> {
-  console.log("role", role);
   let result:{allData:any[]}|string = await getAll(db, tableName, role, dbPassword);
   return result;
 }

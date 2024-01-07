@@ -345,7 +345,7 @@ app.post("/login", (request: Request, response: Response, next:NextFunction) => 
  * /{database}/getall/{table}:
  *  get:
  *    tags:
- *      - CRUD
+ *      - Database Testing
  *    summary: Gets all data from table
  *    parameters:
  *      - name: database
@@ -527,7 +527,7 @@ app.post('/restorePostgres', (req, res) => {
  *   post:
  *     summary: Inserts data into the specified database and table.
  *     tags: 
- *       - CRUD
+ *       - Database Testing
  *     parameters:
  *       - in: path
  *         name: database
@@ -564,86 +564,6 @@ app.post('/restorePostgres', (req, res) => {
 app.post("/:database/:table/insertdata", async (req: Request,res: Response) => {
   let result:string = req.body.returnCols !== undefined ? await insertData(req.params.database, req.params.table,req.body.data,req.body.returnCols) : await insertData(req.params.database, req.params.table,req.body.data);
   let status:number = typeof result === 'string' ? 400 : 200;
-  res.status(status).send(result);
-});
-
-/**
- * @swagger
- * /{database}/{table}/updatedata:
- *   put:
- *     summary: Update data in a specific table in a database.
- *     tags:
- *       - CRUD
- *     parameters:
- *       - in: path
- *         name: database
- *         required: true
- *         schema:
- *           type: string
- *         description: Name of the database.
- *       - in: path
- *         name: table
- *         required: true
- *         schema:
- *           type: string
- *         description: Name of the table.
- *       - in: body
- *         name: data
- *         required: true
- *         description: Data to update.
- *         schema:
- *           type: object
- *           properties:
- *             data:
- *               type: object
- *               description: The data fields to be updated.
- *             predicate:
- *               type: string
- *               description: Condition for which rows to update.
- *     responses:
- *       200:
- *         description: Successfully Updated the Data.
- *       400:
- *         description: Error occurred during the data update.
- */
-app.put("/:database/:table/updatedata", async (req: Request,res: Response) => {
-  let result:string = await updateData(req.params.database, req.params.table,req.body.data, req.body.predicate);
-  let status:number = result.includes("ERROR") ? 400 : 200;
-  res.status(status).send(result);
-});
-
-/**
- * @swagger
- * /{database}/deletedata/{table}/{predicate}:
- *   delete:
- *     summary: Deletes data from a specified table of a database.
- *     tags:
- *       - CRUD
- *     parameters:
- *       - name: database
- *         in: path
- *         description: Name of the database.
- *         required: true
- *         type: string
- *       - name: table
- *         in: path
- *         description: Name of the table where the data needs to be deleted from.
- *         required: true
- *         type: string
- *       - name: predicate
- *         in: path
- *         description: Condition specifying which rows to delete.
- *         required: true
- *         type: string
- *     responses:
- *       200:
- *         description: Data deleted successfully.
- *       400:
- *         description: Error in deleting data.
- */
-app.delete("/:database/deletedata/:table/:predicate", async (req: Request,res: Response) => {
-  let result:string = await deleteData(req.params.database, req.params.table,req.params.predicate);
-  let status:number = result.includes("ERROR") ? 400 : 200;
   res.status(status).send(result);
 });
 

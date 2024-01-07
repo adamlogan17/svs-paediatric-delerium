@@ -1,20 +1,9 @@
 import './NoPage.css';
 import Typography from '@mui/material/Typography';
-import { useLocation } from 'react-router-dom';
-
-
-
 
 const NoPage = () => {
-    const location = useLocation();
     let message = '404'; // Default message
     let description = 'Ooops... Page not found';
-
-    // Check if location.state exists and if it has a method property
-    if (location.state && (location.state.method === 'SOSPD' || location.state.method === 'CAPD')) {
-        message = '401';
-        description = 'You are not authorised to view this page, login first';
-    }
 
     return (
         <div className="no-page">

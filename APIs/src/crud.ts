@@ -102,7 +102,7 @@ export async function retrieveData(database:string, table:string, userForDb:stri
 
   let results:any;
 
-  const data:string[]|undefined = condition?.map((element) => element.value);
+  const data:string[]|undefined = condition?.flatMap((element) => element.value);
 
   try {
     results = await POOL.query(createSelect(table, condition, columns, groupBy), data);
@@ -119,16 +119,21 @@ export async function retrieveData(database:string, table:string, userForDb:stri
  * @param { string } table The table to update the data in
  * @param { string[] } columns The columns that are being changed
  * @param { string[] } [data] The data to change to, must be the same length as the columns array
- * @param { string } [predicate] The condition to decide which rows to update
+ * @param { Predicate[] } [conditions] The conditions to decide which rows to update
  * @returns { string } The update SQL statement
  */
-export function createUpdate(table:string, columns:string[], predicate:string, data?:string[]) : string {
+export function createUpdate(table:string, columns:string[], data?:string[], conditions?:Predicate[]) : string {
   const FAILEDMSSG:string = "FAILED";
   let query:string = ""
 
-  let updateVals:string[] = columns.map((element:string, index:number) => `${element} = ${data === undefined ? `$${index + 1}` : `'${data[index]}'`}`);
+  let updateVals:string[] = columns.map((element:string, index:number) => `${element} = $${index + 1}`);
 
-  query = `UPDATE ${table} SET ${updateVals.concat()} WHERE ${predicate} ;`;
+  if (conditions !== undefined && conditions.length > 0) {
+    const conditionStrs = conditions.map((condition, index) => `${condition.column} ${condition.operation} $${index + columns.length + 1}`);
+    query += " WHERE " + conditionStrs.join(" AND ");
+  }
+
+  query = `UPDATE ${table} SET ${updateVals.concat()}${query} ;`;
   query = (data !== undefined && columns.length !== data.length) ? FAILEDMSSG : query;
 
   return query;
@@ -163,13 +168,21 @@ export function createInsert(table:string, columns:string[], returnCols?:string[
  * Creates a simple delete SQL statement
  * @author Adam Logan
  * @param { string } table The table to delete the data from
- * @param { string } [predicate] The condition to delete the data for
+ * @param { Predicate[] } [conditions] The conditions to delete the data for
  * @returns { string } The delete SQL statement
  */
-export function createDelete(table: string, predicate?:string) : string {
-  let query:string = `DELETE FROM ${table}`;
+export function createDelete(table: string, conditions?:Predicate[]) : string {
+  let query:string = `DELETE FROM ${table}`;  
 
-  query = predicate !== undefined ? query + " WHERE " + predicate : query;
+  if (conditions !== undefined && conditions.length > 0) {
+    const conditionStrs = conditions.map((condition, index) => {
+      if (Array.isArray(condition.value)) {
+        return `${condition.column} ${condition.operation} (${condition.value.map((value, index) => `$${index + 1}`).join(", ")})`;
+      }
+      return `${condition.column} ${condition.operation} $${index + 1}`;
+    });
+    query += " WHERE " + conditionStrs.join(" AND ");
+  }
 
   return query;
 }
@@ -180,12 +193,12 @@ export function createDelete(table: string, predicate?:string) : string {
  * @author Adam Logan
  * @param {string} database - The name of the database.
  * @param {string} table - The name of the table from which to fetch the records.
- * @param {string} userForDb - The username for the database connection.
- * @param {string} passForDb - The password for the database connection.
+ * @param {string} [userForDb] - The username for the database connection.
+ * @param {string} [passForDb] - The password for the database connection.
  * 
  * @returns {Promise<{allData:any[]}|string>} A promise that resolves with all records from the specified table or an error message.
  */
-export async function getAll(database:string, table:string, userForDb:string, passForDb:string): Promise<{allData:any[]}|string> {
+export async function getAll(database:string, table:string, userForDb?:string, passForDb?:string): Promise<{allData:any[]}|string> {
   const POOL = createPool(database, userForDb, passForDb);
 
   let results:any;
@@ -244,26 +257,24 @@ export async function insertData(database:string ,table:string, dataToAdd:any, r
  * @param {string} database - Name of the database to update data in.
  * @param {string} table - Name of the table where the data needs to be updated.
  * @param {any} dataToAdd - Object containing the data fields to be updated.
- * @param {string} predicate - Condition for which rows in the table to update.
- * @param {string} [user="postgres"] - Username for the database.
- * @param {string} [password="postgrespq"] - Password for the database.
+ * @param {Predicate[]} conditions - Conditions for which rows in the table to update.
+ * @param {string} [user] - Username for the database.
+ * @param {string} [password] - Password for the database.
  * @returns {Promise<string>} Promise resolving to a success message if the update was successful, or an error message if it wasn't.
  */
-export async function updateData(database:string ,table:string, dataToAdd:any, predicate:string, user="postgres", password="postgrespw"): Promise<string> {  
-  let role = user === "postgres" ? user : `${user}`;
-
+export async function updateData(database:string ,table:string, dataToAdd:any, conditions:Predicate[], user?:string, password?:string): Promise<string> {  
   const data:string[] = Object.values(dataToAdd);
 
   const columns:string[] = Object.keys(dataToAdd);
 
-  const POOL = createPool(database, role, password);
+  const POOL = createPool(database, user, password);
 
-  const sqlStatement:string = createUpdate(table, columns,predicate);
+  const sqlStatement:string = createUpdate(table, columns, data, conditions);
 
   let results:string;
 
   try {
-    await POOL.query(sqlStatement, data);
+    await POOL.query(sqlStatement, [...data, ...conditions.flatMap(condition => condition.value)]);
     results = "Successfully Updated the Data 😊";
   } catch (e:any) {
     results = errorCodeMessage(e.code);
@@ -277,22 +288,24 @@ export async function updateData(database:string ,table:string, dataToAdd:any, p
  * @author Adam Logan
  * @param {string} database - Name of the database to delete data from.
  * @param {string} table - Name of the table where the data needs to be deleted.
- * @param {string} predicate - Condition specifying which rows to delete.
+ * @param {Predicate[]} conditions - Conditions specifying which rows to delete.
  * @param {string} [user="postgres"] - Username for the database.
- * @param {string} [password="postgrespq"] - Password for the database.
+ * @param {string} [password="postgrespw"] - Password for the database.
  * @returns {Promise<string>} Promise resolving to a success message if the deletion was successful, or an error message if it wasn't.
  */
-export async function deleteData(database:string ,table:string, predicate:string, user="postgres", password="postgrespw"): Promise<string> {
+export async function deleteData(database:string ,table:string, conditions:Predicate[], user="postgres", password="postgrespw"): Promise<string> {
   let role = user === "postgres" ? user : `${user}`;
 
   const POOL = createPool(database, role, password);
 
-  const sqlStatement:string = createDelete(table, predicate);
+  const sqlStatement:string = createDelete(table, conditions);
+
+  console.log(sqlStatement);
 
   let results:string;
 
   try {
-    await POOL.query(sqlStatement);
+    await POOL.query(sqlStatement, conditions.flatMap(condition => condition.value));
     results = "Successfully Deleted the Data 😊";
   } catch (e:any) {
     results = errorCodeMessage(e.code);

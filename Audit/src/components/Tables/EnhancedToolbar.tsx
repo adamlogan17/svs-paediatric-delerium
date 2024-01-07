@@ -27,7 +27,7 @@ type EnhancedToolbarProps = {
   header:Headers,
   title:string,
   handleDelete?:() => void,
-  filterData?:any
+  filterData?:(data:Data) => void,
 }
 
 /**
@@ -77,7 +77,7 @@ export default function EnhancedToolbar(props: EnhancedToolbarProps) {
           label="Search"
           variant="outlined"
           onChange={(e) => {
-            const filteredData = props.dataToFilter?.filter((row: { [key: string]: any }) => {
+            const filteredData:any = props.dataToFilter?.filter((row: { [key: string]: any }) => {
               const searchTerm = e.target.value.toLowerCase();
               return Object.values(row).some(value => value.toString().toLowerCase().includes(searchTerm));
             });

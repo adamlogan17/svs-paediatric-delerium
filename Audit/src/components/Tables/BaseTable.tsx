@@ -32,7 +32,7 @@ type BaseTableProps = {
  */
 export default function BaseTable(props: BaseTableProps) {
   // required to keep a store of all of the data, not just that being displayed
-  const [data, setData] = useState<any[]>(props.initialData);
+  const [data] = useState<any[]>(props.initialData);
   // commented out incase of a merge with the EditTable component
   // const [selected, setSelected] = useState<number[]>([]);
   const [filteredData, setFilteredData] = useState<any[]>(props.initialData);
@@ -76,7 +76,7 @@ export default function BaseTable(props: BaseTableProps) {
         title={props.title}
         dataToFilter={data}
         downloadData={filteredData}
-        filterData={setFilteredData}
+        filterData={(filteredData) => { setPage(0); setFilteredData(filteredData); }}
         header={Object.keys(props.columnNameMap ?? data[0]).map((key:string) => ({label: props.columnNameMap?.[key] ?? key, key: key}))}
       />
       <TableContainer>

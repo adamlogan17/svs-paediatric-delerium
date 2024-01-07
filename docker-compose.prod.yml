@@ -22,7 +22,5 @@ services:
       - "48300:80"    
   postgres:
     container_name: prod_svs_postgres
-    environment:
-      POSTGRES_DB: audit
     ports:
       - "48545:5432"

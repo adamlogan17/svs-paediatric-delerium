@@ -1,6 +1,9 @@
 #!/bin/bash
 
 dump_database() {
+    # Performs rolling delete for the log
+    docker exec -it dev_svs_postgres bash -c "PGPASSWORD=postgrespw psql -U postgres -d audit -c \"DELETE FROM api_log WHERE datetime < current_timestamp - interval '30 days';\""
+
     # Get the current day of the month
     day=$(date +%d)
 
@@ -158,6 +161,13 @@ elif [ "$p" ]; then
     echo ""
     
     remove_project_images
+
+    echo "Creating jobs for the database backups..."
+    echo ""
+    create_cron_job
+    echo ""
+    echo "Creatyion complete!"
+    echo ""
     
     echo "Starting PROD containers..."
     echo ""

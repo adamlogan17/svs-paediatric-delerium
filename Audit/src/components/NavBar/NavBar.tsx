@@ -22,7 +22,7 @@ function BasicNavBar(props:{theme:string, toggleMode:Function, backgroundColor:s
 
   return (
     <Container sx={{ display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
-      <ConfirmDialog open={showDialog} title={'Sign Out'} description={<>Would you like to sign out?</>} handleConfirm={signOut} handleClose={() => null}/>
+      <ConfirmDialog open={showDialog} title={'Sign Out'} description={<>Would you like to sign out?</>} handleConfirm={signOut} handleClose={() => setShowDialog(false)}/>
       <Navbar expand="lg" style={{ backgroundColor:props.backgroundColor, color:props.textColor, margin:'auto'}}>
         <Navbar.Brand>
             <img 

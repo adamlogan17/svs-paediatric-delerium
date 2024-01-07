@@ -46,5 +46,7 @@ export async function getLogData(role:string): Promise<{allData:any[]}|string> {
  * @param { EndpointLog } endpointDetails The data to log
  */
 export async function logEndpoint(endpointDetails:EndpointLog):Promise<void> {
-  await insertData(db, tableName, endpointDetails);
+  if(endpointDetails.method !== "OPTIONS") {
+    await insertData(db, tableName, endpointDetails);
+  }
 }

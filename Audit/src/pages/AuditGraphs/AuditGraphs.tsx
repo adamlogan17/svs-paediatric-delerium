@@ -9,14 +9,13 @@ import { Autocomplete, Box, TextField } from "@mui/material";
 import axios from "axios";
 import LineGraph from "../../components/LineGraph/LineGraph";
 import BarChart from '../../components/BarChart/BarChart';
-import PieChart from '../../components/PieChart/PieChart';
 
 import dayjs, { Dayjs } from 'dayjs';
 import isSameOrBefore from 'dayjs/plugin/isSameOrBefore';
 import isSameOrAfter from 'dayjs/plugin/isSameOrAfter';
 
 import { enqueueSnackbar } from 'notistack';
-import ValidaterDatePicker from '../../components/ValidaterDatePicker/ValidaterDatePicker';
+import ValidatorDatePicker from '../../components/ValidatorDatePicker/ValidatorDatePicker';
 
 
 dayjs.extend(isSameOrBefore);
@@ -156,10 +155,6 @@ const allChartTypes:LabelValuePair[] = [
   {
     label: "Bar Chart",
     value: "bar",
-  },
-  {
-    label: "Pie Chart",
-    value: "pie",
   }
 ];
 
@@ -324,7 +319,7 @@ function AuditGraphs() {
             margin: 'auto', 
             display: 'flex'
           }}>
-            <ValidaterDatePicker 
+            <ValidatorDatePicker 
               dateFormat={dateFormat} 
               startDate={new Date(Date.UTC(2015, 0, 1))}
               sx={splitDropdownStyles}
@@ -335,7 +330,7 @@ function AuditGraphs() {
               }}
             />
 
-            <ValidaterDatePicker 
+            <ValidatorDatePicker 
               dateFormat={dateFormat} 
               startDate={new Date()}
               sx={splitDropdownStyles}
@@ -351,7 +346,6 @@ function AuditGraphs() {
       <div id='graphContainer'>
         {chartType.value === 'line' && (<LineGraph chartData={chartData} title={dataType.label} convertXToNumber={dataType.convertXToNums} xAxisLabel={dataType.xAxisLabel} yAxisLabel={dataType.yAxisLabel} />)}
         {chartType.value === 'bar' && (<BarChart chartData={chartData} title={dataType.label} convertXToNumber={dataType.convertXToNums} xAxisLabel={dataType.xAxisLabel} yAxisLabel={dataType.yAxisLabel} />)}
-        {chartType.value === 'pie' && (<PieChart chartData={chartData} title={dataType.label} />)}
       </div>
 
       <br />

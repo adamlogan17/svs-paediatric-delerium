@@ -91,11 +91,11 @@ export async function editCompliance(dataToEdit:ComplianceData, role:string): Pr
  * @returns {Promise<string>} A message indicating the success or failure of the deletion.
  */
 export async function deleteCompRecords(ids:number[], role:string): Promise<string> {
-  const condition:any = {
+  const condition:any[] = [{
     column: "comp_id",
     operation: "IN",
-    value: `(${ids.join()})`
-  };
+    value: ids
+  }];
   return await deleteData(db, tableName, condition, role, dbPassword);
 }
 

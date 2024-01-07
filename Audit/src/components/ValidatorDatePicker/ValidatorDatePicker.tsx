@@ -10,13 +10,13 @@ import { SxProps, useTheme } from "@mui/material";
  * 
  * @author Adam Logan
  * 
- * @typedef {Object} ValidaterDatePickerProps
+ * @typedef {Object} ValidatorDatePickerProps
  * @property {string} dateFormat - The format of the date.
  * @property {(newDate:Date) => boolean} [onChange] - The function to call when the date changes.
  * @property {Date} startDate - The initial date.
  * @property {SxProps} [sx] - The styles to apply to the DatePicker.
  */
-type ValidaterDatePickerProps = {
+type ValidatorDatePickerProps = {
   dateFormat:string,
   onChange?:(newDate:Date) => boolean,
   startDate:Date,
@@ -28,10 +28,10 @@ type ValidaterDatePickerProps = {
  * 
  * @author Adam Logan
  * 
- * @param {ValidaterDatePickerProps} props - The props of the ValidaterDatePicker component.
- * @returns {JSX.Element} The ValidaterDatePicker component.
+ * @param {ValidatorDatePickerProps} props - The props of the ValidatorDatePicker component.
+ * @returns {JSX.Element} The ValidatorDatePicker component.
  */
-export default function ValidaterDatePicker(props:ValidaterDatePickerProps) {
+export default function ValidatorDatePicker(props:ValidatorDatePickerProps) {
   const theme = useTheme();
   const [error, setError] = useState<boolean>(false);
 

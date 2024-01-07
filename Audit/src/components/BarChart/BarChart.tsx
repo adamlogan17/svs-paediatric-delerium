@@ -15,6 +15,7 @@ function BarChart(props:ChartProps) {
   const barColor = props.chartColor ?? theme.palette.primary.main;
   const textColor = props.textColor ?? theme.palette.text.primary;
   const gridColor = props.gridColor ?? theme.palette.divider;
+  const trendLineColor = theme.palette.secondary.main;
 
   const barRef = useRef(null);
 
@@ -41,7 +42,7 @@ function BarChart(props:ChartProps) {
             },
             {
               type: 'line',
-              borderColor: xValuesAsNum[0] !== undefined ? alpha(barColor, 0.5) : alpha(barColor, 0.0),
+              borderColor: xValuesAsNum[0] !== undefined ? alpha(trendLineColor, 0.5) : alpha(trendLineColor, 0.0),
               data: xValuesAsNum.map(x => trendline.m * (x ?? -1) + trendline.b)
             }
           ]

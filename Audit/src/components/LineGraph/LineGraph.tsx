@@ -18,6 +18,7 @@ function LineGraph(props:ChartProps) {
   const lineColor = props.chartColor ?? theme.palette.primary.main;
   const textColor = props.textColor ?? theme.palette.text.primary;
   const gridColor = props.gridColor ?? theme.palette.divider;
+  const trendLineColor = theme.palette.secondary.main;
 
   const lineRef = useRef(null);
 
@@ -49,7 +50,7 @@ function LineGraph(props:ChartProps) {
             },
             {
               pointRadius: 1,
-              borderColor: xValuesAsNum[0] !== undefined ? alpha(lineColor, 0.5) : alpha(lineColor, 0.0),
+              borderColor: xValuesAsNum[0] !== undefined ? alpha(trendLineColor, 0.5) : alpha(trendLineColor, 0.0),
               data: xValuesAsNum.map(x => trendline.m * (x ?? -1) + trendline.b),
               tension: 0.5
             }

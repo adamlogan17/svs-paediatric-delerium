@@ -34,6 +34,9 @@ type ValidatorDatePickerProps = {
 export default function ValidatorDatePicker(props:ValidatorDatePickerProps) {
   const theme = useTheme();
   const [error, setError] = useState<boolean>(false);
+  const [date, setDate] = useState<Date>(props.startDate);
+
+  const mainColor = error ? theme.palette.error.main : undefined;
 
   return (
     <LocalizationProvider dateAdapter={AdapterDayjs}>
@@ -41,23 +44,26 @@ export default function ValidatorDatePicker(props:ValidatorDatePickerProps) {
         sx={{
           ...props.sx,
           '& .MuiInputBase-input': {
-            color: error ? theme.palette.error.main : undefined,
+            color: mainColor,
           },
           '& .MuiOutlinedInput-root': {
             '& fieldset': {
-              borderColor: error ? theme.palette.error.main : undefined,
+              borderColor: mainColor,
             },
             '&:hover fieldset': {
-              borderColor: error ? theme.palette.error.main : undefined,
+              borderColor: mainColor,
             },
             '&.Mui-focused fieldset': {
-              borderColor: error ? theme.palette.error.main : undefined,
+              borderColor: mainColor,
             },
           },
         }}
-        value={dayjs(props.startDate)} 
+        value={dayjs(date)} 
         format={props.dateFormat}
-        onChange={(newDate:any) => { if(props.onChange) setError(!props.onChange(newDate)); }}
+        onChange={(newDate:any) => { 
+          setDate(newDate);
+          if(props.onChange) setError(!props.onChange(newDate)); 
+        }}
       />
     </LocalizationProvider>
   );

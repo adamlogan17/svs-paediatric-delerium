@@ -11,12 +11,18 @@ const lightTheme:PaletteOptions = {
   mode: 'light',
   primary: {
     main: '#009999'
-  }
+  },
+  secondary: {
+    main: '#009999'
+  },
 }
 
 const darkTheme:PaletteOptions = {
   mode: 'dark',
   primary: {
+    main: '#009999'
+  },
+  secondary: {
     main: '#009999'
   },
   background: {
@@ -28,6 +34,9 @@ const darkTheme:PaletteOptions = {
 const contrastTheme:PaletteOptions = {
   mode: 'dark',
   primary: {
+    main: '#FFFF00'
+  },
+  secondary: {
     main: '#FFFF00'
   },
   text: {

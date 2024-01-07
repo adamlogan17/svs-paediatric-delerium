@@ -202,12 +202,10 @@ function AuditGraphs() {
   const [windowSize, setWindowSize] = useState(20);
 
   const specificPicuNeeded:boolean = dataType.value === 'picu' && sessionStorage.getItem("ROLE") === 'admin';
-
-  const downSampleLimit = 30;
   
   // Define the window size ranges and screen width ranges for down sampling window size
   const minWindowSize = 40;
-  const maxWindowSize = 20;
+  const maxWindowSize = 10;
   const minScreenWidth = 480; // Minimum screen width (e.g., mobile)
   const maxScreenWidth = 1920; // Maximum screen width (e.g., desktop)
 
@@ -244,11 +242,16 @@ function AuditGraphs() {
       try {
         let newCompData = await dataType.getData(picuId);
         newCompData = dataType.filter ? dataType.filter(newCompData, start, end) : newCompData;
-        const dataFitValue = Math.floor(newCompData.xValues.length / downSampleLimit);
+        console.log("array", newCompData.xValues.length);
+        console.log("window", windowSize);
+        const dataFitValue = Math.floor(newCompData.xValues.length / windowSize);
+        let downSampleWindowSize = windowSize;
         if(dataFitValue >= 0) {
-          newCompData = dataType.downSample ? dataType.downSample(newCompData, windowSize) : newCompData;
+          if (dataFitValue < maxWindowSize) {
+            downSampleWindowSize = maxWindowSize;
+          }
+          newCompData = dataType.downSample ? dataType.downSample(newCompData, downSampleWindowSize) : newCompData;
         }
-        console.log(newCompData);
         setChartData(newCompData);
       } catch (error) {
         enqueueSnackbar("System Error", { variant: 'error' });

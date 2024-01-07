@@ -23,4 +23,4 @@ services:
   postgres:
     container_name: prod_svs_postgres
     ports:
-      - "48544:5432"
+      - "48545:5432"

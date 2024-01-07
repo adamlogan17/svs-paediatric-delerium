@@ -11,6 +11,8 @@ RUN apt-get update && \
 
 RUN apt-get update && apt-get install -y bash
 
+RUN apt-get update && apt-get install -y postgresql-client
+
 WORKDIR /app
 
 COPY package*.json ./

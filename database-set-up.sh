@@ -1,6 +1,4 @@
-﻿#!/bin/bash
-
-dbs=(test_database audit elearning backup)
+﻿dbs=(test_database audit elearning backup)
 
 for db in "${dbs[@]}"; do 
     psql -U postgres -c "CREATE DATABASE ${db};"

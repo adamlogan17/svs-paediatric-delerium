@@ -1,4 +1,4 @@
-﻿#!/bin/bash
+﻿#!/bin/sh
 
 dbs=(test_database audit elearning backup)
 

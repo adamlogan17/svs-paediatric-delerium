@@ -4,7 +4,11 @@ import { createSelect, createInsert, createUpdate, createDelete} from '../src/cr
 describe('testCreateSelect (Tests the select query on the database, database with default columns and database with default columns and no condition', () => {
   it('returns a valid SELECT query for a given table', () => {
     const table = 'users';
-    const condition = 'age > 18';
+    const condition:any[] = [{
+      column: 'age',
+      operator: '>',
+      value: 18
+    }];
     const data = ['id', 'name'];
 
     const query = createSelect(table, condition, data);
@@ -14,7 +18,11 @@ describe('testCreateSelect (Tests the select query on the database, database wit
 
   it('returns a SELECT query for a given table with default columns', () => {
     const table = 'users';
-    const condition = 'age > 18';
+    const condition:any[] = [{
+      column: 'age',
+      operator: '>',
+      value: 18
+    }];
 
     const query = createSelect(table, condition);
 
@@ -99,7 +107,11 @@ describe('testCreateDelete (valid delete query and one with a predicate)', () =>
 
   it('should generate a delete query with a predicate', () => {
     const table = 'users';
-    const predicate = 'id = 123';
+    const predicate:any[] = [{
+      column: 'id',
+      operator: '=',
+      value: 123
+    }]
     const expectedQuery = 'DELETE FROM users WHERE id = 123';
 
     const actualQuery = createDelete(table, predicate);

@@ -107,18 +107,20 @@ while [[ $# -gt 0 ]]; do
     esac
 done
 
-docker-compose down
+if [ -z "$d" ]; then
+    docker-compose down
 
-# Ensures the 'database-set-up.sh' file is in the correct format
-# vi database-set-up.sh<<EOF
-# :set ff=unix
-# :wq
-# EOF
+    # Ensures the 'database-set-up.sh' file is in the correct format
+    # vi database-set-up.sh<<EOF
+    # :set ff=unix
+    # :wq
+    # EOF
 
-# The below effictively does the same as the above, but without the need for vi
-tr -d '\r' < database-set-up.sh > temp-file
-mv temp-file database-set-up.sh
-rm temp-file
+    # The below effictively does the same as the above, but without the need for vi
+    tr -d '\r' < database-set-up.sh > temp-file
+    mv temp-file database-set-up.sh
+    rm temp-file
+fi
 
 if [ "$c" ] || [ "$n" ]; then
     # Remove the postgres server volume
@@ -160,7 +162,19 @@ elif [ "$p" ]; then
     echo "Remove complete!"
     echo ""
     
-    remove_project_images
+    echo ""
+    echo "Remove complete!..."
+    echo ""
+
+    echo "Removing svs images..."
+    echo ""
+
+    docker rmi $(docker images -a svs-paediatric-delerium-audit -q)
+    docker rmi $(docker images -a svs-paediatric-delerium-apis -q)
+
+    echo ""
+    echo "Remove complete!..."
+    echo ""
 
     echo "Creating jobs for the database backups..."
     echo ""

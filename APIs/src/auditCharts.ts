@@ -107,7 +107,7 @@ export async function sinlgeDataPointAllPicu(role:string, dataPoint:possibleData
  * @param { any[] } array The array to be shuffled
  * @returns { any[] } The shuffled array
  */
-function shuffleArray(array:any[]): any[] {
+export function shuffleArray(array:any[]): any[] {
     for (let i:number = array.length - 1; i > 0; i--) {
         const j:number = Math.floor(Math.random() * (i + 1));
         const temp:any = array[i];

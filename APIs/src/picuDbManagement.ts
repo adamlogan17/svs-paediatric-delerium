@@ -20,7 +20,7 @@ const tableName:string = 'picu';
  * @property {number|null} [overall_compliance] - Optional overall compliance score for the PICU, which is calculated within the database.
  * @property {number|null} [delirium_positive_patients] - Optional average of the number of patients that are delirium positive
  */
-type Picu = {
+export type Picu = {
   hospital_name:string, 
   auditor:string, 
   picu_role:'picu'|'admin'|'field_engineer',
@@ -30,6 +30,7 @@ type Picu = {
   overall_compliance?:number,
   delirium_positive_patients?:number|null
 }
+export const Types = {}
 
 /**
  * Updates a PICU record in the database.
@@ -40,6 +41,7 @@ type Picu = {
  * @param {string} role - The role for which the database pool will be created. 
  * @returns {Promise<string>} - A message indicating the success or failure of the update.
  */
+
 export async function editPicu(dataToEdit:Picu, role:string): Promise<string> {
   for (const [key, value] of Object.entries(dataToEdit)) {
     if (key === 'password') {

@@ -27,7 +27,7 @@ const tableName = "compliance_data";
  * @property {number} [score] - Optional score, if applicable.
  * @property {number} picu_id - Identifier for the PICU associated with the record.
  */
-type ComplianceData = {
+export type ComplianceData = {
   comp_id?: number,
   entry_date?: Date,
   method: 'SOSPD' | 'CAPD',

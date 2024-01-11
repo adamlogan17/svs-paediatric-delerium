@@ -203,7 +203,6 @@ describe('Picu Functions', () => {
       expect(require('../src/crud').updateData).toHaveBeenCalledWith(db, 'picu', dataToEdit, `picu_id = 1`, role, dbPassword);
     });
 
-    // Add more test cases for different scenarios
   });
 
   //---------------------------------------------------------------------------------------------------------------------------------------

@@ -1,5 +1,5 @@
 import { describe, expect, test } from '@jest/globals';
-import { authenticate, authorise, hashPassword, updatePicuPassword, verifyCaptcha, logData } from '../src/login';
+import { authenticate, authorise, hashPassword, updatePicuPassword, verifyCaptcha } from '../src/login';
 import { Request, Response, NextFunction } from 'express';
 import * as crud from '../src/crud';
 import jwt, { JwtPayload } from 'jsonwebtoken';

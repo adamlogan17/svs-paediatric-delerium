@@ -1,4 +1,4 @@
-#!bin/bash
+﻿#!bin/bash
 dbs=(test_database audit elearning backup)
 
 echo "Creating databases..."

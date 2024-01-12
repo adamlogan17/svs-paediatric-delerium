@@ -97,7 +97,7 @@ app.use((request:Request, response:Response, next:NextFunction) => {
       method: request.method,
       endpoint: request.originalUrl,
       status_code: response.statusCode,
-      user_ip: request.ip,
+      user_ip: request.ip === undefined ? 'undefined' : request.ip,
       user_agent: request.headers['user-agent'] || '',
       username: request.params.username,
       user_role: request.params.role
